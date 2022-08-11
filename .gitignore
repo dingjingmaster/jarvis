@@ -1,3 +1,5 @@
+build-*
+cmake-build-*
 # Prerequisites
 *.d
 
@@ -30,3 +32,8 @@
 *.exe
 *.out
 *.app
+.idea/.gitignore
+.idea/Jarvis.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
