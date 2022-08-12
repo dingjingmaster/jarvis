@@ -19,3 +19,10 @@ target_link_libraries(test-c-poll
         PUBLIC
         ${OPENSSL_LIBRARIES})
 gtest_discover_tests(test-c-poll)
+
+add_executable(test-msg-queue ${CMAKE_SOURCE_DIR}/test/test-msg-queue.cpp ${CORE_SRC})
+target_link_libraries(test-msg-queue
+        PRIVATE ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} ${GMOCK_LIBRARIES}
+        PUBLIC
+        ${OPENSSL_LIBRARIES})
+gtest_discover_tests(test-msg-queue)
