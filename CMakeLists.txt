@@ -12,7 +12,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-
 if(DEBUG)
     add_definitions(-g)
 else()
@@ -23,6 +22,7 @@ endif()
 find_package (PkgConfig)
 
 pkg_check_modules(GIO REQUIRED gio-2.0)
+pkg_check_modules(OPENSSL REQUIRED openssl)
 
 enable_testing()
 set_tests_properties(${noArgsTests} PROPERTIES TIMEOUT 1000)
