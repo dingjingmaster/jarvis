@@ -4,6 +4,8 @@
 
 #ifndef JARVIS_M_POLL_H
 #define JARVIS_M_POLL_H
+#include "c-poll.h"
+
 #ifdef __cplusplus
 extern "C"
 {

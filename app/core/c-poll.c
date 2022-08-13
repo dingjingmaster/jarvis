@@ -358,7 +358,7 @@ static void _poll_handle_read(CPollNode *node, CPoll *poll)
 
 static void _poll_handle_write(CPollNode *node, CPoll *poll)
 {
-    struct iovec *iov = node->data.writeIOV;
+    struct iovec *iov = node->data.writeIov;
     size_t count = 0;
     ssize_t nleft;
     int iovcnt;
@@ -411,9 +411,8 @@ static void _poll_handle_write(CPollNode *node, CPoll *poll)
         } while (node->data.iovec > 0);
     }
 
-    node->data.writeIOV = iov;
-    if (node->data.iovec > 0 && ret >= 0)
-    {
+    node->data.writeIov = iov;
+    if (node->data.iovec > 0 && ret >= 0) {
         if (count == 0)
             return;
 
@@ -424,13 +423,10 @@ static void _poll_handle_write(CPollNode *node, CPoll *poll)
     if (_poll_remove_node(node, poll))
         return;
 
-    if (node->data.iovec == 0)
-    {
+    if (node->data.iovec == 0) {
         node->error = 0;
         node->state = PR_ST_FINISHED;
-    }
-    else
-    {
+    } else {
         node->error = errno;
         node->state = PR_ST_ERROR;
     }

@@ -47,3 +47,10 @@ target_link_libraries(test-executor
         PUBLIC
         ${OPENSSL_LIBRARIES})
 gtest_discover_tests(test-executor)
+
+add_executable(test-all ${CMAKE_SOURCE_DIR}/test/test-all.cpp ${CORE_SRC})
+target_link_libraries(test-all
+        PRIVATE ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} ${GMOCK_LIBRARIES}
+        PUBLIC
+        ${OPENSSL_LIBRARIES})
+gtest_discover_tests(test-all)

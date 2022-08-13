@@ -56,7 +56,7 @@ struct _CPollData
 
     union {
         CPollMessage*           message;
-        struct iovec*           writeIOV;
+        struct iovec*           writeIov;
         void*                   result;
     };
 };

@@ -46,7 +46,7 @@ MPoll* m_poll_create(const CPollParams* params, size_t nthreads)
     if (nthreads == 0)
         nthreads = 1;
 
-    size = offsetof(MPoll, poller) + nthreads * sizeof (void *);
+    size = offsetof(MPoll, poll) + nthreads * sizeof (void *);
     poll = (MPoll*)malloc(size);
     if (poll) {
         poll->nThreads = (unsigned int)nthreads;
