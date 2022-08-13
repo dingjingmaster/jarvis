@@ -19,12 +19,11 @@ struct _ThreadPoolTask
     void* context;
 };
 
-thrdpool_t *thrdpool_create(size_t nthreads, size_t stacksize);
-int thrdpool_schedule(const struct thrdpool_task *task, thrdpool_t *pool);
-int thrdpool_increase(thrdpool_t *pool);
-int thrdpool_in_pool(thrdpool_t *pool);
-void thrdpool_destroy(void (*pending)(const struct thrdpool_task *),
-                      thrdpool_t *pool);
+ThreadPool* thread_pool_create (size_t nThreads, size_t stackSize);
+int thread_pool_schedule (const ThreadPoolTask * task, ThreadPool *pool);
+int thread_pool_increase(ThreadPool *pool);
+int thread_pool_in_pool(ThreadPool *pool);
+void thread_pool_destroy(void (*pending)(const ThreadPoolTask *), ThreadPool *pool);
 
 #ifdef __cplusplus
 };
