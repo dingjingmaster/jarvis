@@ -40,3 +40,10 @@ target_link_libraries(test-sub-task
         PUBLIC
         ${OPENSSL_LIBRARIES})
 gtest_discover_tests(test-sub-task)
+
+add_executable(test-executor ${CMAKE_SOURCE_DIR}/test/test-executor.cpp ${CORE_SRC})
+target_link_libraries(test-executor
+        PRIVATE ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} ${GMOCK_LIBRARIES}
+        PUBLIC
+        ${OPENSSL_LIBRARIES})
+gtest_discover_tests(test-executor)

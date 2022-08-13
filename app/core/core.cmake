@@ -16,4 +16,7 @@ file(GLOB CORE_SRC
 
         ${CMAKE_SOURCE_DIR}/app/core/sub-task.h
         ${CMAKE_SOURCE_DIR}/app/core/sub-task.cpp
+
+        ${CMAKE_SOURCE_DIR}/app/core/executor.h
+        ${CMAKE_SOURCE_DIR}/app/core/executor.cpp
 )
