@@ -12,4 +12,8 @@ file(GLOB CORE_SRC
 
         ${CMAKE_SOURCE_DIR}/app/core/thread-pool.c
         ${CMAKE_SOURCE_DIR}/app/core/thread-pool.h
+
+
+        ${CMAKE_SOURCE_DIR}/app/core/sub-task.h
+        ${CMAKE_SOURCE_DIR}/app/core/sub-task.cpp
 )
