@@ -1,7 +1,7 @@
 project(test LANGUAGES CXX)
 
 include(../app/core/core.cmake)
-
+include(../app/protocol/protocol.cmake)
 
 find_package(GTest)
 pkg_check_modules(GTEST REQUIRED gtest)
@@ -54,3 +54,11 @@ target_link_libraries(test-all
         PUBLIC
         ${OPENSSL_LIBRARIES})
 gtest_discover_tests(test-all)
+
+
+add_executable(test-protocol ${CMAKE_SOURCE_DIR}/test/test-protocol.cpp ${PROTOCOL_SRC})
+target_link_libraries(test-protocol
+        PRIVATE ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} ${GMOCK_LIBRARIES}
+        PUBLIC
+        ${OPENSSL_LIBRARIES})
+gtest_discover_tests(test-protocol)
