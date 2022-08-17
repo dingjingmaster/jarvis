@@ -18,9 +18,9 @@
 #include "../core/io-request.h"
 #include "../core/exec-request.h"
 #include "../core/communicator.h"
+#include "../core/sleep-request.h"
 #include "../core/common-request.h"
 #include "../core/common-scheduler.h"
-#include "../core/sleep-request.h"
 
 enum
 {
