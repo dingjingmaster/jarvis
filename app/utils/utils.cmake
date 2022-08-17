@@ -13,4 +13,7 @@ file(GLOB UTILS_SRC
 
         ${CMAKE_SOURCE_DIR}/app/utils/crc32c.h
         ${CMAKE_SOURCE_DIR}/app/utils/crc32c.c
+
+        ${CMAKE_SOURCE_DIR}/app/utils/json-parser.h
+        ${CMAKE_SOURCE_DIR}/app/utils/json-parser.c
 )
