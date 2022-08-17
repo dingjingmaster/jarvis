@@ -7,11 +7,6 @@
 #include <stddef.h>
 #include "../../core/c-list.h"
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #define HTTP_HEADER_NAME_MAX            64
 
 typedef struct _HttpParser              HttpParser;
@@ -58,11 +53,9 @@ extern "C"
 
 void http_parser_init(int is_resp, HttpParser *parser);
 
-int http_parser_append_message(const void *buf, size_t *n,
-                               HttpParser *parser);
+int http_parser_append_message(const void *buf, size_t *n, HttpParser *parser);
 
-int http_parser_get_body(const void **body, size_t *size,
-                         const HttpParser *parser);
+int http_parser_get_body(const void **body, size_t *size, const HttpParser *parser);
 
 int http_parser_header_complete(const HttpParser *parser);
 
@@ -160,7 +153,4 @@ static inline void http_header_cursor_deinit(HttpHeaderCursor *cursor)
 {
 }
 
-#ifdef __cplusplus
-}
-#endif
 #endif //JARVIS_HTTP_PARSER_H
