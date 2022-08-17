@@ -7,4 +7,7 @@ file(GLOB UTILS_SRC
 
         ${CMAKE_SOURCE_DIR}/app/utils/encode-stream.h
         ${CMAKE_SOURCE_DIR}/app/utils/encode-stream.cpp
+
+        ${CMAKE_SOURCE_DIR}/app/utils/md5-util.h
+        ${CMAKE_SOURCE_DIR}/app/utils/md5-util.cpp
 )
