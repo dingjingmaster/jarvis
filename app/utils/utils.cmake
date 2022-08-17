@@ -10,4 +10,7 @@ file(GLOB UTILS_SRC
 
         ${CMAKE_SOURCE_DIR}/app/utils/md5-util.h
         ${CMAKE_SOURCE_DIR}/app/utils/md5-util.cpp
+
+        ${CMAKE_SOURCE_DIR}/app/utils/crc32c.h
+        ${CMAKE_SOURCE_DIR}/app/utils/crc32c.c
 )
