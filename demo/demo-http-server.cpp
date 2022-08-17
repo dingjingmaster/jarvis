@@ -7,6 +7,7 @@
 #include "../app/utils/lru-cache.h"
 #include "../app/utils/string-util.h"
 #include "../app/factory/task-factory.h"
+#include "../app/algorithm/dns-routine.h"
 
 int main (int argc, char* argv[])
 {
