@@ -12,7 +12,8 @@
 #include "communicator.h"
 #include "common-scheduler.h"
 
-class CommonRequest : public SubTask, public CommSession {
+class CommonRequest : public SubTask, public CommSession
+{
 public:
     CommonRequest(CommSchedObject *object, CommScheduler *scheduler)
     {

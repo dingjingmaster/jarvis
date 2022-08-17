@@ -29,4 +29,5 @@ set_tests_properties(${noArgsTests} PROPERTIES TIMEOUT 1000)
 set_tests_properties(${withArgsTests} PROPERTIES TIMEOUT 20000)
 
 #add_subdirectory(app)
+add_subdirectory(demo)
 add_subdirectory(test)

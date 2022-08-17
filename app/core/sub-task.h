@@ -22,21 +22,21 @@ protected:
     void subTaskDone();
 
 public:
-    ParallelTask* getParentTask() const { return this->parent; }
-    void* getPointer() const { return this->pointer; }
-    void setPointer(void *pointer) { this->pointer = pointer; }
+    ParallelTask* getParentTask() const { return mParent; }
+    void* getPointer() const { return mPointer; }
+    void setPointer(void *pointer) { mPointer = pointer; }
 
 private:
-    SubTask**               entry;
-    ParallelTask*           parent;
-    void*                   pointer;
+    SubTask**               mEntry;
+    ParallelTask*           mParent;
+    void*                   mPointer;
 
 public:
     SubTask()
     {
-        this->parent = NULL;
-        this->entry = NULL;
-        this->pointer = NULL;
+        mParent = NULL;
+        mEntry = NULL;
+        mPointer = NULL;
     }
 
     virtual ~SubTask() { }
@@ -49,31 +49,31 @@ class ParallelTask : public SubTask
 public:
     ParallelTask (SubTask** subTasks, size_t n)
     {
-        this->subTasks = subTasks;
-        this->subTasksNR = n;
+        this->mSubTasks = subTasks;
+        this->mSubTasksNR = n;
     }
 
     SubTask** getSubTasks(size_t *n) const
     {
-        *n = this->subTasksNR;
-        return this->subTasks;
+        *n = this->mSubTasksNR;
+        return this->mSubTasks;
     }
 
     void setSubTasks(SubTask** subTasks, size_t n)
     {
-        this->subTasks = subTasks;
-        this->subTasksNR = n;
+        this->mSubTasks = subTasks;
+        this->mSubTasksNR = n;
     }
 
 public:
     virtual void dispatch();
 
 protected:
-    SubTask**           subTasks;
-    size_t              subTasksNR;
+    SubTask**           mSubTasks;
+    size_t              mSubTasksNR;
 
 private:
-    size_t              nLeft;
+    size_t              mLeft;
 };
 
 #endif //JARVIS_SUB_TASK_H

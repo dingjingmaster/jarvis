@@ -12,18 +12,18 @@ void SubTask::subTaskDone()
     SubTask **entry;
 
     while (1) {
-        parent = cur->parent;
-        entry = cur->entry;
+        parent = cur->mParent;
+        entry = cur->mEntry;
         cur = cur->done();
         if (cur) {
-            cur->parent = parent;
-            cur->entry = entry;
+            cur->mParent = parent;
+            cur->mEntry = entry;
             if (parent) {
                 *entry = cur;
             }
             cur->dispatch();
         } else if (parent) {
-            if (__sync_sub_and_fetch(&parent->nLeft, 1) == 0) {
+            if (__sync_sub_and_fetch(&parent->mLeft, 1) == 0) {
                 cur = parent;
                 continue;
             }
@@ -34,14 +34,14 @@ void SubTask::subTaskDone()
 
 void ParallelTask::dispatch()
 {
-    SubTask** end = this->subTasks + this->subTasksNR;
-    SubTask** p = this->subTasks;
+    SubTask** end = mSubTasks + mSubTasksNR;
+    SubTask** p = mSubTasks;
 
-    this->nLeft = this->subTasksNR;
-    if (this->nLeft != 0) {
+    mLeft = mSubTasksNR;
+    if (mLeft != 0) {
         do {
-            (*p)->parent = this;
-            (*p)->entry = p;
+            (*p)->mParent = this;
+            (*p)->mEntry = p;
             (*p)->dispatch();
         } while (++p != end);
     } else {
