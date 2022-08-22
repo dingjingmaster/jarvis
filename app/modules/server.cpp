@@ -151,7 +151,7 @@ int ServerBase::start(const struct sockaddr *bind_addr, socklen_t addrLen, const
         if (mScheduler->bind(this) >= 0)
             return 0;
 
-        ssl_ctx = get_server_ssl_ctx();
+        ssl_ctx = getSSLCtx();
         deInit();
         if (ssl_ctx)
             SSL_CTX_free(ssl_ctx);

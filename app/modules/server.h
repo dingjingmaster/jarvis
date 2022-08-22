@@ -168,6 +168,8 @@ private:
     std::condition_variable                 mCond;
 
     class CommScheduler*                    mScheduler;
+
+    int start(const sockaddr *bind_addr, socklen_t addrLen, const char *cert_file, const char *key_file);
 };
 
 template<class REQ, class RESP>

@@ -15,6 +15,34 @@
 using HttpProcess = std::function<void(HttpTask*)>;
 using HttpServer = Server<protocol::HttpRequest, protocol::HttpResponse>;
 
+static constexpr ServerParams HTTP_SERVER_PARAMS_DEFAULT =
+        {
+                .maxConnections         =   2000,
+                .peerResponseTimeout    =   10 * 1000,
+                .receiveTimeout         =   -1,
+                .keepAliveTimeout       =   60 * 1000,
+                .requestSizeLimit       =   (size_t)-1,
+                .sslAcceptTimeout       =   10 * 1000,
+        };
+
+template<>
+inline HttpServer::Server(HttpProcess proc)
+    : ServerBase(&HTTP_SERVER_PARAMS_DEFAULT), mProcess(std::move(proc))
+{
+}
+
+template<>
+inline CommSession *HttpServer::newSession(long long seq, CommConnection *conn)
+{
+    HttpTask *task;
+
+    task = ServerTaskFactory::create_http_task(this, mProcess);
+    task->setKeepAlive(mParams.keepAliveTimeout);
+    task->setReceiveTimeout(mParams.receiveTimeout);
+    task->getReq()->setSizeLimit(mParams.requestSizeLimit);
+
+    return task;
+}
 
 
 #endif //JARVIS_HTTP_SERVER_H

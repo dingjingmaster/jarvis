@@ -16,11 +16,12 @@
 
 #include "../protocol/http/http-message.h"
 
+#include "../manager/endpoint-params.h"
+
 //#include "RedisMessage.h"
 //#include "MySQLMessage.h"
 //#include "DnsMessage.h"
 //#include "GraphTask.h"
-//#include "EndpointParams.h"
 //#include "AlgoTaskFactory.h"
 
 
@@ -228,7 +229,7 @@ public:
 };
 
 template<class INPUT, class OUTPUT>
-class WFThreadTaskFactory
+class ThreadTaskFactory
 {
 private:
     using T = ThreadTask<INPUT, OUTPUT>;

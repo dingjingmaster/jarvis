@@ -15,11 +15,11 @@
 
 #include "dns-cache.h"
 #include "route-manager.h"
-#include "core/executor.h"
-#include "core/common-scheduler.h"
+#include "../core/executor.h"
+#include "../core/common-scheduler.h"
 #include "endpoint-params.h"
 #include "resource-pool.h"
-#include "name-service.h"
+#include "../nameservice/name-service.h"
 #include "dns-resolver.h"
 #include "endpoint-params.h"
 
