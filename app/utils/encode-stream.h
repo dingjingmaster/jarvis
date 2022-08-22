@@ -88,26 +88,26 @@ private:
 
 static inline EncodeStream& operator << (EncodeStream& stream, const char *data)
 {
-    stream.append_nocopy(data, strlen(data));
+    stream.appendNoCopy(data, strlen(data));
 
     return stream;
 }
 
 static inline EncodeStream& operator << (EncodeStream& stream, const std::string& data)
 {
-    stream.append_nocopy(data.c_str(), data.size());
+    stream.appendNoCopy(data.c_str(), data.size());
     return stream;
 }
 
 static inline EncodeStream& operator << (EncodeStream& stream, const std::pair<const char *, size_t>& data)
 {
-    stream.append_nocopy(data.first, data.second);
+    stream.appendNoCopy(data.first, data.second);
     return stream;
 }
 
 static inline EncodeStream& operator << (EncodeStream& stream, int64_t intV)
 {
-    stream.append_copy(std::to_string(intV));
+    stream.appendCopy(std::to_string(intV));
     return stream;
 }
 

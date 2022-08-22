@@ -20,7 +20,7 @@ class ParsedURI
 {
 public:
     ParsedURI() { init(); }
-    virtual ~ParsedURI() { deinit(); }
+    virtual ~ParsedURI() { deInit(); }
 
     //copy constructor
     ParsedURI(const ParsedURI& uri) { copy(uri); }
@@ -28,7 +28,7 @@ public:
     ParsedURI& operator= (const ParsedURI& uri)
     {
         if (this != &uri) {
-            deinit();
+            deInit();
             copy(uri);
         }
 
@@ -44,7 +44,7 @@ private:
     void init()
     {
         scheme = NULL;
-        userinfo = NULL;
+        userInfo = NULL;
         host = NULL;
         port = NULL;
         path = NULL;
@@ -57,7 +57,7 @@ private:
     void deInit()
     {
         free(scheme);
-        free(userinfo);
+        free(userInfo);
         free(host);
         free(port);
         free(path);

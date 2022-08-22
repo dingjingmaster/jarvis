@@ -18,17 +18,17 @@
 #include "../core/executor.h"
 #include "../core/common-scheduler.h"
 #include "endpoint-params.h"
-#include "resource-pool.h"
+#include "../factory/resource-pool.h"
 #include "../nameservice/name-service.h"
-#include "dns-resolver.h"
+#include "../nameservice/dns-resolver.h"
 #include "endpoint-params.h"
 
 typedef struct _GlobalSettings      GlobalSettings;
 
 struct _GlobalSettings
 {
-    struct EndpointParams endpointParams;
-    struct EndpointParams dnsServerParams;
+    EndpointParams endpointParams;
+    EndpointParams dnsServerParams;
     unsigned int dns_ttl_default;	///< in seconds, DNS TTL when network request success
     unsigned int dns_ttl_min;		///< in seconds, DNS TTL when network request fail
     int dns_threads;
@@ -41,8 +41,8 @@ struct _GlobalSettings
 
 static constexpr GlobalSettings GLOBAL_SETTINGS_DEFAULT =
         {
-                .endpoint_params	=	ENDPOINT_PARAMS_DEFAULT,
-                .dns_server_params	=	ENDPOINT_PARAMS_DEFAULT,
+                .endpointParams	=	ENDPOINT_PARAMS_DEFAULT,
+                .dnsServerParams	=	ENDPOINT_PARAMS_DEFAULT,
                 .dns_ttl_default	=	12 * 3600,
                 .dns_ttl_min		=	180,
                 .dns_threads		=	4,

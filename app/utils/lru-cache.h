@@ -50,7 +50,7 @@ public:
     {
         INIT_LIST_HEAD(&mNotUse);
         INIT_LIST_HEAD(&mInUse);
-        mCacheMap.rb_node = NULL;
+        mCacheMap.rbNode = NULL;
         mMaxSize = 0;
         mSize = 0;
     }
@@ -64,9 +64,9 @@ public:
         assert(list_empty(&mInUse));
         list_for_each_safe(pos, tmp, &mNotUse) {
             e = list_entry(pos, Handle, list);
-            assert(e->in_cache);
-            e->in_cache = false;
-            assert(e->ref == 1);// Invariant for not_use_ list.
+            assert(e->mInCache);
+            e->mInCache = false;
+            assert(e->mRef == 1);// Invariant for not_use_ list.
             this->unref(e);
         }
     }
@@ -87,7 +87,7 @@ public:
         list_for_each_safe(pos, tmp, &mNotUse)
         {
             e = list_entry(&pos, Handle, list);
-            assert(e->ref == 1);
+            assert(e->mRef == 1);
             rb_erase(&e->rb);
             this->erase_node(e);
         }
@@ -103,25 +103,25 @@ public:
     // Need call release when handle no longer needed
     const Handle *get(const KEY& key)
     {
-        struct rb_node *p = mCacheMap.rb_node;
+        RBNode*p = mCacheMap.rbNode;
         Handle *bound = NULL;
         Handle *e;
 
         while (p)
         {
-            e = rb_entry(p, Handle, rb);
-            if (!(e->key < key))
+            e = RB_ENTRY (p, Handle, mRb);
+            if (!(e->mKey < key))
             {
                 bound = e;
-                p = p->rb_left;
+                p = p->rbLeft;
             }
             else
-                p = p->rb_right;
+                p = p->rbRight;
         }
 
-        if (bound && !(key < bound->key))
+        if (bound && !(key < bound->mKey))
         {
-            this->ref(bound);
+            this->mRef(bound);
             return bound;
         }
 
@@ -132,48 +132,48 @@ public:
     // Need call release when handle no longer needed
     const Handle *put(const KEY& key, VALUE value)
     {
-        struct rb_node **p = &mCacheMap.rb_node;
-        struct rb_node *parent = NULL;
+        RBNode**p = &mCacheMap.rbNode;
+        RBNode* parent = NULL;
         Handle *bound = NULL;
         Handle *e;
 
         while (*p)
         {
             parent = *p;
-            e = rb_entry(*p, Handle, rb);
-            if (!(e->key < key))
+            e = RB_ENTRY(*p, Handle, mRb);
+            if (!(e->mKey < key))
             {
                 bound = e;
-                p = &(*p)->rb_left;
+                p = &(*p)->rbLeft;
             }
             else
-                p = &(*p)->rb_right;
+                p = &(*p)->rbRight;
         }
 
         e = new Handle(key, value);
-        e->in_cache = true;
-        e->ref = 2;
-        list_add_tail(&e->list, &mInUse);
+        e->mInCache = true;
+        e->mRef = 2;
+        list_add_tail(&e->mList, &mInUse);
         mSize++;
 
-        if (bound && !(key < bound->key))
+        if (bound && !(key < bound->mKey))
         {
-            rb_replace_node(&bound->rb, &e->rb, &mCacheMap);
+            rb_replace_node(&bound->mRb, &e->mRb, &mCacheMap);
             this->erase_node(bound);
         }
         else
         {
-            rb_link_node(&e->rb, parent, p);
-            rb_insert_color(&e->rb, &mCacheMap);
+            rb_link_node(&e->mRb, parent, p);
+            rb_insert_color(&e->mRb, &mCacheMap);
         }
 
         if (mMaxSize > 0)
         {
             while (mSize > mMaxSize && !list_empty(&mNotUse))
             {
-                Handle *tmp = list_entry(mNotUse.next, Handle, list);
-                assert(tmp->ref == 1);
-                rb_erase(&tmp->rb, &mCacheMap);
+                Handle *tmp = list_entry(mNotUse.next, Handle, mList);
+                assert(tmp->mRef == 1);
+                rb_erase(&tmp->mRb, &mCacheMap);
                 this->erase_node(tmp);
             }
         }
@@ -189,7 +189,7 @@ public:
         if (e)
         {
             this->unref(e);
-            rb_erase(&e->rb, &mCacheMap);
+            rb_erase(&e->mRb, &mCacheMap);
             this->erase_node(e);
         }
     }
@@ -197,30 +197,30 @@ public:
 private:
     void ref(Handle *e)
     {
-        if (e->in_cache && e->ref == 1)
-            list_move_tail(&e->list, &mInUse);
+        if (e->mInCache && e->mRef == 1)
+            list_move_tail(&e->mList, &mInUse);
 
-        e->ref++;
+        e->mRef++;
     }
 
     void unref(Handle *e)
     {
-        assert(e->ref > 0);
-        if (--e->ref == 0)
+        assert(e->mRef > 0);
+        if (--e->mRef == 0)
         {
-            assert(!e->in_cache);
+            assert(!e->mInCache);
             mValueDeleter(e->value);
             delete e;
         }
-        else if (e->in_cache && e->ref == 1)
+        else if (e->mInCache && e->mRef == 1)
             list_move_tail(&e->list, &mNotUse);
     }
 
     void erase_node(Handle *e)
     {
-        assert(e->in_cache);
+        assert(e->mInCache);
         list_del(&e->list);
-        e->in_cache = false;
+        e->mInCache = false;
         --mSize;
         this->unref(e);
     }

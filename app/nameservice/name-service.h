@@ -20,6 +20,7 @@
 
 #include "../utils/uri-parser.h"
 
+typedef struct _NSParams                NSParams;
 typedef struct _NSPolicyEntry           NSPolicyEntry;
 
 class RouterTask : public GenericTask
@@ -68,7 +69,7 @@ public:
     void (*mDeleter)(void *);
 };
 
-struct NSParams
+struct _NSParams
 {
     TransportType               mType;
     ParsedURI&                  mUri;
