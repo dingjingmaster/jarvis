@@ -4,4 +4,7 @@ file(GLOB MANAGER_SRC
 
         ${CMAKE_SOURCE_DIR}/app/manager/dns-cache.h
         ${CMAKE_SOURCE_DIR}/app/manager/dns-cache.cpp
+
+        ${CMAKE_SOURCE_DIR}/app/manager/route-manager.h
+        ${CMAKE_SOURCE_DIR}/app/manager/route-manager.cpp
 )

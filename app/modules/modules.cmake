@@ -5,3 +5,5 @@ file(GLOB HTTP_SERVER_SRC
         ${CMAKE_SOURCE_DIR}/app/modules/http-server.h
         ${CMAKE_SOURCE_DIR}/app/modules/http-server.cpp
         )
+
+set(MODULES_SRC ${HTTP_SERVER_SRC})
