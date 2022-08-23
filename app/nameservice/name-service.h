@@ -84,7 +84,7 @@ using RouterCallback = std::function<void (RouterTask*)>;
 class NSPolicy
 {
 public:
-    virtual RouterTask *create_router_task(const struct WFNSParams *params, RouterCallback callback) = 0;
+    virtual RouterTask *createRouterTask(const NSParams *params, RouterCallback callback) = 0;
 
     virtual void success(RouteManager::RouteResult *result, NSTracing *tracing, CommTarget *target)
     {

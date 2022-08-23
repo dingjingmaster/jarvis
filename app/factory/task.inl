@@ -1,7 +1,5 @@
 
 
-
-
 template<class REQ, class RESP>
 int NetworkTask<REQ, RESP>::getPeerAddr(struct sockaddr *addr, socklen_t *addrLen) const
 {
@@ -35,18 +33,18 @@ protected:
             mPrepare(this);
         }
 
-        return &mReq;
+        return &this->mReq;
     }
 
-    virtual CommMessageIn *messageIn() { return &mResp; }
+    virtual CommMessageIn *messageIn() { return &this->mResp; }
 
 protected:
-    virtual Connection *get_connection() const
+    virtual Connection *getConnection() const
     {
         CommConnection *conn;
 
-        if (this->target) {
-            conn = this->CommSession::get_connection();
+        if (this->mTarget) {
+            conn = this->CommSession::getConnection();
             if (conn) {
                 return (Connection*)conn;
             }
@@ -61,13 +59,13 @@ protected:
     {
         SeriesWork *series = seriesOf(this);
 
-        if (mState == TASK_STATE_SYS_ERROR && mError < 0) {
-            mState = TASK_STATE_SSL_ERROR;
-            mError = -mError;
+        if (this->mState == TASK_STATE_SYS_ERROR && this->mError < 0) {
+            this->mState = TASK_STATE_SSL_ERROR;
+            this->mError = -this->mError;
         }
 
-        if (mCallback) {
-            mCallback(this);
+        if (this->mCallback) {
+            this->mCallback(this);
         }
 
         delete this;
@@ -97,18 +95,18 @@ template<class REQ, class RESP>
 class ServerTask : public NetworkTask<REQ, RESP>
 {
 protected:
-    virtual CommMessageOut *messageOut() { return &mResp; }
-    virtual CommMessageIn *messageIn() { return &mReq; }
+    virtual CommMessageOut *messageOut() { return &this->mResp; }
+    virtual CommMessageIn *messageIn() { return &this->mReq; }
     virtual void handle(int state, int error);
 
 protected:
-    /* CommSession::get_connection() is supposed to be called only in the
+    /* CommSession::getConnection() is supposed to be called only in the
      * implementations of it's virtual functions. As a server task, to call
      * this function after process() and before callback() is very dangerous
      * and should be blocked. */
     virtual Connection *getConnection() const
     {
-        if (this->processor.task)
+        if (this->mProcessor.mTask)
             return (Connection *)this->CommSession::getConnection();
 
         errno = EPERM;
@@ -118,31 +116,31 @@ protected:
 protected:
     virtual void dispatch()
     {
-        if (mState == TASK_STATE_TOREPLY) {
-            /* Enable get_connection() again if the reply() call is success. */
-            mProcessor.task = this;
-            if (mScheduler->reply(this) >= 0)
+        if (this->mState == TASK_STATE_TOREPLY) {
+            /* Enable getConnection() again if the reply() call is success. */
+            mProcessor.mTask = this;
+            if (this->mScheduler->reply(this) >= 0)
                 return;
 
-            mError = errno;
-            mProcessor.task = NULL;
-            mState = TASK_STATE_SYS_ERROR;
+            this->mError = errno;
+            mProcessor.mTask = NULL;
+            this->mState = TASK_STATE_SYS_ERROR;
         }
 
-        subTaskDone();
+        this->subTaskDone();
     }
 
     virtual SubTask *done()
     {
-        SeriesWork *series = series_of(this);
+        SeriesWork *series = seriesOf(this);
 
-        if (mState == TASK_STATE_SYS_ERROR && mError < 0) {
-            mState = TASK_STATE_SSL_ERROR;
-            mError = -mError;
+        if (this->mState == TASK_STATE_SYS_ERROR && this->mError < 0) {
+            this->mState = TASK_STATE_SSL_ERROR;
+            this->mError = -this->mError;
         }
 
-        if (mCallback)
-            mCallback(this);
+        if (this->mCallback)
+            this->mCallback(this);
 
         /* Defer deleting the task. */
         return series->pop();
@@ -160,7 +158,7 @@ protected:
 
         virtual void dispatch()
         {
-            mProcess(this->task);
+            mProcess(this->mTask);
             mTask = NULL;	/* As a flag. get_conneciton() disabled. */
             subTaskDone();
         }
@@ -185,7 +183,7 @@ protected:
         }
 
         Series(ServerTask<REQ, RESP> *task)
-                : SeriesWork(&task->processor, nullptr)
+                : SeriesWork(&task->mProcessor, nullptr)
         {
             setLastTask(task);
             mTask = task;
@@ -213,17 +211,17 @@ template<class REQ, class RESP>
 void ServerTask<REQ, RESP>::handle(int state, int error)
 {
     if (state == TASK_STATE_TOREPLY) {
-        mState = TASK_STATE_TOREPLY;
-        mTarget = getTarget();
+        this->mState = TASK_STATE_TOREPLY;
+        this->mTarget = this->getTarget();
         new Series(this);
         mProcessor.dispatch();
-    } else if (mState == TASK_STATE_TOREPLY) {
-        mState = state;
-        mError = error;
+    } else if (this->mState == TASK_STATE_TOREPLY) {
+        this->mState = state;
+        this->mError = error;
         if (error == ETIMEDOUT) {
-            mTimeoutReason = TOR_TRANSMIT_TIMEOUT;
+            this->mTimeoutReason = TOR_TRANSMIT_TIMEOUT;
         }
-        subTaskDone();
+        this->subTaskDone();
     } else {
         delete this;
     }

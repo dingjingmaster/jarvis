@@ -13,18 +13,18 @@
 class DnsClient
 {
 public:
-    DnsClient() : params(NULL) { }
+    DnsClient() : mParams(NULL) { }
     virtual ~DnsClient() { }
 
     int init(const std::string& url);
     int init(const std::string& url, const std::string& search_list, int ndots, int attempts, bool rotate);
-    void deinit();
+    void deInit();
 
-    WFDnsTask *create_dns_task(const std::string& name, dns_callback_t callback);
+    DnsTask *createDnsTask(const std::string& name, DnsCallback callback);
 
 private:
-    void *params;
-    std::atomic<size_t> id;
+    std::atomic<size_t>         mId;
+    void*                       mParams;
 };
 
 

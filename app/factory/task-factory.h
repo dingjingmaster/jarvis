@@ -14,13 +14,13 @@
 #include "workflow.h"
 #include "../utils/uri-parser.h"
 
+#include "../protocol/dns/dns-message.h"
 #include "../protocol/http/http-message.h"
 
 #include "../manager/endpoint-params.h"
 
 //#include "RedisMessage.h"
 //#include "MySQLMessage.h"
-//#include "DnsMessage.h"
 //#include "GraphTask.h"
 //#include "AlgoTaskFactory.h"
 
@@ -84,6 +84,11 @@ using RepeaterCallback = std::function<void (RepeaterTask*)>;
 
 using ModuleCallback = std::function<void (const ModuleTask*)>;
 
+// DNS
+using DnsTask = NetworkTask<protocol::DnsRequest, protocol::DnsResponse>;
+using DnsCallback = std::function<void (DnsTask*)>;
+
+
 class TaskFactory
 {
 public:
@@ -117,6 +122,12 @@ public:
     static TimerTask* createTimerTask(unsigned int microseconds, TimerCallback callback);
 
     static TimerTask* createTimerTask(time_t seconds, long nanoseconds, TimerCallback callback);
+
+    /* DNS - start */
+    static DnsTask *createDnsTask(const std::string& url, int retryMax, DnsCallback callback);
+    static DnsTask *createDnsTask(const ParsedURI& uri, int retryMax, DnsCallback callback);
+    /* DNS - end */
+
 
     /* Counter is like semaphore. The callback of counter is called when
      * 'count' operations reach target_value & after the task is started.

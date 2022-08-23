@@ -72,8 +72,8 @@ protected:
     {
         SeriesWork *series = seriesOf(this);
 
-        if (this->callback)
-            this->callback(this);
+        if (this->mCallback)
+            this->mCallback(this);
 
         delete this;
         return series->pop();
@@ -258,7 +258,7 @@ public:
 
     virtual int push(const void *buf, size_t size)
     {
-        return this->scheduler->push(buf, size, this);
+        return this->mScheduler->push(buf, size, this);
     }
 
 public:

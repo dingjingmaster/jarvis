@@ -63,7 +63,7 @@ public:
         // Error if caller has an unreleased handle
         assert(list_empty(&mInUse));
         list_for_each_safe(pos, tmp, &mNotUse) {
-            e = list_entry(pos, Handle, list);
+            e = list_entry(pos, Handle, mList);
             assert(e->mInCache);
             e->mInCache = false;
             assert(e->mRef == 1);// Invariant for not_use_ list.
@@ -121,7 +121,7 @@ public:
 
         if (bound && !(key < bound->mKey))
         {
-            this->mRef(bound);
+            this->ref(bound);
             return bound;
         }
 
@@ -209,17 +209,17 @@ private:
         if (--e->mRef == 0)
         {
             assert(!e->mInCache);
-            mValueDeleter(e->value);
+            mValueDeleter(e->mValue);
             delete e;
         }
         else if (e->mInCache && e->mRef == 1)
-            list_move_tail(&e->list, &mNotUse);
+            list_move_tail(&e->mList, &mNotUse);
     }
 
     void erase_node(Handle *e)
     {
         assert(e->mInCache);
-        list_del(&e->list);
+        list_del(&e->mList);
         e->mInCache = false;
         --mSize;
         this->unref(e);

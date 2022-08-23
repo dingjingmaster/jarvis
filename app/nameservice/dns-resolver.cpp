@@ -295,10 +295,10 @@ void ResolverTask::dispatch()
             auto&& cb = std::bind(&ResolverTask::dns_single_callback,
                                   this,
                                   std::placeholders::_1);
-            DnsTask *dns_task = client->create_dns_task(hostname, std::move(cb));
+            DnsTask *dns_task = client->createDnsTask(hostname, std::move(cb));
 
             if (family == AF_INET6)
-                dns_task->get_req()->set_question_type(DNS_TYPE_AAAA);
+                dns_task->getReq()->set_question_type(DNS_TYPE_AAAA);
 
             Conditional *cond = respool->get(dns_task);
             seriesOf(this)->pushFront(cond);
@@ -315,16 +315,14 @@ void ResolverTask::dispatch()
             dctx[0].port = port_;
             dctx[1].port = port_;
 
-            task_v4 = client->create_dns_task(hostname, dns_partial_callback);
-            task_v4->user_data = dctx;
+            task_v4 = client->createDnsTask(hostname, dns_partial_callback);
+            task_v4->mUserData = dctx;
 
-            task_v6 = client->create_dns_task(hostname, dns_partial_callback);
-            task_v6->get_req()->set_question_type(DNS_TYPE_AAAA);
-            task_v6->user_data = dctx + 1;
+            task_v6 = client->createDnsTask(hostname, dns_partial_callback);
+            task_v6->getReq()->set_question_type(DNS_TYPE_AAAA);
+            task_v6->mUserData = dctx + 1;
 
-            auto&& cb = std::bind(&ResolverTask::dns_parallel_callback,
-                                  this,
-                                  std::placeholders::_1);
+            auto&& cb = std::bind(&ResolverTask::dns_parallel_callback, this, std::placeholders::_1);
 
             pwork = Workflow::createParallelWork(std::move(cb));
             pwork->setContext(dctx);
@@ -414,20 +412,18 @@ void ResolverTask::dns_single_callback(void *net_dns_task)
     DnsTask *dns_task = (DnsTask*)net_dns_task;
     Global::getDnsRespool()->post(NULL);
 
-    if (dns_task->get_state() == TASK_STATE_SUCCESS)
+    if (dns_task->getState() == TASK_STATE_SUCCESS)
     {
         struct addrinfo *ai = NULL;
         int ret;
 
-        ret = protocol::DnsUtil::getaddrinfo(dns_task->get_resp(), port_, &ai);
+        ret = protocol::DnsUtil::getaddrinfo(dns_task->getResp(), port_, &ai);
         DnsOutput out;
         DnsRoutine::create(&out, ret, ai);
         dns_callback_internal(&out, dns_ttl_default_, dns_ttl_min_);
-    }
-    else
-    {
-        this->mState = dns_task->get_state();
-        this->mError = dns_task->get_error();
+    } else {
+        this->mState = dns_task->getState();
+        this->mError = dns_task->getError();
     }
 
     if (this->mCallback)
@@ -441,15 +437,13 @@ void ResolverTask::dns_partial_callback(void *net_dns_task)
     DnsTask *dns_task = (DnsTask *)net_dns_task;
     Global::getDnsRespool()->post(NULL);
 
-    struct DnsContext *ctx = (struct DnsContext *)dns_task->user_data;
+    struct DnsContext *ctx = (struct DnsContext *)dns_task->mUserData;
     ctx->ai = NULL;
-    ctx->state = dns_task->get_state();
-    ctx->error = dns_task->get_error();
-    if (ctx->state == TASK_STATE_SUCCESS)
-    {
-        protocol::DnsResponse *resp = dns_task->get_resp();
-        ctx->eai_error = protocol::DnsUtil::getaddrinfo(resp, ctx->port,
-                                                        &ctx->ai);
+    ctx->state = dns_task->getState();
+    ctx->error = dns_task->getError();
+    if (ctx->state == TASK_STATE_SUCCESS) {
+        protocol::DnsResponse *resp = dns_task->getResp();
+        ctx->eai_error = protocol::DnsUtil::getaddrinfo(resp, ctx->port, &ctx->ai);
     }
     else
         ctx->eai_error = EAI_NONAME;

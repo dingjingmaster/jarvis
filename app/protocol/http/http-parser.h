@@ -9,6 +9,11 @@
 
 #define HTTP_HEADER_NAME_MAX            64
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 typedef struct _HttpParser              HttpParser;
 typedef struct _HttpHeaderCursor        HttpHeaderCursor;
 
@@ -46,10 +51,6 @@ struct _HttpHeaderCursor
     const struct list_head*     next;
 };
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 void http_parser_init(int is_resp, HttpParser *parser);
 

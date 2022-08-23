@@ -127,11 +127,11 @@ namespace protocol
         virtual ~HttpHeaderCursor();
 
     public:
-        inline void rewind ();
-        inline bool next (HttpMessageHeader* header);
+        void rewind ();
+        bool next (HttpMessageHeader* header);
         bool next (std::string& name, std::string& value);
 
-        inline bool find (HttpMessageHeader* header);
+        bool find (HttpMessageHeader* header);
         bool find (const std::string& name, std::string& value);
 
     protected:

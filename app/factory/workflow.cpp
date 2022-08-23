@@ -12,18 +12,18 @@
 #include <functional>
 
 
-inline SeriesWork* Workflow::createSeriesWork(SubTask* first, SeriesCallback callback)
+SeriesWork* Workflow::createSeriesWork(SubTask* first, SeriesCallback callback)
 {
     return new SeriesWork(first, std::move(callback));
 }
 
-inline void Workflow::startSeriesWork(SubTask *first, SeriesCallback callback)
+void Workflow::startSeriesWork(SubTask *first, SeriesCallback callback)
 {
     new SeriesWork(first, std::move(callback));
     first->dispatch();
 }
 
-inline SeriesWork* Workflow::createSeriesWork(SubTask *first, SubTask *last, SeriesCallback callback)
+SeriesWork* Workflow::createSeriesWork(SubTask *first, SubTask *last, SeriesCallback callback)
 {
     SeriesWork *series = new SeriesWork(first, std::move(callback));
     series->setLastTask(last);
@@ -31,7 +31,7 @@ inline SeriesWork* Workflow::createSeriesWork(SubTask *first, SubTask *last, Ser
     return series;
 }
 
-inline void Workflow::startSeriesWork(SubTask *first, SubTask *last, SeriesCallback callback)
+void Workflow::startSeriesWork(SubTask *first, SubTask *last, SeriesCallback callback)
 {
     SeriesWork *series = new SeriesWork(first, std::move(callback));
     series->setLastTask(last);
@@ -248,17 +248,17 @@ void SeriesWork::expandQueue()
     mBack = i;
 }
 
-inline ParallelWork* Workflow::createParallelWork(ParallelCallback callback)
+ParallelWork* Workflow::createParallelWork(ParallelCallback callback)
 {
     return new ParallelWork(std::move(callback));
 }
 
-inline ParallelWork* Workflow::createParallelWork(SeriesWork *const all_series[], size_t n, ParallelCallback callback)
+ParallelWork* Workflow::createParallelWork(SeriesWork *const all_series[], size_t n, ParallelCallback callback)
 {
     return new ParallelWork(all_series, n, std::move(callback));
 }
 
-inline void Workflow::startParallelWork(SeriesWork *const all_series[], size_t n, ParallelCallback callback)
+void Workflow::startParallelWork(SeriesWork *const all_series[], size_t n, ParallelCallback callback)
 {
     ParallelWork *p = new ParallelWork(all_series, n, std::move(callback));
     Workflow::startSeriesWork(p, nullptr);

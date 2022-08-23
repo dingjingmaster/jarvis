@@ -42,7 +42,7 @@ DnsOutput& DnsOutput::operator= (DnsOutput&& move)
     return *this;
 }
 
-void DnsRoutine::run_local_path(const std::string& path, DnsOutput *out)
+void DnsRoutine::runLocalPath(const std::string& path, DnsOutput *out)
 {
     struct sockaddr_un *sun = NULL;
 
@@ -74,9 +74,8 @@ void DnsRoutine::run_local_path(const std::string& path, DnsOutput *out)
 
 void DnsRoutine::run(const DnsInput *in, DnsOutput *out)
 {
-    if (!in->host_.empty() && in->host_[0] == '/')
-    {
-        run_local_path(in->host_, out);
+    if (!in->host_.empty() && in->host_[0] == '/') {
+        runLocalPath(in->host_, out);
         return;
     }
 

@@ -36,7 +36,7 @@ inline CommSession *HttpServer::newSession(long long seq, CommConnection *conn)
 {
     HttpTask *task;
 
-    task = ServerTaskFactory::create_http_task(this, mProcess);
+    task = ServerTaskFactory::createHttpTask(this, mProcess);
     task->setKeepAlive(mParams.keepAliveTimeout);
     task->setReceiveTimeout(mParams.receiveTimeout);
     task->getReq()->setSizeLimit(mParams.requestSizeLimit);

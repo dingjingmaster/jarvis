@@ -106,7 +106,7 @@ public:
     }
 
 private:
-    static void run_local_path(const std::string& path, DnsOutput *out);
+    static void runLocalPath(const std::string& path, DnsOutput *out);
 };
 
 

@@ -1,4 +1,4 @@
-project(Jarvis LANGUAGES C CXX)
+project(Jarvis LANGUAGES CXX)
 
 cmake_minimum_required(VERSION 3.5)
 

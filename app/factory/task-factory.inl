@@ -161,10 +161,7 @@ public:
         initWithUri();
     }
 
-    void init(TransportType type,
-              const struct sockaddr *addr,
-              socklen_t addrlen,
-              const std::string& info);
+    void init(TransportType type, const struct sockaddr *addr, socklen_t addrLen, const std::string& info);
 
     void setTransportType(TransportType type)
     {
@@ -181,11 +178,10 @@ public:
         init(uri);
     }
 
-    void setRedirect(TransportType type, const struct sockaddr *addr,
-                      socklen_t addrlen, const std::string& info)
+    void setRedirect(TransportType type, const struct sockaddr *addr, socklen_t addrLen, const std::string& info)
     {
         mRedirect = true;
-        init(type, addr, addrlen, info);
+        init(type, addr, addrLen, info);
     }
 
     bool isFixedAddr() const { return this->fixed_addr_; }
@@ -209,11 +205,11 @@ protected:
 
     void clearResp()
     {
-        size_t size = this->resp.get_size_limit();
+        size_t size = this->mResp.getSizeLimit();
 
-        this->resp.~RESP();
-        new(&this->resp) RESP();
-        this->resp.setSizeLimit(size);
+        this->mResp.~RESP();
+        new(&this->mResp) RESP();
+        this->mResp.setSizeLimit(size);
     }
 
     void disableRetry()
@@ -251,15 +247,15 @@ void ComplexClientTask<REQ, RESP, CTX>::clearPrevState()
 {
     mNsPolicy = NULL;
     mRouteResult.clear();
-    if (mTracing.deleter) {
-        mTracing.deleter(mTracing.data);
-        mTracing.deleter = NULL;
+    if (mTracing.mDeleter) {
+        mTracing.mDeleter(mTracing.mData);
+        mTracing.mDeleter = NULL;
     }
-    mTracing.data = NULL;
+    mTracing.mData = NULL;
     mRetryTimes = 0;
-    this->state = TASK_STATE_UNDEFINED;
-    this->error = 0;
-    this->timeout_reason = TOR_NOT_TIMEOUT;
+    this->mState = TASK_STATE_UNDEFINED;
+    this->mError = 0;
+    this->mTimeoutReason = TOR_NOT_TIMEOUT;
 }
 
 template<class REQ, class RESP, typename CTX>
@@ -277,10 +273,10 @@ void ComplexClientTask<REQ, RESP, CTX>::init(TransportType type, const struct so
 
     mType = type;
     mInfo.assign(info);
-    params.use_tls_sni = false;
+    params.useTlsSni = false;
     if (Global::getRouteManager()->get(type, &addrInfo, mInfo, &params, "", mRouteResult) < 0) {
-        this->state = TASK_STATE_SYS_ERROR;
-        this->error = errno;
+        this->mState = TASK_STATE_SYS_ERROR;
+        this->mError = errno;
     } else if (this->init_success()) {
         return;
     }
@@ -295,8 +291,8 @@ bool ComplexClientTask<REQ, RESP, CTX>::setPort()
         int port = atoi(mUri.port);
 
         if (port <= 0 || port > 65535) {
-            this->state = TASK_STATE_TASK_ERROR;
-            this->error = TASK_ERROR_URI_PORT_INVALID;
+            this->mState = TASK_STATE_TASK_ERROR;
+            this->mError = TASK_ERROR_URI_PORT_INVALID;
             return false;
         }
 
@@ -311,14 +307,14 @@ bool ComplexClientTask<REQ, RESP, CTX>::setPort()
             if (mUri.port)
                 return true;
 
-            this->state = TASK_STATE_SYS_ERROR;
-            this->error = errno;
+            this->mState = TASK_STATE_SYS_ERROR;
+            this->mError = errno;
             return false;
         }
     }
 
-    this->state = TASK_STATE_TASK_ERROR;
-    this->error = TASK_ERROR_URI_SCHEME_INVALID;
+    this->mState = TASK_STATE_TASK_ERROR;
+    this->mError = TASK_ERROR_URI_SCHEME_INVALID;
     return false;
 }
 
@@ -331,33 +327,33 @@ void ComplexClientTask<REQ, RESP, CTX>::initWithUri()
     }
 
     if (mUri.state == URI_STATE_SUCCESS) {
-        if (this->set_port()) {
-            if (this->init_success()) {
+        if (this->setPort()) {
+            if (this->initSuccess()) {
                 return;
             }
         }
     } else if (mUri.state == URI_STATE_ERROR) {
-        this->state = TASK_STATE_SYS_ERROR;
-        this->error = mUri.error;
+        this->mState = TASK_STATE_SYS_ERROR;
+        this->mError = mUri.error;
     } else {
-        this->state = TASK_STATE_TASK_ERROR;
-        this->error = TASK_ERROR_URI_PARSE_FAILED;
+        this->mState = TASK_STATE_TASK_ERROR;
+        this->mError = TASK_ERROR_URI_PARSE_FAILED;
     }
 
-    this->init_failed();
+    this->initFailed();
 }
 
 template<class REQ, class RESP, typename CTX>
 RouterTask *ComplexClientTask<REQ, RESP, CTX>::route()
 {
-    auto&& cb = std::bind(&ComplexClientTask::router_callback, this, std::placeholders::_1);
+    auto&& cb = std::bind(&ComplexClientTask::routerCallback, this, std::placeholders::_1);
     NSParams params = {
-            .type			=	mType,
-            .uri			=	mUri,
-            .info			=	mInfo.c_str(),
-            .fixed_addr		=	mFixedAddr,
-            .retry_times	=	mRetryTimes,
-            .tracing		=	&mTracing,
+            .mType			=	mType,
+            .mUri			=	mUri,
+            .mInfo			=	mInfo.c_str(),
+            .mFixedAddr		=	mFixedAddr,
+            .mRetryTimes	=	mRetryTimes,
+            .mTracing		=	&mTracing,
     };
 
     if (!mNsPolicy) {
@@ -365,7 +361,7 @@ RouterTask *ComplexClientTask<REQ, RESP, CTX>::route()
         mNsPolicy = ns->getPolicy(mUri.host ? mUri.host : "");
     }
 
-    return mNsPolicy->create_router_task(&params, std::move(cb));
+    return mNsPolicy->createRouterTask(&params, std::move(cb));
 }
 
 template<class REQ, class RESP, typename CTX>
@@ -373,27 +369,27 @@ void ComplexClientTask<REQ, RESP, CTX>::routerCallback(void *t)
 {
     RouterTask *task = (RouterTask *)t;
 
-    this->state = task->getState();
-    if (this->state == TASK_STATE_SUCCESS)
+    this->mState = task->getState();
+    if (this->mState == TASK_STATE_SUCCESS)
         mRouteResult = std::move(*task->get_result());
-    else if (this->state == TASK_STATE_UNDEFINED) {
+    else if (this->mState == TASK_STATE_UNDEFINED) {
         /* should not happend */
-        this->state = TASK_STATE_SYS_ERROR;
-        this->error = ENOSYS;
+        this->mState = TASK_STATE_SYS_ERROR;
+        this->mError = ENOSYS;
     } else {
-        this->error = task->getError();
+        this->mError = task->getError();
     }
 }
 
 template<class REQ, class RESP, typename CTX>
 void ComplexClientTask<REQ, RESP, CTX>::dispatch()
 {
-    switch (this->state) {
+    switch (this->mState) {
         case TASK_STATE_UNDEFINED: {
-            if (this->check_request()) {
-                if (this->route_result_.request_object) {
+            if (this->checkRequest()) {
+                if (this->mRouteResult.mRequestObject) {
                     case TASK_STATE_SUCCESS:
-                        this->set_request_object(mRouteResult.request_object);
+                        this->set_request_object(mRouteResult.mRequestObject);
                     this->ClientTask<REQ, RESP>::dispatch();
                     return;
                 }
@@ -407,32 +403,32 @@ void ComplexClientTask<REQ, RESP, CTX>::dispatch()
             break;
     }
 
-    this->subtask_done();
+    this->subTaskDone();
 }
 
 template<class REQ, class RESP, typename CTX>
 void ComplexClientTask<REQ, RESP, CTX>::switchCallback(void *t)
 {
     if (!mRedirect) {
-        if (this->state == TASK_STATE_SYS_ERROR && this->error < 0) {
-            this->state = TASK_STATE_SSL_ERROR;
-            this->error = -this->error;
+        if (this->mState == TASK_STATE_SYS_ERROR && this->mError < 0) {
+            this->mState = TASK_STATE_SSL_ERROR;
+            this->mError = -this->mError;
         }
 
-        if (mTracing.deleter) {
-            mTracing.deleter(mTracing.data);
-            mTracing.deleter = NULL;
+        if (mTracing.mDeleter) {
+            mTracing.mDeleter(mTracing.mData);
+            mTracing.mDeleter = NULL;
         }
 
-        if (this->callback) {
-            this->callback(this);
+        if (this->mCallback) {
+            this->mCallback(this);
         }
     }
 
     if (mRedirect) {
         mRedirect = false;
         clearResp();
-        this->target = NULL;
+        this->mTarget = NULL;
         seriesOf(this)->pushFront(this);
     } else {
         delete this;
@@ -449,27 +445,27 @@ SubTask* ComplexClientTask<REQ, RESP, CTX>::done()
         return series->pop();
     }
 
-    bool is_user_request = this->finish_once();
+    bool is_user_request = this->finishOnce();
 
-    if (mNsPolicy && mRouteResult.request_object) {
-        if (this->state == TASK_STATE_SYS_ERROR)
-            mNsPolicy->failed(&mRouteResult, &mTracing, this->target);
+    if (mNsPolicy && mRouteResult.mRequestObject) {
+        if (this->mState == TASK_STATE_SYS_ERROR)
+            mNsPolicy->failed(&mRouteResult, &mTracing, this->mTarget);
         else
-            mNsPolicy->success(&mRouteResult, &mTracing, this->target);
+            mNsPolicy->success(&mRouteResult, &mTracing, this->mTarget);
     }
 
-    if (this->state == TASK_STATE_SUCCESS) {
+    if (this->mState == TASK_STATE_SUCCESS) {
         if (!is_user_request)
             return this;
-    } else if (this->state == TASK_STATE_SYS_ERROR) {
+    } else if (this->mState == TASK_STATE_SYS_ERROR) {
         if (mRetryTimes < mRetryMax) {
             mRedirect = true;
             if (mNsPolicy)
                 mRouteResult.clear();
 
-            this->state = TASK_STATE_UNDEFINED;
-            this->error = 0;
-            this->timeout_reason = 0;
+            this->mState = TASK_STATE_UNDEFINED;
+            this->mError = 0;
+            this->mTimeoutReason = 0;
             mRetryTimes++;
         }
     }
@@ -479,14 +475,14 @@ SubTask* ComplexClientTask<REQ, RESP, CTX>::done()
      * thread or DNS thread (dns failed). Running a timer will switch callback
      * function to a handler thread, and this can prevent stack overflow.
      */
-    if (!this->target) {
-        auto&& cb = std::bind(&ComplexClientTask::switch_callback, this, std::placeholders::_1);
+    if (!this->mTarget) {
+        auto&& cb = std::bind(&ComplexClientTask::switchCallback, this, std::placeholders::_1);
         TimerTask *timer;
 
         timer = TaskFactory::createTimerTask(0, 0, std::move(cb));
         series->pushFront(timer);
     } else {
-        this->switch_callback(NULL);
+        this->switchCallback(NULL);
     }
 
     return series->pop();
@@ -549,7 +545,7 @@ NetworkTaskFactory<REQ, RESP>::createServerTask(CommService *service, std::funct
 class ServerTaskFactory
 {
 public:
-    static HttpTask *create_http_task(CommService *service, std::function<void (HttpTask *)>& process);
+    static HttpTask *createHttpTask(CommService *service, std::function<void (HttpTask *)>& process);
     //static MySQLTask *create_mysql_task(CommService *service, std::function<void (MySQLTask *)>& process);
 };
 
@@ -561,7 +557,7 @@ class _ThreadTask : public ThreadTask<INPUT, OUTPUT>
 protected:
     virtual void execute()
     {
-        this->routine(&this->input, &this->output);
+        this->routine(&this->mInput, &this->mOutput);
     }
 
 protected:
