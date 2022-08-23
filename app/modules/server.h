@@ -187,7 +187,7 @@ public:
     }
 
 protected:
-    virtual CommSession *newSession(long long seq, CommConnection *conn);
+    virtual CommSession *newSession(long long seq, CommConnection *conn) override ;
 
 protected:
     std::function<void (NetworkTask<REQ, RESP> *)>              mProcess;

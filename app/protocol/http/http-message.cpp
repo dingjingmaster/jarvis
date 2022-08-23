@@ -19,7 +19,7 @@ namespace protocol
 bool protocol::HttpMessage::appendOutputBody(const void *buf, size_t size)
 {
     size_t n = sizeof (HttpMessageBlock) + size;
-    HttpMessageBlock *block = (HttpMessageBlock *)malloc(n);
+    auto block = (HttpMessageBlock*)malloc(n);
 
     if (block) {
         memcpy(block + 1, buf, size);
