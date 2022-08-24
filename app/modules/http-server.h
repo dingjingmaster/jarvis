@@ -29,12 +29,15 @@ template<>
 inline HttpServer::Server(HttpProcess proc)
     : ServerBase(&HTTP_SERVER_PARAMS_DEFAULT), mProcess(std::move(proc))
 {
+    logv("");
 }
 
 template<>
 inline CommSession *HttpServer::newSession(long long seq, CommConnection *conn)
 {
     HttpTask *task;
+
+    logv("");
 
     task = ServerTaskFactory::createHttpTask(this, mProcess);
     task->setKeepAlive(mParams.keepAliveTimeout);

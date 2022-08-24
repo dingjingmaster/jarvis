@@ -617,6 +617,7 @@ NameService Global::gNameService(&Global::gDnsResolver);
 
 CommScheduler* Global::getScheduler()
 {
+    logv("");
     return __CommManager::get_instance()->get_scheduler();
 }
 

@@ -733,7 +733,9 @@ class HttpServerTask : public ServerTask<HttpRequest, HttpResponse>
 public:
     HttpServerTask(CommService *service, std::function<void (HttpTask *)>& process)
         : ServerTask(service, Global::getScheduler(), process), req_is_alive_(false), req_has_keep_alive_header_(false)
-    {}
+    {
+        logv("");
+    }
 
 protected:
     virtual void handle(int state, int error)
@@ -863,6 +865,7 @@ CommMessageOut *HttpServerTask::messageOut()
 
 HttpTask *ServerTaskFactory::createHttpTask(CommService *service, std::function<void (HttpTask*)>& process)
 {
+    logv("");
     return new HttpServerTask(service, process);
 }
 

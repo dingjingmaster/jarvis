@@ -389,7 +389,7 @@ void ComplexClientTask<REQ, RESP, CTX>::dispatch()
             if (this->checkRequest()) {
                 if (this->mRouteResult.mRequestObject) {
                     case TASK_STATE_SUCCESS:
-                        this->set_request_object(mRouteResult.mRequestObject);
+                        this->setRequestObject(mRouteResult.mRequestObject);
                     this->ClientTask<REQ, RESP>::dispatch();
                     return;
                 }

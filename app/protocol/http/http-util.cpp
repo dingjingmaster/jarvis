@@ -7,6 +7,7 @@
 
 protocol::HttpHeaderCursor::HttpHeaderCursor(const protocol::HttpMessage *msg)
 {
+    logv("");
     http_header_cursor_init(&mCursor, msg->getParser());
 }
 
@@ -17,6 +18,7 @@ bool protocol::HttpHeaderCursor::find(const std::string &name, std::string &valu
             .nameLen    =   name.size()
     };
 
+    logv("");
     if (this->find(&header)) {
         value.assign((const char *)header.value, header.valueLen);
         return true;
@@ -27,26 +29,31 @@ bool protocol::HttpHeaderCursor::find(const std::string &name, std::string &valu
 
 bool protocol::HttpHeaderCursor::find(protocol::HttpMessageHeader *header)
 {
+    logv("");
     return http_header_cursor_find(header->name, header->nameLen, &header->value, &header->valueLen, &mCursor) == 0;
 }
 
 bool protocol::HttpHeaderCursor::next(protocol::HttpMessageHeader *header)
 {
+    logv("");
     return http_header_cursor_next(&header->name, &header->nameLen, &header->value, &header->valueLen, &mCursor) == 0;
 }
 
 void protocol::HttpHeaderCursor::rewind()
 {
+    logv("");
     http_header_cursor_rewind(&mCursor);
 }
 
 protocol::HttpHeaderCursor::~HttpHeaderCursor()
 {
+    logv("");
     http_header_cursor_deinit(&mCursor);
 }
 
 bool protocol::HttpHeaderCursor::next(std::string &name, std::string &value)
 {
+    logv("");
     HttpMessageHeader header;
 
     if (next(&header)) {
@@ -60,6 +67,7 @@ bool protocol::HttpHeaderCursor::next(std::string &name, std::string &value)
 
 void protocol::HttpUtil::setResponseStatus(protocol::HttpResponse *resp, int statusCode)
 {
+    logv("");
     char buf[32] = {0};
     sprintf(buf, "%d", statusCode);
     resp->setStatusCode(buf);
@@ -337,6 +345,7 @@ void protocol::HttpUtil::setResponseStatus(protocol::HttpResponse *resp, int sta
 
 std::string protocol::HttpUtil::decodeChunkedBody(const protocol::HttpMessage *msg)
 {
+    logv("");
     const void*         body;
     size_t              bodyLen;
     const void*         chunk;
@@ -356,6 +365,7 @@ std::string protocol::HttpUtil::decodeChunkedBody(const protocol::HttpMessage *m
 
 bool protocol::HttpHeaderMap::get(std::string key, std::string &value)
 {
+    logv("");
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
     const auto it = mHeaderMap.find(key);
 
@@ -369,6 +379,7 @@ bool protocol::HttpHeaderMap::get(std::string key, std::string &value)
 
 protocol::HttpHeaderMap::HttpHeaderMap(const protocol::HttpMessage* message)
 {
+    logv("");
     ::HttpHeaderCursor      cursor;
     HttpMessageHeader       header;
 
@@ -384,6 +395,7 @@ protocol::HttpHeaderMap::HttpHeaderMap(const protocol::HttpMessage* message)
 
 bool protocol::HttpHeaderMap::keyExists(std::string key)
 {
+    logv("");
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
 
     return mHeaderMap.count(key) > 0;
@@ -391,6 +403,7 @@ bool protocol::HttpHeaderMap::keyExists(std::string key)
 
 std::string protocol::HttpHeaderMap::get(std::string key)
 {
+    logv("");
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
     const auto it = mHeaderMap.find(key);
 
@@ -402,6 +415,7 @@ std::string protocol::HttpHeaderMap::get(std::string key)
 
 std::vector<std::string> protocol::HttpHeaderMap::getStrict(std::string key)
 {
+    logv("");
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
 
     return mHeaderMap[key];
@@ -409,6 +423,7 @@ std::vector<std::string> protocol::HttpHeaderMap::getStrict(std::string key)
 
 bool protocol::HttpHeaderMap::getStrict(std::string key, std::vector<std::string> &values)
 {
+    logv("");
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
     const auto it = mHeaderMap.find(key);
 
@@ -422,6 +437,7 @@ bool protocol::HttpHeaderMap::getStrict(std::string key, std::vector<std::string
 
 protocol::HttpChunkCursor::HttpChunkCursor(const protocol::HttpMessage *msg)
 {
+    logv("");
     if (msg->getParsedBody(&mBody, &mBodyLen)) {
         mPos = mBody;
         mChunked = msg->isChunked();
@@ -434,6 +450,7 @@ protocol::HttpChunkCursor::HttpChunkCursor(const protocol::HttpMessage *msg)
 
 bool protocol::HttpChunkCursor::next(const void **chunk, size_t *size)
 {
+    logv("");
     if (mEnd)
         return false;
 
@@ -463,6 +480,7 @@ bool protocol::HttpChunkCursor::next(const void **chunk, size_t *size)
 
 void protocol::HttpChunkCursor::rewind()
 {
+    logv("");
     if (mBody) {
         mPos = mBody;
         mEnd = false;

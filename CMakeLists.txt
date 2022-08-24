@@ -13,10 +13,14 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(DEBUG)
-    add_definitions(-g)
+    add_definitions(-g -DDEBUG)
 else()
     add_definitions(-w)
 endif()
+
+add_definitions(
+        -D LOG_TAG=\\"${CMAKE_PROJECT_NAME}\\"
+)
 
 
 find_package (PkgConfig)

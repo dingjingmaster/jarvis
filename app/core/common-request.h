@@ -17,22 +17,24 @@ class CommonRequest : public SubTask, public CommSession
 public:
     CommonRequest(CommSchedObject *object, CommScheduler *scheduler)
     {
+        logv("");
         mScheduler = scheduler;
         mObject = object;
         mWaitTimeout = 0;
     }
 
-    CommSchedObject *get_request_object() const { return mObject; }
+    CommSchedObject *getRequestObject() const { return mObject; }
 
-    void set_request_object(CommSchedObject *object) { mObject = object; }
+    void setRequestObject(CommSchedObject *object) { mObject = object; }
 
-    int get_wait_timeout() const { return mWaitTimeout; }
+    int getWaitTimeout() const { return mWaitTimeout; }
 
-    void set_wait_timeout(int timeout) { mWaitTimeout = timeout; }
+    void setWaitTimeout(int timeout) { mWaitTimeout = timeout; }
 
 public:
     virtual void dispatch()
     {
+        logv("");
         if (mScheduler->request(this, mObject, mWaitTimeout, &mTarget) < 0) {
             handle(CS_STATE_ERROR, errno);
         }

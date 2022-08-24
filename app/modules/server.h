@@ -14,6 +14,7 @@
 #include <openssl/ssl.h>
 #include <condition_variable>
 
+#include "../core/c-log.h"
 #include "../factory/task-factory.h"
 
 typedef struct _ServerParams                ServerParams;
@@ -47,12 +48,15 @@ public:
         mParams = *params;
         mUnbindFinish = false;
         mListenFd = -1;
+
+        logv("");
     }
 
 public:
     /* Start on port with IPv4. */
     int start(unsigned short port)
     {
+        logv("");
         return start(AF_INET, nullptr, port, nullptr, nullptr);
     }
 
@@ -112,6 +116,7 @@ public:
     /* stop() is a blocking operation. */
     void stop()
     {
+        logv("");
         this->shutdown();
         this->waitFinish();
     }
@@ -123,7 +128,11 @@ public:
     void shutdown();
     void waitFinish();
 
-    size_t get_conn_count() const { return mConnCount; }
+    size_t get_conn_count() const
+    {
+        logv("");
+        return mConnCount;
+    }
 
     /* Get the listening address. This is often used after starting
      * server on a random port (start() with port == 0). */
@@ -143,6 +152,7 @@ protected:
 	 * Returning NULL to indicate that servername is not supported. */
     virtual SSL_CTX *get_server_ssl_ctx(const char *servername)
     {
+        logv("");
         return this->getSSLCtx();
     }
 
@@ -179,23 +189,26 @@ public:
     Server(const ServerParams *params, std::function<void (NetworkTask<REQ, RESP> *)> proc)
         : ServerBase(params), mProcess(std::move(proc))
     {
+        logv("");
     }
 
-    Server(std::function<void (NetworkTask<REQ, RESP> *)> proc)
+    explicit Server(std::function<void (NetworkTask<REQ, RESP>*)> proc)
         : ServerBase(&SERVER_PARAMS_DEFAULT), mProcess(std::move(proc))
     {
+        logv("");
     }
 
 protected:
-    virtual CommSession *newSession(long long seq, CommConnection *conn) override ;
+    CommSession *newSession(long long seq, CommConnection *conn) override ;
 
 protected:
-    std::function<void (NetworkTask<REQ, RESP> *)>              mProcess;
+    std::function<void (NetworkTask<REQ, RESP>*)>               mProcess;
 };
 
 template<class REQ, class RESP>
 CommSession* Server<REQ, RESP>::newSession(long long seq, CommConnection *conn)
 {
+    logv("");
     using factory = NetworkTaskFactory<REQ, RESP>;
     NetworkTask<REQ, RESP> *task;
 

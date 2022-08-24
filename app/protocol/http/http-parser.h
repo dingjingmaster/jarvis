@@ -6,6 +6,7 @@
 #define JARVIS_HTTP_PARSER_H
 #include <stddef.h>
 #include "../../core/c-list.h"
+#include "../../core/c-log.h"
 
 #define HTTP_HEADER_NAME_MAX            64
 
@@ -86,72 +87,86 @@ int http_header_cursor_find(const void *name, size_t name_len, const void **valu
 
 static inline const char *http_parser_get_method(const HttpParser *parser)
 {
+    logv("");
     return parser->method;
 }
 
 static inline const char *http_parser_get_uri(const HttpParser *parser)
 {
+    logv("");
     return parser->uri;
 }
 
 static inline const char *http_parser_get_version(const HttpParser *parser)
 {
+    logv("");
     return parser->version;
 }
 
 static inline const char *http_parser_get_code(const HttpParser *parser)
 {
+    logv("");
     return parser->code;
 }
 
 static inline const char *http_parser_get_phrase(const HttpParser *parser)
 {
+    logv("");
     return parser->phrase;
 }
 
 static inline int http_parser_chunked(const HttpParser *parser)
 {
+    logv("");
     return parser->chunked;
 }
 
 static inline int http_parser_keep_alive(const HttpParser *parser)
 {
+    logv("");
     return parser->keepAlive;
 }
 
 static inline int http_parser_has_connection(const HttpParser *parser)
 {
+    logv("");
     return parser->hasConnection;
 }
 
 static inline int http_parser_has_content_length(const HttpParser *parser)
 {
+    logv("");
     return parser->hasContentLength;
 }
 
 static inline int http_parser_has_keep_alive(const HttpParser *parser)
 {
+    logv("");
     return parser->hasKeepAlive;
 }
 
 static inline void http_parser_close_message(HttpParser *parser)
 {
+    logv("");
     parser->complete = 1;
 }
 
 static inline void http_header_cursor_init(HttpHeaderCursor *cursor, const HttpParser *parser)
 {
+    logv("");
     cursor->head = &parser->headerList;
     cursor->next = cursor->head;
 }
 
 static inline void http_header_cursor_rewind(HttpHeaderCursor *cursor)
 {
+    logv("");
     cursor->next = cursor->head;
 }
 
 static inline void http_header_cursor_deinit(HttpHeaderCursor *cursor)
 {
+    logv("");
 }
 
 #endif //JARVIS_HTTP_PARSER_H

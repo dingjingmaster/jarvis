@@ -11,6 +11,7 @@
 #include <openssl/ssl.h>
 
 #include "communicator.h"
+#include "c-log.h"
 
 class CommSchedGroup;
 
@@ -97,12 +98,12 @@ class CommScheduler
 public:
     int init(size_t pollThreads, size_t handlerThreads)
     {
-        return this->comm.init(pollThreads, handlerThreads);
+        return this->mCommon.init(pollThreads, handlerThreads);
     }
 
     void deInit()
     {
-        this->comm.deInit();
+        this->mCommon.deInit();
     }
 
     /* wait_timeout in milliseconds, -1 for no timeout. */
@@ -112,7 +113,7 @@ public:
 
         *target = object->acquire(wait_timeout);
         if (*target) {
-            ret = this->comm.request(session, *target);
+            ret = this->mCommon.request(session, *target);
             if (ret < 0) {
                 (*target)->release(0);
             }
@@ -124,54 +125,55 @@ public:
     /* for services. */
     int reply(CommSession *session)
     {
-        return this->comm.reply(session);
+        return this->mCommon.reply(session);
     }
 
     int push(const void *buf, size_t size, CommSession *session)
     {
-        return this->comm.push(buf, size, session);
+        return this->mCommon.push(buf, size, session);
     }
 
     int bind(CommService *service)
     {
-        return this->comm.bind(service);
+        logv("");
+        return this->mCommon.bind(service);
     }
 
     void unbind(CommService *service)
     {
-        this->comm.unbind(service);
+        this->mCommon.unbind(service);
     }
 
     /* for sleepers. */
     int sleep(SleepSession *session)
     {
-        return this->comm.sleep(session);
+        return this->mCommon.sleep(session);
     }
 
     /* for file aio services. */
     int ioBind(IOService *service)
     {
-        return this->comm.ioBind(service);
+        return this->mCommon.ioBind(service);
     }
 
     void ioUnbind(IOService *service)
     {
-        this->comm.ioUnbind(service);
+        this->mCommon.ioUnbind(service);
     }
 
 public:
     int isHandlerThread() const
     {
-        return this->comm.isHandlerThread();
+        return this->mCommon.isHandlerThread();
     }
 
     int increaseHandlerThread()
     {
-        return this->comm.increaseHandlerThread();
+        return this->mCommon.increaseHandlerThread();
     }
 
 private:
-    Communicator comm;
+    Communicator                    mCommon;
 
 public:
     virtual ~CommScheduler() { }

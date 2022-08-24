@@ -3,6 +3,7 @@
 //
 
 #include "workflow.h"
+#include "../core/c-log.h"
 
 #include <mutex>
 #include <utility>
@@ -14,17 +15,20 @@
 
 SeriesWork* Workflow::createSeriesWork(SubTask* first, SeriesCallback callback)
 {
+    logv("");
     return new SeriesWork(first, std::move(callback));
 }
 
 void Workflow::startSeriesWork(SubTask *first, SeriesCallback callback)
 {
+    logv("");
     new SeriesWork(first, std::move(callback));
     first->dispatch();
 }
 
 SeriesWork* Workflow::createSeriesWork(SubTask *first, SubTask *last, SeriesCallback callback)
 {
+    logv("");
     SeriesWork *series = new SeriesWork(first, std::move(callback));
     series->setLastTask(last);
 
@@ -33,6 +37,7 @@ SeriesWork* Workflow::createSeriesWork(SubTask *first, SubTask *last, SeriesCall
 
 void Workflow::startSeriesWork(SubTask *first, SubTask *last, SeriesCallback callback)
 {
+    logv("");
     SeriesWork *series = new SeriesWork(first, std::move(callback));
     series->setLastTask(last);
     first->dispatch();
@@ -41,6 +46,7 @@ void Workflow::startSeriesWork(SubTask *first, SubTask *last, SeriesCallback cal
 ParallelWork::ParallelWork(ParallelCallback&& cb)
     : ParallelTask(new SubTask * [2 * 4], 0), mCallback(std::move(cb))
 {
+    logv("");
     mBufSize = 4;
     mAllSeries = (SeriesWork **)&mSubTasks[mBufSize];
     mContext = NULL;
@@ -49,6 +55,7 @@ ParallelWork::ParallelWork(ParallelCallback&& cb)
 ParallelWork::ParallelWork(SeriesWork *const *allSeries, size_t n, ParallelCallback &&cb)
     : ParallelTask(new SubTask *[2 * (n > 4 ? n : 4)], n), mCallback(std::move(cb))
 {
+    logv("");
     size_t      i = 0;
 
     mBufSize = (n > 4 ? n : 4);
@@ -65,6 +72,7 @@ ParallelWork::ParallelWork(SeriesWork *const *allSeries, size_t n, ParallelCallb
 
 ParallelWork::~ParallelWork()
 {
+    logv("");
     for (size_t i = 0; i < mSubTasksNR; ++i) {
         mAllSeries[i]->mInParallel = false;
         mAllSeries[i]->dismissRecursive();
@@ -79,6 +87,7 @@ void ParallelWork::expandBuf()
     SubTask**               buf;
     size_t                  size;
 
+    logv("");
     mBufSize *= 2;
     buf = new SubTask *[2 * mBufSize];
     size = mSubTasksNR * sizeof (void *);
@@ -92,6 +101,7 @@ void ParallelWork::expandBuf()
 
 SubTask *ParallelWork::done()
 {
+    logv("");
     SeriesWork *series = seriesOf(this);
     size_t i;
 
@@ -109,6 +119,7 @@ SubTask *ParallelWork::done()
 
 void ParallelWork::addSeries(SeriesWork *series)
 {
+    logv("");
     if (mSubTasksNR == mBufSize)
         expandBuf();
 
@@ -121,6 +132,7 @@ void ParallelWork::addSeries(SeriesWork *series)
 
 void SeriesWork::pushBack(SubTask *task)
 {
+    logv("");
     mMutex.lock();
     task->setPointer(this);
     mQueue[mBack] = task;
@@ -135,6 +147,7 @@ void SeriesWork::pushBack(SubTask *task)
 
 void SeriesWork::pushFront(SubTask *task)
 {
+    logv("");
     mMutex.lock();
     if (--mFront == -1)
         mFront = mQueueSize - 1;
@@ -149,6 +162,7 @@ void SeriesWork::pushFront(SubTask *task)
 
 SubTask *SeriesWork::pop()
 {
+    logv("");
     bool canceled = mCanceled;
     SubTask *task = popTask();
 
@@ -165,6 +179,7 @@ SubTask *SeriesWork::pop()
 
 SeriesWork::~SeriesWork()
 {
+    logv("");
     if (mQueue != mBuf)
         delete [] mQueue;
 }
@@ -172,6 +187,7 @@ SeriesWork::~SeriesWork()
 SeriesWork::SeriesWork(SubTask *first, SeriesCallback &&cb)
     : mCallback(std::move(cb))
 {
+    logv("");
     mQueue = mBuf;
     mQueueSize = sizeof mBuf / sizeof *mBuf;
     mFront = 0;
@@ -188,6 +204,7 @@ SeriesWork::SeriesWork(SubTask *first, SeriesCallback &&cb)
 
 void SeriesWork::dismissRecursive()
 {
+    logv("");
     SubTask *task = mFirst;
 
     mCallback = nullptr;
@@ -199,6 +216,7 @@ void SeriesWork::dismissRecursive()
 
 SubTask *SeriesWork::popTask()
 {
+    logv("");
     SubTask *task;
 
     mMutex.lock();
@@ -227,6 +245,7 @@ SubTask *SeriesWork::popTask()
 
 void SeriesWork::expandQueue()
 {
+    logv("");
     int size = 2 * mQueueSize;
     SubTask **queue = new SubTask *[size];
     int i, j;
@@ -250,16 +269,19 @@ void SeriesWork::expandQueue()
 
 ParallelWork* Workflow::createParallelWork(ParallelCallback callback)
 {
+    logv("");
     return new ParallelWork(std::move(callback));
 }
 
 ParallelWork* Workflow::createParallelWork(SeriesWork *const all_series[], size_t n, ParallelCallback callback)
 {
+    logv("");
     return new ParallelWork(all_series, n, std::move(callback));
 }
 
 void Workflow::startParallelWork(SeriesWork *const all_series[], size_t n, ParallelCallback callback)
 {
+    logv("");
     ParallelWork *p = new ParallelWork(all_series, n, std::move(callback));
     Workflow::startSeriesWork(p, nullptr);
 }

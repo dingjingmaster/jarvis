@@ -11,8 +11,7 @@
 
 typedef struct _ThreadPoolTaskEntry ThreadPoolTaskEntry;
 
-inline int thread_pool_in_pool(ThreadPool* pool);
-inline void _thread_pool_schedule(const ThreadPoolTask* task, void* buf, ThreadPool* pool);
+void _thread_pool_schedule(const ThreadPoolTask* task, void* buf, ThreadPool* pool);
 
 struct _ThreadPool
 {

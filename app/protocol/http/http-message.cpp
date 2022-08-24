@@ -18,6 +18,7 @@ namespace protocol
 
 bool protocol::HttpMessage::appendOutputBody(const void *buf, size_t size)
 {
+    logv("");
     size_t n = sizeof (HttpMessageBlock) + size;
     auto block = (HttpMessageBlock*)malloc(n);
 
@@ -37,6 +38,7 @@ bool protocol::HttpMessage::appendOutputBodyNocopy(const void *buf, size_t size)
 {
     size_t n = sizeof (HttpMessageBlock);
     HttpMessageBlock *block = (HttpMessageBlock *)malloc(n);
+    logv("");
 
     if (block) {
         block->ptr = buf;
@@ -54,6 +56,7 @@ void protocol::HttpMessage::clearOutputBody()
     HttpMessageBlock *block;
     struct list_head *pos, *tmp;
 
+    logv("");
     list_for_each_safe(pos, tmp, &mOutputBody) {
         block = list_entry(pos, HttpMessageBlock, list);
         list_del(pos);
@@ -65,11 +68,13 @@ void protocol::HttpMessage::clearOutputBody()
 
 size_t protocol::HttpMessage::getOutputBodySize() const
 {
+    logv("");
     return mOutputBodySize;
 }
 
 int protocol::HttpMessage::append(const void *buf, size_t *size)
 {
+    logv("");
     int ret = http_parser_append_message(buf, size, mParser);
 
     if (ret >= 0) {
@@ -96,6 +101,7 @@ int protocol::HttpMessage::encode(struct iovec *vectors, int max)
     struct list_head*           pos;
     size_t                      size;
 
+    logv("");
     startLine[0] = http_parser_get_method(mParser);
     if (startLine[0]) {
         startLine[1] = http_parser_get_uri(mParser);
@@ -172,6 +178,7 @@ struct list_head *protocol::HttpMessage::combineFrom(struct list_head *pos, size
     HttpMessageBlock *entry;
     char *ptr;
 
+    logv("");
     if (block) {
         block->ptr = block + 1;
         block->size = size;
@@ -199,6 +206,7 @@ protocol::HttpMessage::HttpMessage(protocol::HttpMessage &&msg)
     mParser = msg.mParser;
     msg.mParser = NULL;
 
+    logv("");
     INIT_LIST_HEAD(&mOutputBody);
     list_splice_init(&msg.mOutputBody, &mOutputBody);
     mOutputBodySize = msg.mOutputBodySize;
@@ -210,6 +218,7 @@ protocol::HttpMessage::HttpMessage(protocol::HttpMessage &&msg)
 
 protocol::HttpMessage &protocol::HttpMessage::operator=(protocol::HttpMessage &&msg)
 {
+    logv("");
     if (&msg != this) {
         *(ProtocolMessage *)this = std::move(msg);
 
@@ -262,6 +271,7 @@ protocol::HttpMessage &protocol::HttpMessage::operator=(protocol::HttpMessage &&
 
 int protocol::HttpRequest::append(const void* buf, size_t* size)
 {
+    logv("");
     int ret = HttpMessage::append(buf, size);
 
     if (ret == 0) {
@@ -281,6 +291,7 @@ int protocol::HttpRequest::append(const void* buf, size_t* size)
 
 int protocol::HttpRequest::handleExpectContinue()
 {
+    logv("");
     size_t trans_len = mParser->transferLength;
     int ret;
 
@@ -304,6 +315,7 @@ int protocol::HttpRequest::handleExpectContinue()
 
 int protocol::HttpResponse::append(const void *buf, size_t *size)
 {
+    logv("");
     int ret = HttpMessage::append(buf, size);
 
     if (ret > 0) {

@@ -25,11 +25,13 @@ class ServerConnection : public Connection
 public:
     ServerConnection(std::atomic<size_t> *connCount)
     {
+        logv("");
         mConnCount = connCount;
     }
 
     virtual ~ServerConnection()
     {
+        logv("");
         (*mConnCount)--;
     }
 
@@ -39,6 +41,7 @@ private:
 
 int ServerBase::sslCtxCallback(SSL *ssl, int *al, void *arg)
 {
+    logv("");
     ServerBase *server = (ServerBase*)arg;
     const char *servername = SSL_get_servername(ssl, TLSEXT_NAMETYPE_host_name);
     SSL_CTX *ssl_ctx = server->get_server_ssl_ctx(servername);
@@ -54,6 +57,7 @@ int ServerBase::sslCtxCallback(SSL *ssl, int *al, void *arg)
 
 int ServerBase::initSslCtx(const char *certFile, const char *keyFile)
 {
+    logv("");
     SSL_CTX *ssl_ctx = Global::newSslServerCtx();
 
     if (!ssl_ctx)
@@ -72,38 +76,48 @@ int ServerBase::initSslCtx(const char *certFile, const char *keyFile)
     return -1;
 }
 
-int ServerBase::init(const struct sockaddr *bind_addr, socklen_t addrlen, const char *cert_file, const char *key_file)
+int ServerBase::init(const struct sockaddr *bindAddr, socklen_t addrLen, const char *certFile, const char *keyFile)
 {
     int timeout = mParams.peerResponseTimeout;
 
     if (mParams.receiveTimeout >= 0) {
-        if ((unsigned int)timeout > (unsigned int)mParams.receiveTimeout)
+        if ((unsigned int)timeout > (unsigned int)mParams.receiveTimeout) {
             timeout = mParams.receiveTimeout;
+        }
     }
 
-    if (CommService::init(bind_addr, addrlen, -1, timeout) < 0)
-        return -1;
+    logv("timeout: %d, keyFile: %s, certFile: %s", timeout, keyFile ? keyFile : "null", certFile ? certFile : "null");
 
-    if (key_file && cert_file) {
-        if (this->initSslCtx(cert_file, key_file) < 0) {
+    if (CommService::init(bindAddr, addrLen, -1, timeout) < 0) {
+        logd("CommService::init failed!");
+        return -1;
+    }
+
+    if (keyFile && certFile) {
+        logv("init ssl context...");
+        if (this->initSslCtx(certFile, keyFile) < 0) {
             this->deInit();
+            logv("init ssl context failed!");
             return -1;
         }
     }
 
     mScheduler = Global::getScheduler();
 
+    logv("get global scheduler: %p", mScheduler);
+
     return 0;
 }
 
 int ServerBase::createListenFd()
 {
+    logv("");
     if (mListenFd < 0) {
         const struct sockaddr *bind_addr;
-        socklen_t addrlen;
+        socklen_t addrLen;
         int reuse = 1;
 
-        getAddr(&bind_addr, &addrlen);
+        getAddr(&bind_addr, &addrLen);
         mListenFd = socket(bind_addr->sa_family, SOCK_STREAM, 0);
         if (this->mListenFd >= 0) {
             setsockopt(mListenFd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof (int));
@@ -117,6 +131,7 @@ int ServerBase::createListenFd()
 
 Connection *ServerBase::newConnection(int accept_fd)
 {
+    logv("");
     if (++mConnCount <= mParams.maxConnections
         || drain(1) == 1) {
         int reuse = 1;
@@ -132,29 +147,35 @@ Connection *ServerBase::newConnection(int accept_fd)
 
 void ServerBase::deleteConnection(Connection *conn)
 {
+    logv("");
     delete (ServerConnection*) conn;
 }
 
 void ServerBase::handleUnbound()
 {
+    logv("");
     mMutex.lock();
     mUnbindFinish = true;
     mCond.notify_one();
     mMutex.unlock();
 }
 
-int ServerBase::start(const struct sockaddr *bind_addr, socklen_t addrLen, const char *cert_file, const char *key_file)
+int ServerBase::start(const struct sockaddr *bindAddr, socklen_t addrLen, const char *certFile, const char *keyFile)
 {
-    SSL_CTX *ssl_ctx;
+    SSL_CTX*        sslCtx;
 
-    if (init(bind_addr, addrLen, cert_file, key_file) >= 0) {
-        if (mScheduler->bind(this) >= 0)
+    logv("");
+
+    if (init(bindAddr, addrLen, certFile, keyFile) >= 0) {
+        if (mScheduler->bind(this) >= 0) {
             return 0;
+        }
 
-        ssl_ctx = getSSLCtx();
+        sslCtx = getSSLCtx();
         deInit();
-        if (ssl_ctx)
-            SSL_CTX_free(ssl_ctx);
+        if (sslCtx) {
+            SSL_CTX_free(sslCtx);
+        }
     }
 
     mListenFd = -1;
@@ -162,51 +183,60 @@ int ServerBase::start(const struct sockaddr *bind_addr, socklen_t addrLen, const
     return -1;
 }
 
-int ServerBase::start(int family, const char *host, unsigned short port, const char *cert_file, const char *key_file)
+int ServerBase::start(int family, const char *host, unsigned short port, const char *certFile, const char *keyFile)
 {
+    logv("");
     struct addrinfo hints = {
             .ai_flags		=	AI_PASSIVE,
             .ai_family		=	family,
             .ai_socktype	=	SOCK_STREAM,
     };
-    struct addrinfo *addrinfo;
-    char port_str[PORT_STR_MAX + 1];
+    struct addrinfo *addrInfo;
+    char portStr[PORT_STR_MAX + 1];
     int ret;
 
-    snprintf(port_str, PORT_STR_MAX + 1, "%d", port);
-    ret = getaddrinfo(host, port_str, &hints, &addrinfo);
+    snprintf(portStr, PORT_STR_MAX + 1, "%d", port);
+    ret = getaddrinfo(host, portStr, &hints, &addrInfo);
+
+    logv("host: %s, port: %s, getaddrinfo(): %d", host, portStr, ret);
+
     if (ret == 0) {
-        ret = start(addrinfo->ai_addr, (socklen_t)addrinfo->ai_addrlen, cert_file, key_file);
-        freeaddrinfo(addrinfo);
+        ret = start(addrInfo->ai_addr, (socklen_t)addrInfo->ai_addrlen, certFile, keyFile);
+        freeaddrinfo(addrInfo);
     } else {
-        if (ret != EAI_SYSTEM)
+        if (ret != EAI_SYSTEM) {
             errno = EINVAL;
+        }
         ret = -1;
     }
 
     return ret;
 }
 
-int ServerBase::serve(int listen_fd, const char *cert_file, const char *key_file)
+int ServerBase::serve(int listenFd, const char *certFile, const char *keyFile)
 {
+    logv("");
     struct sockaddr_storage ss;
     socklen_t len = sizeof ss;
 
-    if (getsockname(listen_fd, (struct sockaddr *)&ss, &len) < 0)
+    if (getsockname(listenFd, (struct sockaddr *)&ss, &len) < 0) {
         return -1;
+    }
 
-    mListenFd = listen_fd;
-    return start((struct sockaddr *)&ss, len, cert_file, key_file);
+    mListenFd = listenFd;
+    return start((struct sockaddr *)&ss, len, certFile, keyFile);
 }
 
 void ServerBase::shutdown()
 {
+    logv("");
     mListenFd = -1;
     mScheduler->unbind(this);
 }
 
 void ServerBase::waitFinish()
 {
+    logv("");
     SSL_CTX *sslCtx = getSSLCtx();
     std::unique_lock<std::mutex> lock(mMutex);
 
@@ -214,10 +244,12 @@ void ServerBase::waitFinish()
         mCond.wait(lock);
     }
 
+    logv("");
     deInit();
     mUnbindFinish = false;
     lock.unlock();
     if (sslCtx) {
+        logv("ssl ctx free");
         SSL_CTX_free(sslCtx);
     }
 }

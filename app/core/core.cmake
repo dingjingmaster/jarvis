@@ -1,4 +1,7 @@
 file(GLOB CORE_SRC
+        ${CMAKE_SOURCE_DIR}/app/core/c-log.c
+        ${CMAKE_SOURCE_DIR}/app/core/c-log.h
+
         ${CMAKE_SOURCE_DIR}/app/core/c-list.h
         ${CMAKE_SOURCE_DIR}/app/core/io-request.h
         ${CMAKE_SOURCE_DIR}/app/core/sleep-request.h

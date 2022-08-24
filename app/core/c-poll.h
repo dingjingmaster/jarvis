@@ -72,7 +72,7 @@ struct _CPollResult
 
     int                         state;
     int                         error;
-    CPollData*                  data;
+    CPollData                   data;
 };
 
 struct _CPollParams

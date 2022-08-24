@@ -45,6 +45,7 @@ struct _HeaderLine
 
 static int _add_message_header(const void *name, size_t name_len, const void *value, size_t value_len, HttpParser *parser)
 {
+    logv("");
     size_t size = sizeof (HeaderLine) + name_len + value_len + 4;
     HeaderLine *line;
 
@@ -68,6 +69,7 @@ static int _add_message_header(const void *name, size_t name_len, const void *va
 
 static int _set_message_header(const void *name, size_t name_len, const void *value, size_t value_len, HttpParser *parser)
 {
+    logv("");
     HeaderLine *line;
     struct list_head *pos;
     char *buf;
@@ -102,6 +104,7 @@ static int _set_message_header(const void *name, size_t name_len, const void *va
 
 static int _match_request_line(const char *method, const char *uri, const char *version, HttpParser *parser)
 {
+    logv("");
     if (strcmp(version, "HTTP/1.0") == 0 || strncmp(version, "HTTP/0", 6) == 0)
         parser->keepAlive = 0;
 
@@ -131,6 +134,7 @@ static int _match_request_line(const char *method, const char *uri, const char *
 
 static int _match_status_line(const char *version, const char *code, const char *phrase, HttpParser *parser)
 {
+    logv("");
     if (strcmp(version, "HTTP/1.0") == 0 || strncmp(version, "HTTP/0", 6) == 0)
         parser->keepAlive = 0;
 
@@ -163,6 +167,7 @@ static int _match_status_line(const char *version, const char *code, const char 
 
 static void _check_message_header(const char *name, size_t name_len, const char *value, size_t value_len, HttpParser *parser)
 {
+    logv("");
     switch (name_len) {
         case 6:
             if (strncasecmp(name, "Expect", 6) == 0) {
@@ -209,6 +214,7 @@ static void _check_message_header(const char *name, size_t name_len, const char 
 
 static int _parse_start_line(const char *ptr, size_t len, HttpParser *parser)
 {
+    logv("");
     char start_line[HTTP_START_LINE_MAX];
     size_t min = MIN(HTTP_START_LINE_MAX, len);
     char *p1, *p2, *p3;
@@ -268,6 +274,7 @@ static int _parse_start_line(const char *ptr, size_t len, HttpParser *parser)
 
 static int _parse_header_name(const char *ptr, size_t len, HttpParser *parser)
 {
+    logv("");
     size_t min = MIN(HTTP_HEADER_NAME_MAX, len);
     size_t i;
 
@@ -299,6 +306,7 @@ static int _parse_header_name(const char *ptr, size_t len, HttpParser *parser)
 
 static int _parse_header_value(const char *ptr, size_t len, HttpParser *parser)
 {
+    logv("");
     char header_value[HTTP_HEADER_VALUE_MAX];
     const char *end = ptr + len;
     const char *begin = ptr;
@@ -366,6 +374,7 @@ static int _parse_header_value(const char *ptr, size_t len, HttpParser *parser)
 
 static int _parse_message_header(const void *message, size_t size, HttpParser *parser)
 {
+    logv("");
     const char *ptr;
     size_t len;
     int ret;
@@ -391,6 +400,7 @@ static int _parse_message_header(const void *message, size_t size, HttpParser *p
 
 static int _parse_chunk_data(const char *ptr, size_t len, HttpParser *parser)
 {
+    logv("");
     char chunk_line[HTTP_CHUNK_LINE_MAX];
     size_t min = MIN(HTTP_CHUNK_LINE_MAX, len);
     long chunk_size;
@@ -434,6 +444,7 @@ static int _parse_chunk_data(const char *ptr, size_t len, HttpParser *parser)
 
 static int _parse_trailer_part(const char *ptr, size_t len, HttpParser *parser)
 {
+    logv("");
     size_t min = MIN(HTTP_TRAILER_LINE_MAX, len);
     size_t i;
 
@@ -461,6 +472,7 @@ static int _parse_trailer_part(const char *ptr, size_t len, HttpParser *parser)
 
 static int _parse_chunk(const void *message, size_t size, HttpParser *parser)
 {
+    logv("");
     const char *ptr;
     size_t len;
     int ret;
@@ -482,6 +494,7 @@ static int _parse_chunk(const void *message, size_t size, HttpParser *parser)
 
 void http_parser_init(int is_resp, HttpParser *parser)
 {
+    logv("");
     parser->headerState = HPS_START_LINE;
     parser->headerOffset = 0;
     parser->transferLength = (size_t)-1;
@@ -507,6 +520,7 @@ void http_parser_init(int is_resp, HttpParser *parser)
 
 int http_parser_append_message(const void *buf, size_t *n, HttpParser *parser)
 {
+    logv("");
     int ret;
 
     if (parser->complete) {
@@ -574,11 +588,13 @@ int http_parser_append_message(const void *buf, size_t *n, HttpParser *parser)
 
 int http_parser_header_complete(const HttpParser *parser)
 {
+    logv("");
     return parser->headerState == HPS_HEADER_COMPLETE;
 }
 
 int http_parser_get_body(const void **body, size_t *size, const HttpParser *parser)
 {
+    logv("");
     if (parser->complete && parser->headerState == HPS_HEADER_COMPLETE) {
         *body = (char *)parser->msgBuf + parser->headerOffset;
         *size = parser->msgSize - parser->headerOffset;
@@ -591,6 +607,7 @@ int http_parser_get_body(const void **body, size_t *size, const HttpParser *pars
 
 int http_parser_set_method(const char *method, HttpParser *parser)
 {
+    logv("");
     method = strdup(method);
     if (method) {
         free(parser->method);
@@ -603,6 +620,7 @@ int http_parser_set_method(const char *method, HttpParser *parser)
 
 int http_parser_set_uri(const char *uri, HttpParser *parser)
 {
+    logv("");
     uri = strdup(uri);
     if (uri) {
         free(parser->uri);
@@ -615,6 +633,7 @@ int http_parser_set_uri(const char *uri, HttpParser *parser)
 
 int http_parser_set_version(const char *version, HttpParser *parser)
 {
+    logv("");
     version = strdup(version);
     if (version) {
         free(parser->version);
@@ -627,6 +646,7 @@ int http_parser_set_version(const char *version, HttpParser *parser)
 
 int http_parser_set_code(const char *code, HttpParser *parser)
 {
+    logv("");
     code = strdup(code);
     if (code) {
         free(parser->code);
@@ -639,6 +659,7 @@ int http_parser_set_code(const char *code, HttpParser *parser)
 
 int http_parser_set_phrase(const char *phrase, HttpParser *parser)
 {
+    logv("");
     phrase = strdup(phrase);
     if (phrase) {
         free(parser->phrase);
@@ -651,6 +672,7 @@ int http_parser_set_phrase(const char *phrase, HttpParser *parser)
 
 int http_parser_add_header(const void *name, size_t name_len, const void *value, size_t value_len, HttpParser *parser)
 {
+    logv("");
     if (_add_message_header(name, name_len, value, value_len, parser) >= 0) {
         _check_message_header((const char *)name, name_len, (const char *)value, value_len, parser);
         return 0;
@@ -661,6 +683,7 @@ int http_parser_add_header(const void *name, size_t name_len, const void *value,
 
 int http_parser_set_header(const void *name, size_t name_len, const void *value, size_t value_len, HttpParser *parser)
 {
+    logv("");
     if (_set_message_header(name, name_len, value, value_len, parser) >= 0) {
         _check_message_header((const char *)name, name_len, (const char *)value, value_len, parser);
         return 0;
@@ -671,6 +694,7 @@ int http_parser_set_header(const void *name, size_t name_len, const void *value,
 
 void http_parser_deinit(HttpParser *parser)
 {
+    logv("");
     HeaderLine *line;
     struct list_head *pos, *tmp;
 
@@ -693,6 +717,7 @@ void http_parser_deinit(HttpParser *parser)
 
 int http_header_cursor_next(const void **name, size_t *name_len, const void **value, size_t *value_len, HttpHeaderCursor *cursor)
 {
+    logv("");
     HeaderLine *line;
 
     if (cursor->next->next != cursor->head) {
@@ -710,6 +735,7 @@ int http_header_cursor_next(const void **name, size_t *name_len, const void **va
 
 int http_header_cursor_find(const void *name, size_t name_len, const void **value, size_t *value_len, HttpHeaderCursor *cursor)
 {
+    logv("");
     HeaderLine *line;
 
     while (cursor->next->next != cursor->head) {
