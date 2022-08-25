@@ -67,3 +67,9 @@ target_link_libraries(demo-dns-client
         PRIVATE
         PUBLIC
         ${OPENSSL_LIBRARIES})
+
+add_executable(demo-reducer ${CMAKE_SOURCE_DIR}/demo/demo-reducer.cpp ${HTTP_SERVER_SRC})
+target_link_libraries(demo-reducer
+        PRIVATE
+        PUBLIC
+        ${OPENSSL_LIBRARIES})

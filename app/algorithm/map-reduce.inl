@@ -74,7 +74,7 @@ namespace algorithm
                 delete this->heap[n];
 
             this->heap[n]->value = std::move(value);
-            this->heap_insert(this->heap[n]);
+            this->heapInsert(this->heap[n]);
         }
 
         size_t count() { return this->heap_size; }
@@ -265,8 +265,8 @@ namespace algorithm
     template<typename KEY, typename VAL>
     void Reducer<KEY, VAL>::insert(KEY&& key, VAL&& value)
     {
-        struct rb_node **p = &this->key_tree.rb_node;
-        struct rb_node *parent = NULL;
+        RBNode**p = &this->mKeyTree.rbNode;
+        RBNode*parent = NULL;
         __ReduceKey<KEY, VAL> *entry;
 
         while (*p) {
@@ -274,9 +274,9 @@ namespace algorithm
             using TYPE = __ReduceKey<KEY, VAL>;
             entry = RB_ENTRY(*p, TYPE, rb);
             if (key < entry->key)
-                p = &(*p)->rb_left;
+                p = &(*p)->rbLeft;
             else if (key > entry->key)
-                p = &(*p)->rb_right;
+                p = &(*p)->rbRight;
             else
                 break;
         }
@@ -284,7 +284,7 @@ namespace algorithm
         if (!*p) {
             entry = new __ReduceKey<KEY, VAL>(std::move(key));
             rb_link_node(&entry->rb, parent, p);
-            rb_insert_color(&entry->rb, &this->key_tree);
+            rb_insert_color(&entry->rb, &this->mKeyTree);
         }
 
         entry->insert(std::move(value));
@@ -293,7 +293,7 @@ namespace algorithm
     template<typename KEY, typename VAL>
     void Reducer<KEY, VAL>::start(ReduceFunction<KEY, VAL> reduce, std::vector<std::pair<KEY, VAL>> *result)
     {
-        struct rb_node *p = rb_first(&this->key_tree);
+        RBNode*p = rb_first(&this->mKeyTree);
         __ReduceKey<KEY, VAL> *key;
         __ReduceValue<VAL> *value;
 
@@ -305,9 +305,9 @@ namespace algorithm
 
                 do {
                     VAL tmp;
-                    iter.reduce_begin();
+                    iter.reduceBegin();
                     reduce(&key->key, &iter, &tmp);
-                    iter.reduce_end(std::move(tmp));
+                    iter.reduceEnd(std::move(tmp));
                 } while (iter.count() > 1);
 
                 list_add_tail(&iter.value()->list, &key->valueList);
@@ -320,7 +320,7 @@ namespace algorithm
             delete value;
 
             p = rb_next(p);
-            rb_erase(&key->rb, &this->key_tree);
+            rb_erase(&key->rb, &this->mKeyTree);
             delete key;
         }
     }
@@ -330,10 +330,10 @@ namespace algorithm
     {
         __ReduceKey<KEY, VAL> *entry;
 
-        while (this->key_tree.rb_node) {
+        while (this->mKeyTree.rbNode) {
             using TYPE = __ReduceKey<KEY, VAL>;
-            entry = RB_ENTRY(this->key_tree.rb_node, TYPE, rb);
-            rb_erase(&entry->rb, &this->key_tree);
+            entry = RB_ENTRY(this->mKeyTree.rbNode, TYPE, rb);
+            rb_erase(&entry->rb, &this->mKeyTree);
             delete entry;
         }
     }
