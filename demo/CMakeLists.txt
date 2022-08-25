@@ -43,3 +43,9 @@ target_link_libraries(demo-matrix-multiply
         PRIVATE
         PUBLIC
         ${OPENSSL_LIBRARIES})
+
+add_executable(demo-http-file-server ${CMAKE_SOURCE_DIR}/demo/demo-http-file-server.cpp ${HTTP_SERVER_SRC})
+target_link_libraries(demo-http-file-server
+        PRIVATE
+        PUBLIC
+        ${OPENSSL_LIBRARIES})

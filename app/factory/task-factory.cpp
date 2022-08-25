@@ -23,8 +23,8 @@ protected:
     }
 
 protected:
-    time_t seconds;
-    long nanoseconds;
+    time_t              seconds;
+    long                nanoseconds;
 
 public:
     __TimerTask(CommScheduler *scheduler, time_t seconds, long nanoseconds, TimerCallback && cb)
@@ -93,8 +93,7 @@ public:
     void remove(struct __CounterList *counters, struct __counter_node *node);
 
 private:
-    void count_n_locked(struct __CounterList *counters, unsigned int n,
-                        struct list_head *task_list);
+    void count_n_locked(struct __CounterList *counters, unsigned int n, struct list_head *task_list);
     RBRoot          counters_map_;
     std::mutex      mutex_;
 
@@ -228,8 +227,7 @@ void __CounterMap::count_n(const std::string& name, unsigned int n)
     }
 }
 
-void __CounterMap::count(struct __CounterList *counters,
-                         struct __counter_node *node)
+void __CounterMap::count(struct __CounterList *counters, struct __counter_node *node)
 {
     __CounterTask *task = NULL;
 
@@ -250,8 +248,7 @@ void __CounterMap::count(struct __CounterList *counters,
         task->CounterTask::count();
 }
 
-void __CounterMap::remove(struct __CounterList *counters,
-                          struct __counter_node *node)
+void __CounterMap::remove(struct __CounterList *counters, struct __counter_node *node)
 {
     mutex_.lock();
     counters->del(node);

@@ -97,14 +97,14 @@ public:
     static HttpTask* createHttpTask(const ParsedURI& uri, const ParsedURI& proxyUri, int redirectMax, int retryMax, HttpCallback callback);
     static HttpTask* createHttpTask(const std::string& url, const std::string& proxyUrl, int redirectMax, int retryMax, HttpCallback callback);
 
-    static FileIOTask* createPreadTask(int fd, void *buf, size_t count, off_t offset, FileIOCallback callback);
-    static FileIOTask* createPwriteTask(int fd, const void *buf, size_t count, off_t offset, FileIOCallback callback);
+    static FileIOTask* createPReadTask(int fd, void *buf, size_t count, off_t offset, FileIOCallback callback);
+    static FileIOTask* createPWriteTask(int fd, const void *buf, size_t count, off_t offset, FileIOCallback callback);
 
     /* preadv and pwritev tasks are supported by Linux aio only.
      * On macOS or others, you will get an ENOSYS error in callback. */
 
-    static FileVIOTask* createPreadvTask(int fd, const struct iovec *iov, int iovCnt, off_t offset, FileVIOCallback callback);
-    static FileVIOTask* createPwritevTask(int fd, const struct iovec *iov, int iovCnt, off_t offset, FileVIOCallback callback);
+    static FileVIOTask* createPReadVTask(int fd, const struct iovec *iov, int iovCnt, off_t offset, FileVIOCallback callback);
+    static FileVIOTask* createPWriteVTask(int fd, const struct iovec *iov, int iovCnt, off_t offset, FileVIOCallback callback);
 
     static FileSyncTask* createFsyncTask(int fd, FileSyncCallback callback);
 
@@ -113,11 +113,11 @@ public:
     static FileSyncTask* createFdSyncTask(int fd, FileSyncCallback callback);
 
     /* File tasks with path name. */
-    static FileIOTask* createPreadTask(const std::string& pathname, void *buf, size_t count, off_t offset, FileIOCallback callback);
-    static FileIOTask* createPwriteTask(const std::string& pathname, const void *buf, size_t count, off_t offset, FileIOCallback callback);
+    static FileIOTask* createPReadTask(const std::string& pathname, void *buf, size_t count, off_t offset, FileIOCallback callback);
+    static FileIOTask* createPWriteTask(const std::string& pathname, const void *buf, size_t count, off_t offset, FileIOCallback callback);
 
-    static FileVIOTask* createPreadvTask(const std::string& pathname, const struct iovec *iov, int iovCnt, off_t offset, FileVIOCallback callback);
-    static FileVIOTask* createPwritevTask(const std::string& pathname, const struct iovec *iov, int iovCnt, off_t offset, FileVIOCallback callback);
+    static FileVIOTask* createPReadVTask(const std::string& pathname, const struct iovec *iov, int iovCnt, off_t offset, FileVIOCallback callback);
+    static FileVIOTask* createPWriteVTask(const std::string& pathname, const struct iovec *iov, int iovCnt, off_t offset, FileVIOCallback callback);
 
     static TimerTask* createTimerTask(unsigned int microseconds, TimerCallback callback);
 

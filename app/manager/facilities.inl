@@ -64,7 +64,7 @@ inline Future<ssize_t> Facilities::asyncPRead(int fd, void *buf, size_t count, o
 {
     auto *pr = new Promise<ssize_t>();
     auto fr = pr->getFuture();
-    auto *task = TaskFactory::createPreadTask(fd, buf, count, offset, __fio_future_callback);
+    auto *task = TaskFactory::createPReadTask(fd, buf, count, offset, __fio_future_callback);
 
     task->mUserData = pr;
     task->start();
@@ -75,7 +75,7 @@ inline Future<ssize_t> Facilities::asyncPWrite(int fd, const void *buf, size_t c
 {
     auto *pr = new Promise<ssize_t>();
     auto fr = pr->getFuture();
-    auto *task = TaskFactory::createPwriteTask(fd, buf, count, offset, __fio_future_callback);
+    auto *task = TaskFactory::createPWriteTask(fd, buf, count, offset, __fio_future_callback);
 
     task->mUserData = pr;
     task->start();
@@ -86,7 +86,7 @@ inline Future<ssize_t> Facilities::asyncPReadV(int fd, const struct iovec *iov, 
 {
     auto *pr = new Promise<ssize_t>();
     auto fr = pr->getFuture();
-    auto *task = TaskFactory::createPreadvTask(fd, iov, iovcnt, offset, __fvio_future_callback);
+    auto *task = TaskFactory::createPReadVTask(fd, iov, iovcnt, offset, __fvio_future_callback);
 
     task->mUserData = pr;
     task->start();
@@ -97,7 +97,7 @@ inline Future<ssize_t> Facilities::asyncPWriteV(int fd, const struct iovec *iov,
 {
     auto *pr = new Promise<ssize_t>();
     auto fr = pr->getFuture();
-    auto *task = TaskFactory::createPwritevTask(fd, iov, iovcnt, offset, __fvio_future_callback);
+    auto *task = TaskFactory::createPWriteVTask(fd, iov, iovcnt, offset, __fvio_future_callback);
 
     task->mUserData = pr;
     task->start();
