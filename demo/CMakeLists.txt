@@ -61,3 +61,9 @@ target_link_libraries(demo-name-service
         PRIVATE
         PUBLIC
         ${OPENSSL_LIBRARIES})
+
+add_executable(demo-dns-client ${CMAKE_SOURCE_DIR}/demo/demo-dns-client.cpp ${HTTP_SERVER_SRC})
+target_link_libraries(demo-dns-client
+        PRIVATE
+        PUBLIC
+        ${OPENSSL_LIBRARIES})
