@@ -2,8 +2,6 @@
 // Created by dingjing on 8/17/22.
 //
 
-#include "map-reduce.h"
-
 #include <vector>
 #include <utility>
 #include <assert.h>
@@ -17,36 +15,36 @@ namespace algorithm
     template<typename VAL>
     struct __ReduceValue
     {
-        struct list_head list;
-        VAL value;
+        struct list_head            list;
+        VAL                         value;
         __ReduceValue(VAL&& val) : value(std::move(val)) { }
     };
 
     template<typename KEY, typename VAL>
     struct __ReduceKey
     {
-        struct rb_node rb;
-        KEY key;
-        struct list_head value_list;
-        size_t value_cnt;
+        RBNode              rb;
+        KEY                 key;
+        struct list_head    valueList;
+        size_t              valueCnt;
 
         __ReduceKey(KEY&& k) : key(std::move(k))
         {
-            INIT_LIST_HEAD(&this->value_list);
-            this->value_cnt = 0;
+            INIT_LIST_HEAD(&this->valueList);
+            this->valueCnt = 0;
         }
 
         void insert(VAL&& value)
         {
             __ReduceValue<VAL> *entry = new __ReduceValue<VAL>(std::move(value));
-            list_add_tail(&entry->list, &this->value_list);
-            this->value_cnt++;
+            list_add_tail(&entry->list, &this->valueList);
+            this->valueCnt++;
         }
 
         ~__ReduceKey()
         {
             struct list_head *pos, *tmp;
-            list_for_each_safe(pos, tmp, &this->value_list)
+            list_for_each_safe(pos, tmp, &this->valueList)
             delete list_entry(pos, struct __ReduceValue<VAL>, list);
         }
     };
@@ -65,9 +63,9 @@ namespace algorithm
         virtual size_t size() { return this->original_size; }
 
     private:
-        void reduce_begin() { this->original_size = this->heap_size; }
+        void reduceBegin() { this->original_size = this->heap_size; }
 
-        void reduce_end(VAL&& value)
+        void reduceEnd(VAL&& value)
         {
             size_t n = this->original_size;
 
@@ -85,7 +83,7 @@ namespace algorithm
 
     private:
         void heapify(int top);
-        void heap_insert(__ReduceValue<VAL> *data);
+        void heapInsert(__ReduceValue<VAL> *data);
 
     private:
         __ReduceValue<VAL> *heap[__REDUCE_ITERATOR_HEAP_MAX];
@@ -119,42 +117,30 @@ namespace algorithm
         int last = this->heap_size - 1;
         int i;
 
-        while (i = 2 * top + 1, i < last)
-        {
+        while (i = 2 * top + 1, i < last) {
             child = &this->heap[i];
-            if (child[0]->value.size() < data->value.size())
-            {
-                if (child[1]->value.size() < child[0]->value.size())
-                {
+            if (child[0]->value.size() < data->value.size()) {
+                if (child[1]->value.size() < child[0]->value.size()) {
                     this->heap[top] = child[1];
                     top = i + 1;
-                }
-                else
-                {
+                } else {
                     this->heap[top] = child[0];
                     top = i;
                 }
-            }
-            else
-            {
-                if (child[1]->value.size() < data->value.size())
-                {
+            } else {
+                if (child[1]->value.size() < data->value.size()) {
                     this->heap[top] = child[1];
                     top = i + 1;
-                }
-                else
-                {
+                } else {
                     this->heap[top] = data;
                     return;
                 }
             }
         }
 
-        if (i == last)
-        {
+        if (i == last) {
             child = &this->heap[i];
-            if (child[0]->value.size() < data->value.size())
-            {
+            if (child[0]->value.size() < data->value.size()) {
                 this->heap[top] = child[0];
                 top = i;
             }
@@ -164,21 +150,19 @@ namespace algorithm
     }
 
     template<typename VAL>
-    void __ReduceIterator<VAL, true>::heap_insert(__ReduceValue<VAL> *data)
+    void __ReduceIterator<VAL, true>::heapInsert(__ReduceValue<VAL> *data)
     {
         __ReduceValue<VAL> *parent;
         int i = this->heap_size;
 
-        while (i > 0)
-        {
+        while (i > 0) {
             parent = this->heap[(i - 1) / 2];
-            if (data->value.size() < parent->value.size())
-            {
+            if (data->value.size() < parent->value.size()) {
                 this->heap[i] = parent;
                 i = (i - 1) / 2;
-            }
-            else
+            } else {
                 break;
+            }
         }
 
         this->heap[i] = data;
@@ -186,8 +170,7 @@ namespace algorithm
     }
 
     template<typename VAL>
-    __ReduceIterator<VAL, true>::__ReduceIterator(struct list_head *value_list,
-                                                  size_t *value_cnt)
+    __ReduceIterator<VAL, true>::__ReduceIterator(struct list_head *value_list, size_t *value_cnt)
     {
         struct list_head *pos, *tmp;
         int n = 0;
@@ -217,44 +200,44 @@ namespace algorithm
     public:
         virtual const VAL *next()
         {
-            if (this->cursor->next == &this->value_list)
+            if (this->cursor->next == &this->valueList)
                 return NULL;
 
             this->cursor = this->cursor->next;
-            this->value_cnt--;
+            this->valueCnt--;
             return &list_entry(this->cursor, __ReduceValue<VAL>, list)->value;
         }
 
         virtual size_t size() { return this->original_size; }
 
     private:
-        void reduce_begin()
+        void reduceBegin()
         {
-            this->cursor = &this->value_list;
-            this->original_size = this->value_cnt;
+            this->cursor = &this->valueList;
+            this->original_size = this->valueCnt;
         }
 
-        void reduce_end(VAL&& value);
+        void reduceEnd(VAL&& value);
 
-        size_t count() { return this->value_cnt; }
+        size_t count() { return this->valueCnt; }
 
         __ReduceValue<VAL> *value()
         {
-            return list_entry(this->value_list.next, __ReduceValue<VAL>, list);
+            return list_entry(this->valueList.next, __ReduceValue<VAL>, list);
         }
 
     private:
-        struct list_head value_list;
-        size_t value_cnt;
-        size_t original_size;
-        struct list_head *cursor;
+        struct list_head            valueList;
+        size_t                      valueCnt;
+        size_t                      originalSize;
+        struct list_head*           cursor;
 
     private:
         __ReduceIterator(struct list_head *value_list, size_t *value_cnt)
         {
-            INIT_LIST_HEAD(&this->value_list);
-            list_splice_init(value_list, &this->value_list);
-            this->value_cnt = *value_cnt;
+            INIT_LIST_HEAD(&this->valueList);
+            list_splice_init(value_list, &this->valueList);
+            this->valueCnt = *value_cnt;
             *value_cnt = 0;
         }
 
@@ -262,22 +245,21 @@ namespace algorithm
     };
 
     template<class VAL>
-    void __ReduceIterator<VAL, false>::reduce_end(VAL&& value)
+    void __ReduceIterator<VAL, false>::reduceEnd(VAL&& value)
     {
         __ReduceValue<VAL> *entry;
 
-        assert(this->cursor != &this->value_list);
-        while (this->value_list.next != this->cursor)
-        {
-            entry = list_entry(this->value_list.next, __ReduceValue<VAL>, list);
+        assert(this->cursor != &this->valueList);
+        while (this->valueList.next != this->cursor) {
+            entry = list_entry(this->valueList.next, __ReduceValue<VAL>, list);
             list_del(&entry->list);
             delete entry;
         }
 
         entry = list_entry(this->cursor, __ReduceValue<VAL>, list);
         entry->value = std::move(value);
-        list_move_tail(&entry->list, &this->value_list);
-        this->value_cnt++;
+        list_move_tail(&entry->list, &this->valueList);
+        this->valueCnt++;
     }
 
     template<typename KEY, typename VAL>
@@ -287,11 +269,10 @@ namespace algorithm
         struct rb_node *parent = NULL;
         __ReduceKey<KEY, VAL> *entry;
 
-        while (*p)
-        {
+        while (*p) {
             parent = *p;
             using TYPE = __ReduceKey<KEY, VAL>;
-            entry = rb_entry(*p, TYPE, rb);
+            entry = RB_ENTRY(*p, TYPE, rb);
             if (key < entry->key)
                 p = &(*p)->rb_left;
             else if (key > entry->key)
@@ -300,8 +281,7 @@ namespace algorithm
                 break;
         }
 
-        if (!*p)
-        {
+        if (!*p) {
             entry = new __ReduceKey<KEY, VAL>(std::move(key));
             rb_link_node(&entry->rb, parent, p);
             rb_insert_color(&entry->rb, &this->key_tree);
@@ -311,34 +291,30 @@ namespace algorithm
     }
 
     template<typename KEY, typename VAL>
-    void Reducer<KEY, VAL>::start(reduce_function_t<KEY, VAL> reduce,
-                                  std::vector<std::pair<KEY, VAL>> *result)
+    void Reducer<KEY, VAL>::start(ReduceFunction<KEY, VAL> reduce, std::vector<std::pair<KEY, VAL>> *result)
     {
         struct rb_node *p = rb_first(&this->key_tree);
         __ReduceKey<KEY, VAL> *key;
         __ReduceValue<VAL> *value;
 
-        while (p)
-        {
+        while (p) {
             using TYPE = __ReduceKey<KEY, VAL>;
-            key = rb_entry(p, TYPE, rb);
-            while (key->value_cnt > 1)
-            {
-                __ReduceIterator<VAL> iter(&key->value_list, &key->value_cnt);
+            key = RB_ENTRY(p, TYPE, rb);
+            while (key->valueCnt > 1) {
+                __ReduceIterator<VAL> iter(&key->valueList, &key->valueCnt);
 
-                do
-                {
+                do {
                     VAL tmp;
                     iter.reduce_begin();
                     reduce(&key->key, &iter, &tmp);
                     iter.reduce_end(std::move(tmp));
                 } while (iter.count() > 1);
 
-                list_add_tail(&iter.value()->list, &key->value_list);
-                key->value_cnt++;
+                list_add_tail(&iter.value()->list, &key->valueList);
+                key->valueCnt++;
             }
 
-            value = list_entry(key->value_list.next, __ReduceValue<VAL>, list);
+            value = list_entry(key->valueList.next, __ReduceValue<VAL>, list);
             list_del(&value->list);
             result->emplace_back(std::move(key->key), std::move(value->value));
             delete value;
@@ -354,10 +330,9 @@ namespace algorithm
     {
         __ReduceKey<KEY, VAL> *entry;
 
-        while (this->key_tree.rb_node)
-        {
+        while (this->key_tree.rb_node) {
             using TYPE = __ReduceKey<KEY, VAL>;
-            entry = rb_entry(this->key_tree.rb_node, TYPE, rb);
+            entry = RB_ENTRY(this->key_tree.rb_node, TYPE, rb);
             rb_erase(&entry->rb, &this->key_tree);
             delete entry;
         }

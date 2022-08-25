@@ -31,3 +31,9 @@ target_link_libraries(demo-parallel-wget
         PRIVATE
         PUBLIC
         ${OPENSSL_LIBRARIES})
+
+add_executable(demo-sort-task ${CMAKE_SOURCE_DIR}/demo/demo-sort-task.cpp ${HTTP_SERVER_SRC})
+target_link_libraries(demo-sort-task
+        PRIVATE
+        PUBLIC
+        ${OPENSSL_LIBRARIES})

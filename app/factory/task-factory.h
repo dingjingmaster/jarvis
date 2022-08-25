@@ -18,11 +18,11 @@
 #include "../protocol/http/http-message.h"
 
 #include "../manager/endpoint-params.h"
+#include "algorithm-task-factory.h"
 
 //#include "RedisMessage.h"
 //#include "MySQLMessage.h"
 //#include "GraphTask.h"
-//#include "AlgoTaskFactory.h"
 
 
 using HttpTask = NetworkTask<protocol::HttpRequest, protocol::HttpResponse>;
