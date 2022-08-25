@@ -25,3 +25,9 @@ target_link_libraries(demo-http-proxy
         PRIVATE
         PUBLIC
         ${OPENSSL_LIBRARIES})
+
+add_executable(demo-parallel-wget ${CMAKE_SOURCE_DIR}/demo/demo-parallel-wget.cpp ${HTTP_SERVER_SRC})
+target_link_libraries(demo-parallel-wget
+        PRIVATE
+        PUBLIC
+        ${OPENSSL_LIBRARIES})
