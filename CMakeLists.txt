@@ -2,7 +2,7 @@ project(Jarvis LANGUAGES CXX C)
 
 cmake_minimum_required(VERSION 3.5)
 
-set(DEBUG ON)
+set(DEBUG OFF)
 
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 0)

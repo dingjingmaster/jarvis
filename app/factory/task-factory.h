@@ -20,9 +20,9 @@
 #include "../manager/endpoint-params.h"
 #include "algorithm-task-factory.h"
 
+#include "graph-task.h"
 //#include "RedisMessage.h"
 //#include "MySQLMessage.h"
-//#include "GraphTask.h"
 
 
 using HttpTask = NetworkTask<protocol::HttpRequest, protocol::HttpResponse>;
@@ -72,7 +72,7 @@ using CounterCallback = std::function<void (CounterTask*)>;
 using MailboxCallback = std::function<void (MailboxTask*)>;
 
 // Graph (DAG) task.
-//using graph_callback_t = std::function<void (WFGraphTask *)>;
+using GraphCallback = std::function<void (GraphTask*)>;
 
 using EmptyTask = GenericTask;
 
@@ -192,12 +192,10 @@ public:
     template<class FUNC, class... ARGS>
     static GoTask *createTimedGoTask(time_t seconds, long nanoseconds, ExecQueue *queue, Executor *executor, FUNC&& func, ARGS&&... args);
 
-#if 0
-    static GraphTask* createGraphTask(graph_callback_t callback)
+    static GraphTask* createGraphTask(GraphCallback callback)
     {
-        return new WFGraphTask(std::move(callback));
+        return new GraphTask(std::move(callback));
     }
-#endif
 
     static EmptyTask* createEmptyTask()
     {

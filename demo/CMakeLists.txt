@@ -49,3 +49,9 @@ target_link_libraries(demo-http-file-server
         PRIVATE
         PUBLIC
         ${OPENSSL_LIBRARIES})
+
+add_executable(demo-graph-task ${CMAKE_SOURCE_DIR}/demo/demo-graph-task.cpp ${HTTP_SERVER_SRC})
+target_link_libraries(demo-graph-task
+        PRIVATE
+        PUBLIC
+        ${OPENSSL_LIBRARIES})

@@ -5,8 +5,8 @@
 #ifndef JARVIS_HTTP_PARSER_H
 #define JARVIS_HTTP_PARSER_H
 #include <stddef.h>
-#include "../../core/c-list.h"
 #include "../../core/c-log.h"
+#include "../../core/c-list.h"
 
 #define HTTP_HEADER_NAME_MAX            64
 
