@@ -37,3 +37,9 @@ target_link_libraries(demo-sort-task
         PRIVATE
         PUBLIC
         ${OPENSSL_LIBRARIES})
+
+add_executable(demo-matrix-multiply ${CMAKE_SOURCE_DIR}/demo/demo-matrix-multiply.cpp ${HTTP_SERVER_SRC})
+target_link_libraries(demo-matrix-multiply
+        PRIVATE
+        PUBLIC
+        ${OPENSSL_LIBRARIES})
