@@ -12,21 +12,16 @@
 
 #include "task.h"
 #include "workflow.h"
+#include "graph-task.h"
 #include "../utils/uri-parser.h"
-
+#include "algorithm-task-factory.h"
+#include "../manager/endpoint-params.h"
 #include "../protocol/dns/dns-message.h"
 #include "../protocol/http/http-message.h"
 
-#include "../manager/endpoint-params.h"
-#include "algorithm-task-factory.h"
-
-#include "graph-task.h"
-//#include "RedisMessage.h"
-//#include "MySQLMessage.h"
-
 
 using HttpTask = NetworkTask<protocol::HttpRequest, protocol::HttpResponse>;
-using HttpCallback = std::function<void (HttpTask*)>;
+using HttpCallback = std::function<void (HttpTask*, void*)>;
 
 typedef struct _FileIOArgs              FileIOArgs;
 typedef struct _FileVIOArgs             FileVIOArgs;
@@ -86,16 +81,16 @@ using ModuleCallback = std::function<void (const ModuleTask*)>;
 
 // DNS
 using DnsTask = NetworkTask<protocol::DnsRequest, protocol::DnsResponse>;
-using DnsCallback = std::function<void (DnsTask*)>;
+using DnsCallback = std::function<void (DnsTask*, void*)>;
 
 
 class TaskFactory
 {
 public:
-    static HttpTask* createHttpTask(const ParsedURI& uri, int redirectMax, int retryMax, HttpCallback callback);
-    static HttpTask* createHttpTask(const std::string& url, int redirectMax, int retryMax, HttpCallback callback);
-    static HttpTask* createHttpTask(const ParsedURI& uri, const ParsedURI& proxyUri, int redirectMax, int retryMax, HttpCallback callback);
-    static HttpTask* createHttpTask(const std::string& url, const std::string& proxyUrl, int redirectMax, int retryMax, HttpCallback callback);
+    static HttpTask* createHttpTask(const ParsedURI& uri, int redirectMax, int retryMax, HttpCallback callback, void* udata);
+    static HttpTask* createHttpTask(const std::string& url, int redirectMax, int retryMax, HttpCallback callback, void* udata);
+    static HttpTask* createHttpTask(const ParsedURI& uri, const ParsedURI& proxyUri, int redirectMax, int retryMax, HttpCallback callback, void* udata);
+    static HttpTask* createHttpTask(const std::string& url, const std::string& proxyUrl, int redirectMax, int retryMax, HttpCallback callback, void* udata);
 
     static FileIOTask* createPReadTask(int fd, void *buf, size_t count, off_t offset, FileIOCallback callback);
     static FileIOTask* createPWriteTask(int fd, const void *buf, size_t count, off_t offset, FileIOCallback callback);
@@ -124,8 +119,8 @@ public:
     static TimerTask* createTimerTask(time_t seconds, long nanoseconds, TimerCallback callback);
 
     /* DNS - start */
-    static DnsTask *createDnsTask(const std::string& url, int retryMax, DnsCallback callback);
-    static DnsTask *createDnsTask(const ParsedURI& uri, int retryMax, DnsCallback callback);
+    static DnsTask *createDnsTask(const std::string& url, int retryMax, DnsCallback callback, void* udata);
+    static DnsTask *createDnsTask(const ParsedURI& uri, int retryMax, DnsCallback callback, void* udata);
     /* DNS - end */
 
 

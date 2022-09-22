@@ -2,7 +2,7 @@ project(Jarvis LANGUAGES CXX C)
 
 cmake_minimum_required(VERSION 3.5)
 
-set(DEBUG OFF)
+set(DEBUG ON)
 
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 0)
@@ -32,6 +32,6 @@ enable_testing()
 set_tests_properties(${noArgsTests} PROPERTIES TIMEOUT 1000)
 set_tests_properties(${withArgsTests} PROPERTIES TIMEOUT 20000)
 
-#add_subdirectory(app)
+add_subdirectory(app)
 add_subdirectory(demo)
 add_subdirectory(test)

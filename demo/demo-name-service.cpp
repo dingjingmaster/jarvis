@@ -27,7 +27,7 @@
 class MyNSPolicy : public NSPolicy
 {
 public:
-    RouterTask *createRouterTask(const NSParams *params, RouterCallback callback) override;
+    RouterTask *createRouterTask(const NSParams *params, RouterCallback callback, void*) override;
 
 private:
     std::string path;
@@ -95,7 +95,7 @@ std::string MyNSPolicy::read_from_fp(FILE *fp, const char *name)
     return result;
 }
 
-RouterTask *MyNSPolicy::createRouterTask(const NSParams *params, RouterCallback callback)
+RouterTask *MyNSPolicy::createRouterTask(const NSParams *params, RouterCallback callback, void*)
 {
     DnsResolver *dns_resolver = Global::getDnsResolver();
 
@@ -115,7 +115,7 @@ RouterTask *MyNSPolicy::createRouterTask(const NSParams *params, RouterCallback 
     }
 
     /* Simply, use the global dns resolver to create a router task. */
-    return dns_resolver->createRouterTask(params, std::move(callback));
+    return dns_resolver->createRouterTask(params, std::move(callback), nullptr);
 }
 
 int main(int argc, char *argv[])
@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
 
     Facilities::WaitGroup wg(1);
     HttpTask *task = TaskFactory::createHttpTask(argv[1], 2, 3,
-                                                       [&wg](HttpTask *task) {
+                                                       [&wg](HttpTask *task, void*) {
                                                            int state = task->getState();
                                                            int error = task->getError();
                                                            if (state != TASK_STATE_SUCCESS) {
@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
                                                                fwrite(body.c_str(), 1, body.size(), stdout);
                                                            }
                                                            wg.done();
-                                                       });
+                                                       }, nullptr);
 
     task->start();
     wg.wait();

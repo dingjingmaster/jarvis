@@ -182,8 +182,7 @@ inline Facilities::WaitGroup::~WaitGroup()
 
 inline void Facilities::WaitGroup::done()
 {
-    if (--this->mNLeft == 0)
-    {
+    if (--this->mNLeft == 0) {
         this->mTask->count();
     }
 }

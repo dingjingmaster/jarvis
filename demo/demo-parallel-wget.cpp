@@ -66,14 +66,14 @@ int main(int argc, char *argv[])
         }
 
         task = TaskFactory::createHttpTask(url, REDIRECT_MAX, RETRY_MAX,
-                                               [](HttpTask *task)
+                                               [](HttpTask *task, void*)
                                                {
                                                    tutorial_series_context *ctx =
                                                            (tutorial_series_context *)seriesOf(task)->getContext();
                                                    ctx->state = task->getState();
                                                    ctx->error = task->getError();
                                                    ctx->resp = std::move(*task->getResp());
-                                               });
+                                               }, nullptr);
 
         req = task->getReq();
         req->addHeaderPair("Accept", "*/*");

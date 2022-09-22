@@ -64,7 +64,7 @@ void process(HttpTask *server_task, const char *root)
          * instead of tasks' user_data to pass/store internal data. */
         pread_task->mUserData = resp;	/* pass resp pointer to pread task. */
         server_task->mUserData = buf;	/* to free() in callback() */
-        server_task->setCallback([](HttpTask *t){ free(t->mUserData); });
+        server_task->setCallback([](HttpTask *t, void*){ free(t->mUserData); });
         seriesOf(server_task)->pushBack(pread_task);
     }
     else
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
 
         std::string url = scheme + "127.0.0.1:" + std::to_string(port) + "/" + buf;
         HttpTask *task = TaskFactory::createHttpTask(url, 0, 0,
-                                                           [](HttpTask *task) {
+                                                           [](HttpTask *task, void*) {
                                                                auto *resp = task->getResp();
                                                                if (strcmp(resp->getStatusCode(), "200") == 0) {
                                                                    std::string body = protocol::HttpUtil::decodeChunkedBody(resp);
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
                                                                } else {
                                                                    printf("%s %s\n", resp->getStatusCode(), resp->getReasonPhrase());
                                                                }
-                                                           });
+                                                           }, nullptr);
 
         return task;
     };

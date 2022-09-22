@@ -20,7 +20,7 @@ public:
     int init(const std::string& url, const std::string& search_list, int ndots, int attempts, bool rotate);
     void deInit();
 
-    DnsTask *createDnsTask(const std::string& name, DnsCallback callback);
+    DnsTask *createDnsTask(const std::string& name, DnsCallback callback, void* udata);
 
 private:
     std::atomic<size_t>         mId;

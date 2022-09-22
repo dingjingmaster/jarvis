@@ -223,7 +223,7 @@ void DnsClient::deInit()
     this->mParams = NULL;
 }
 
-DnsTask *DnsClient::createDnsTask(const std::string& name, DnsCallback callback)
+DnsTask *DnsClient::createDnsTask(const std::string& name, DnsCallback callback, void* udata)
 {
     DnsParams::dns_params *p = ((DnsParams *)this->mParams)->get_params();
     struct DnsStatus status;
@@ -245,7 +245,7 @@ DnsTask *DnsClient::createDnsTask(const std::string& name, DnsCallback callback)
 
     __has_next_name(p, &status);
 
-    task = TaskFactory::createDnsTask(p->uris[next_server], 0, std::move(callback));
+    task = TaskFactory::createDnsTask(p->uris[next_server], 0, std::move(callback), udata);
     status.next_server = next_server;
     status.last_server = (next_server + p->uris.size() - 1) % p->uris.size();
 

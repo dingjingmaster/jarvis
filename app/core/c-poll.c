@@ -794,7 +794,7 @@ static void _poll_set_timer(CPoll *poll)
     CPollNode *first;
     struct timespec absTime;
 
-    logd("poll is %s", poll ? "not null" : "error null");
+    logv("poll is %s", poll ? "not null" : "error null");
 
     pthread_mutex_lock(&poll->mutex);
     if (!list_empty(&poll->timeoutList)) {
@@ -1128,8 +1128,7 @@ int poll_add (const CPollData *data, int timeout, CPoll *poll)
     int need_res;
     int event;
 
-    if ((size_t)data->fd >= poll->maxOpenFiles)
-    {
+    if ((size_t)data->fd >= poll->maxOpenFiles) {
         errno = data->fd < 0 ? EBADF : EMFILE;
         return -1;
     }
@@ -1138,11 +1137,11 @@ int poll_add (const CPollData *data, int timeout, CPoll *poll)
     if (need_res < 0)
         return -1;
 
-    if (need_res)
-    {
+    if (need_res) {
         res = (CPollNode *)malloc(sizeof (CPollNode));
-        if (!res)
+        if (!res) {
             return -1;
+        }
     }
 
     node = (CPollNode *)malloc(sizeof (CPollNode));
@@ -1152,8 +1151,9 @@ int poll_add (const CPollData *data, int timeout, CPoll *poll)
         node->inRBTree = 0;
         node->removed = 0;
         node->res = res;
-        if (timeout >= 0)
+        if (timeout >= 0) {
             _poll_node_set_timeout(timeout, node);
+        }
 
         pthread_mutex_lock(&poll->mutex);
         if (!poll->nodes[data->fd]) {
@@ -1170,8 +1170,9 @@ int poll_add (const CPollData *data, int timeout, CPoll *poll)
         }
 
         pthread_mutex_unlock(&poll->mutex);
-        if (node == NULL)
+        if (node == NULL) {
             return 0;
+        }
 
         free(node);
     }

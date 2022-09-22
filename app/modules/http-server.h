@@ -39,7 +39,7 @@ inline CommSession *HttpServer::newSession(long long seq, CommConnection *conn)
 
     logv("");
 
-    task = ServerTaskFactory::createHttpTask(this, mProcess);
+    task = ServerTaskFactory::createHttpTask(this, mProcess, nullptr);
     task->setKeepAlive(mParams.keepAliveTimeout);
     task->setReceiveTimeout(mParams.receiveTimeout);
     task->getReq()->setSizeLimit(mParams.requestSizeLimit);

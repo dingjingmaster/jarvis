@@ -18,7 +18,7 @@ void go_func(const size_t *size1, const size_t *size2)
     printf("page1 size = %zu, page2 size = %zu\n", *size1, *size2);
 }
 
-void http_callback(HttpTask *task)
+void http_callback(HttpTask *task, void*)
 {
     size_t *size = (size_t *)task->mUserData;
     const void *body;
@@ -46,15 +46,11 @@ int main()
     });
 
     /* Http task1 */
-    http_task1 = TaskFactory::createHttpTask("https://www.sogou.com/",
-                                                 REDIRECT_MAX, RETRY_MAX,
-                                                 http_callback);
+    http_task1 = TaskFactory::createHttpTask("https://www.sogou.com/", REDIRECT_MAX, RETRY_MAX, http_callback, nullptr);
     http_task1->mUserData = &size1;
 
     /* Http task2 */
-    http_task2 = TaskFactory::createHttpTask("https://www.baidu.com/",
-                                                 REDIRECT_MAX, RETRY_MAX,
-                                                 http_callback);
+    http_task2 = TaskFactory::createHttpTask("https://www.baidu.com/", REDIRECT_MAX, RETRY_MAX, http_callback, nullptr);
     http_task2->mUserData = &size2;
 
     /* go task will print the http pages size */

@@ -18,8 +18,8 @@ class ComplexDnsTask : public ComplexClientTask<DnsRequest, DnsResponse, std::fu
     static struct addrinfo hints;
 
 public:
-    ComplexDnsTask(int retry_max, DnsCallback && cb)
-        : ComplexClientTask(retry_max, std::move(cb))
+    ComplexDnsTask(int retry_max, DnsCallback && cb, void* udata)
+        : ComplexClientTask(retry_max, std::move(cb), udata)
     {
         this->setTransportType(TT_UDP);
     }
@@ -137,17 +137,17 @@ bool ComplexDnsTask::need_redirect()
 
 /**********Client Factory**********/
 
-DnsTask *TaskFactory::createDnsTask (const std::string& url, int retry_max, DnsCallback callback)
+DnsTask *TaskFactory::createDnsTask (const std::string& url, int retry_max, DnsCallback callback, void* udata)
 {
     ParsedURI uri;
 
     URIParser::parse(url, uri);
-    return TaskFactory::createDnsTask(uri, retry_max, std::move(callback));
+    return TaskFactory::createDnsTask(uri, retry_max, std::move(callback), udata);
 }
 
-DnsTask *TaskFactory::createDnsTask(const ParsedURI& uri, int retry_max, DnsCallback callback)
+DnsTask *TaskFactory::createDnsTask(const ParsedURI& uri, int retry_max, DnsCallback callback, void* udata)
 {
-    ComplexDnsTask *task = new ComplexDnsTask(retry_max, std::move(callback));
+    ComplexDnsTask *task = new ComplexDnsTask(retry_max, std::move(callback), udata);
     const char *name;
 
     if (uri.path && uri.path[0] && uri.path[1])

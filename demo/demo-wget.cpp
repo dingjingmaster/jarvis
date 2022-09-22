@@ -18,7 +18,7 @@
 #define REDIRECT_MAX    5
 #define RETRY_MAX       2
 
-void wget_callback(HttpTask *task)
+void wget_callback(HttpTask *task, void*)
 {
     protocol::HttpRequest *req = task->getReq();
     protocol::HttpResponse *resp = task->getResp();
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
         url = "http://" + url;
     }
 
-    task = TaskFactory::createHttpTask(url, REDIRECT_MAX, RETRY_MAX, wget_callback);
+    task = TaskFactory::createHttpTask(url, REDIRECT_MAX, RETRY_MAX, wget_callback, nullptr);
     protocol::HttpRequest *req = task->getReq();
     req->addHeaderPair("Accept", "*/*");
     req->addHeaderPair("User-Agent", "Wget/1.14 (linux-gnu)");

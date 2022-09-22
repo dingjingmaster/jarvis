@@ -21,11 +21,10 @@ struct tutorial_series_context
     bool is_keep_alive;
 };
 
-void reply_callback(HttpTask *proxy_task)
+void reply_callback(HttpTask *proxy_task, void*)
 {
     SeriesWork *series = seriesOf(proxy_task);
-    tutorial_series_context *context =
-            (tutorial_series_context *)series->getContext();
+    tutorial_series_context *context = (tutorial_series_context *)series->getContext();
     auto *proxy_resp = proxy_task->getResp();
     size_t size = proxy_resp->getOutputBodySize();
 
@@ -37,7 +36,7 @@ void reply_callback(HttpTask *proxy_task)
                 context->url.c_str(), strerror(proxy_task->getError()), size);
 }
 
-void http_callback(HttpTask *task)
+void http_callback(HttpTask *task, void*)
 {
     int state = task->getState();
     int error = task->getError();
@@ -100,7 +99,7 @@ void process(HttpTask *proxy_task)
     });
 
     context->is_keep_alive = req->isKeepAlive();
-    http_task = TaskFactory::createHttpTask(req->getRequestUri(), 0, 0, http_callback);
+    http_task = TaskFactory::createHttpTask(req->getRequestUri(), 0, 0, http_callback, nullptr);
 
     const void *body;
     size_t len;

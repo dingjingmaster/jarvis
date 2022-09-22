@@ -65,7 +65,8 @@ protected:
         }
 
         if (this->mCallback) {
-            this->mCallback(this);
+            // FIXME:// DJ-
+            this->mCallback(this, nullptr);
         }
 
         delete this;
@@ -79,8 +80,8 @@ public:
     }
 
 public:
-    ClientTask(CommSchedObject *object, CommScheduler *scheduler, std::function<void (NetworkTask<REQ, RESP> *)>&& cb)
-            : NetworkTask<REQ, RESP>(object, scheduler, std::move(cb))
+    ClientTask(CommSchedObject *object, CommScheduler *scheduler, std::function<void (NetworkTask<REQ, RESP>*, void*)>&& cb, void* udata)
+            : NetworkTask<REQ, RESP>(object, scheduler, std::move(cb), udata)
     {
     }
 
@@ -139,8 +140,10 @@ protected:
             this->mError = -this->mError;
         }
 
-        if (this->mCallback)
-            this->mCallback(this);
+        if (this->mCallback) {
+            // FIXME:// DJ-
+            this->mCallback(this, nullptr);
+        }
 
         /* Defer deleting the task. */
         return series->pop();
@@ -150,7 +153,7 @@ protected:
     class Processor : public SubTask
     {
     public:
-        Processor(ServerTask<REQ, RESP>*task, std::function<void (NetworkTask<REQ, RESP> *)>& proc)
+        Processor(ServerTask<REQ, RESP>*task, std::function<void (NetworkTask<REQ, RESP> *)>& proc, void* udata)
                 : mProcess(proc)
         {
             mTask = task;
@@ -198,8 +201,8 @@ protected:
     };
 
 public:
-    ServerTask(CommService *service, CommScheduler *scheduler, std::function<void (NetworkTask<REQ, RESP> *)>& proc)
-            : NetworkTask<REQ, RESP>(NULL, scheduler, nullptr), mProcessor(this, proc)
+    ServerTask(CommService *service, CommScheduler *scheduler, std::function<void (NetworkTask<REQ, RESP> *)>& proc, void* udata)
+            : NetworkTask<REQ, RESP>(NULL, scheduler, nullptr, udata), mProcessor(this, proc, udata)
     {
     }
 

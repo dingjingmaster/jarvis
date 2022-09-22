@@ -295,7 +295,7 @@ void ResolverTask::dispatch()
             auto&& cb = std::bind(&ResolverTask::dns_single_callback,
                                   this,
                                   std::placeholders::_1);
-            DnsTask *dns_task = client->createDnsTask(hostname, std::move(cb));
+            DnsTask *dns_task = client->createDnsTask(hostname, std::move(cb), mUdata);
 
             if (family == AF_INET6)
                 dns_task->getReq()->set_question_type(DNS_TYPE_AAAA);
@@ -315,10 +315,10 @@ void ResolverTask::dispatch()
             dctx[0].port = port_;
             dctx[1].port = port_;
 
-            task_v4 = client->createDnsTask(hostname, dns_partial_callback);
+            task_v4 = client->createDnsTask(hostname, dns_partial_callback, mUdata);
             task_v4->mUserData = dctx;
 
-            task_v6 = client->createDnsTask(hostname, dns_partial_callback);
+            task_v6 = client->createDnsTask(hostname, dns_partial_callback, mUdata);
             task_v6->getReq()->set_question_type(DNS_TYPE_AAAA);
             task_v6->mUserData = dctx + 1;
 
@@ -335,11 +335,8 @@ void ResolverTask::dispatch()
             seriesOf(this)->pushFront(pwork);
         }
     } else {
-        auto&& cb = std::bind(&ResolverTask::thread_dns_callback,
-                              this,
-                              std::placeholders::_1);
-        ThreadDnsTask *dns_task = __create_thread_dns_task(hostname, port_,
-                                                           std::move(cb));
+        auto&& cb = std::bind(&ResolverTask::thread_dns_callback, this, std::placeholders::_1);
+        ThreadDnsTask *dns_task = __create_thread_dns_task(hostname, port_, std::move(cb));
         seriesOf(this)->pushFront(dns_task);
     }
 
@@ -432,7 +429,7 @@ void ResolverTask::dns_single_callback(void *net_dns_task)
     delete this;
 }
 
-void ResolverTask::dns_partial_callback(void *net_dns_task)
+void ResolverTask::dns_partial_callback(void *net_dns_task, void*)
 {
     DnsTask *dns_task = (DnsTask *)net_dns_task;
     Global::getDnsRespool()->post(NULL);
@@ -444,9 +441,9 @@ void ResolverTask::dns_partial_callback(void *net_dns_task)
     if (ctx->state == TASK_STATE_SUCCESS) {
         protocol::DnsResponse *resp = dns_task->getResp();
         ctx->eai_error = protocol::DnsUtil::getaddrinfo(resp, ctx->port, &ctx->ai);
-    }
-    else
+    } else {
         ctx->eai_error = EAI_NONAME;
+    }
 }
 
 void ResolverTask::dns_parallel_callback(const void *parallel)
@@ -515,11 +512,11 @@ void ResolverTask::thread_dns_callback(void *thrd_dns_task)
     delete this;
 }
 
-RouterTask* DnsResolver::createRouterTask(const NSParams *params, RouterCallback callback)
+RouterTask* DnsResolver::createRouterTask(const NSParams *params, RouterCallback callback, void* udata)
 {
     const GlobalSettings *settings = Global::getGlobalSettings();
     unsigned int dns_ttl_default = settings->dns_ttl_default;
     unsigned int dns_ttl_min = settings->dns_ttl_min;
     const EndpointParams *ep_params = &settings->endpointParams;
-    return new ResolverTask(params, dns_ttl_default, dns_ttl_min, ep_params, std::move(callback));
+    return new ResolverTask(params, dns_ttl_default, dns_ttl_min, ep_params, std::move(callback), udata);
 }

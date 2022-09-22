@@ -13,8 +13,8 @@
 class ResolverTask : public RouterTask
 {
 public:
-    ResolverTask(const NSParams *ns_params, unsigned int dns_ttl_default, unsigned int dns_ttl_min, const EndpointParams *ep_params, RouterCallback && cb)
-        : RouterTask(std::move(cb)), ns_params_(*ns_params), ep_params_(*ep_params)
+    ResolverTask(const NSParams *ns_params, unsigned int dns_ttl_default, unsigned int dns_ttl_min, const EndpointParams *ep_params, RouterCallback && cb, void* udata)
+        : RouterTask(std::move(cb)), ns_params_(*ns_params), ep_params_(*ep_params), mUdata(udata)
     {
         dns_ttl_default_ = dns_ttl_default;
         dns_ttl_min_ = dns_ttl_min;
@@ -35,8 +35,8 @@ protected:
 private:
     void thread_dns_callback(void *thrd_dns_task);
     void dns_single_callback(void *net_dns_task);
-    static void dns_partial_callback(void *net_dns_task);
     void dns_parallel_callback(const void *parallel);
+    static void dns_partial_callback(void *net_dns_task, void*);
     void dns_callback_internal(void *thrd_dns_output, unsigned int ttl_default, unsigned int ttl_min);
 
 protected:
@@ -49,12 +49,14 @@ private:
     const char *host_;
     unsigned short port_;
     bool has_next_;
+
+    void*                       mUdata;
 };
 
 class DnsResolver : public NSPolicy
 {
 public:
-    virtual RouterTask* createRouterTask(const NSParams *params, RouterCallback callback);
+    virtual RouterTask* createRouterTask(const NSParams *params, RouterCallback callback, void* udata);
 };
 
 

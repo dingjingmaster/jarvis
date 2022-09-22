@@ -138,7 +138,6 @@ namespace protocol
         bool appendOutputBody(const void* buf)
         {
             logv("");
-            logv("");
             return appendOutputBody(buf, strlen(static_cast<const char*>(buf)));
         }
 

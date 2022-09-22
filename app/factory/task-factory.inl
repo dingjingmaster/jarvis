@@ -125,11 +125,11 @@ template<class REQ, class RESP, typename CTX = bool>
 class ComplexClientTask : public ClientTask<REQ, RESP>
 {
 protected:
-    using TaskCallback = std::function<void (NetworkTask<REQ, RESP>*)>;
+    using TaskCallback = std::function<void (NetworkTask<REQ, RESP>*, void*)>;
 
 public:
-    ComplexClientTask(int retry_max, TaskCallback && cb)
-        : ClientTask<REQ, RESP>(NULL, Global::getScheduler(), std::move(cb))
+    ComplexClientTask(int retry_max, TaskCallback&& cb, void* udata)
+        : ClientTask<REQ, RESP>(NULL, Global::getScheduler(), std::move(cb), udata)
     {
         mType = TT_TCP;
         mFixedAddr = false;
@@ -138,6 +138,7 @@ public:
         mRedirect = false;
         mNsPolicy = NULL;
         mRouterTask = NULL;
+        mUdata = udata;
     }
 
 protected:
@@ -230,6 +231,9 @@ protected:
     RouterTask*                             mRouterTask;
     RouteManager::RouteResult               mRouteResult;
     NSTracing                               mTracing;
+
+private:
+    void*                                   mUdata;
 
 public:
     CTX* getMutableCtx() { return &mCtx; }
@@ -361,7 +365,7 @@ RouterTask *ComplexClientTask<REQ, RESP, CTX>::route()
         mNsPolicy = ns->getPolicy(mUri.host ? mUri.host : "");
     }
 
-    return mNsPolicy->createRouterTask(&params, std::move(cb));
+    return mNsPolicy->createRouterTask(&params, std::move(cb), mUdata);
 }
 
 template<class REQ, class RESP, typename CTX>
@@ -421,7 +425,7 @@ void ComplexClientTask<REQ, RESP, CTX>::switchCallback(void *t)
         }
 
         if (this->mCallback) {
-            this->mCallback(this);
+            this->mCallback(this, mUdata);
         }
     }
 
@@ -545,7 +549,7 @@ NetworkTaskFactory<REQ, RESP>::createServerTask(CommService *service, std::funct
 class ServerTaskFactory
 {
 public:
-    static HttpTask *createHttpTask(CommService *service, std::function<void (HttpTask *)>& process);
+    static HttpTask *createHttpTask(CommService *service, std::function<void (HttpTask *)>& process, void* udata);
     //static MySQLTask *create_mysql_task(CommService *service, std::function<void (MySQLTask *)>& process);
 };
 

@@ -73,8 +73,9 @@ protected:
     {
         SeriesWork *series = seriesOf(this);
 
-        if (this->mCallback)
+        if (this->mCallback) {
             this->mCallback(this);
+        }
 
         delete this;
         return series->pop();
@@ -296,7 +297,7 @@ public:
     }
 
 public:
-    void setCallback(std::function<void (NetworkTask<REQ, RESP>*)> cb)
+    void setCallback(std::function<void (NetworkTask<REQ, RESP>*, void*)> cb)
     {
         logv("");
         mCallback = std::move(cb);
@@ -321,8 +322,8 @@ protected:
 
 
 protected:
-    NetworkTask(CommSchedObject *object, CommScheduler *scheduler, std::function<void (NetworkTask<REQ, RESP> *)>&& cb)
-        : CommonRequest(object, scheduler), mCallback(std::move(cb))
+    NetworkTask(CommSchedObject *object, CommScheduler *scheduler, std::function<void (NetworkTask<REQ, RESP>*, void*)>&& cb, void* udata)
+        : CommonRequest(object, scheduler), mCallback(std::move(cb)), mUdata(udata)
     {
         mError = 0;
         mSendTime = -1;
@@ -342,15 +343,18 @@ protected:
     }
 
 public:
-    void*                                               mUserData;
+    void*                                                   mUserData;
 
 protected:
-    int                                                 mSendTime;
-    int                                                 mReceiveTime;
-    int                                                 mKeepAliveTime;
-    REQ                                                 mReq;
-    RESP                                                mResp;
-    std::function<void (NetworkTask<REQ, RESP>*)>       mCallback;
+    int                                                     mSendTime;
+    int                                                     mReceiveTime;
+    int                                                     mKeepAliveTime;
+    REQ                                                     mReq;
+    RESP                                                    mResp;
+    std::function<void (NetworkTask<REQ, RESP>*, void*)>    mCallback;
+
+private:
+    void*                                                   mUdata;
 };
 
 

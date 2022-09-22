@@ -1535,15 +1535,15 @@ int Communicator::request(CommSession *session, CommTarget *target)
 int Communicator::nonblockListen(CommService *service)
 {
     logv("");
-    int sockfd = service->createListenFd();
+    int socketFd = service->createListenFd();
 
-    if (sockfd >= 0) {
-        if (_set_fd_nonblock(sockfd) >= 0) {
-            if (_bind_and_listen(sockfd, service->mBindAddr, service->mAddrLen) >= 0) {
-                return sockfd;
+    if (socketFd >= 0) {
+        if (_set_fd_nonblock(socketFd) >= 0) {
+            if (_bind_and_listen(socketFd, service->mBindAddr, service->mAddrLen) >= 0) {
+                return socketFd;
             }
         }
-        close(sockfd);
+        close(socketFd);
     }
 
     return -1;

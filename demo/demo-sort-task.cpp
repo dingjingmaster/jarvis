@@ -52,37 +52,39 @@ int main(int argc, char *argv[])
     int *end;
     size_t i;
 
-    if (argc != 2 && argc != 3)
-    {
+    if (argc != 2 && argc != 3) {
         fprintf(stderr, "USAGE: %s <count> [p]\n", argv[0]);
         exit(1);
     }
 
     count = atoi(argv[1]);
     array = (int *)malloc(count * sizeof (int));
-    if (!array)
-    {
+    if (!array) {
         perror("malloc");
         exit(1);
     }
 
-    if (argc == 3 && (*argv[2] == 'p' || *argv[2] == 'P'))
+    if (argc == 3 && (*argv[2] == 'p' || *argv[2] == 'P')) {
         use_parallel_sort = true;
+    }
 
-    for (i = 0; i < count; i++)
+    for (i = 0; i < count; i++) {
         array[i] = rand() % 65536;
+    }
     end = &array[count];
 
     SortTask<int> *task;
-    if (use_parallel_sort)
+    if (use_parallel_sort) {
         task = AlgorithmTaskFactory::createPSortTask("sort", array, end, callback);
-    else
+    } else {
         task = AlgorithmTaskFactory::createSortTask("sort", array, end, callback);
+    }
 
-    if (use_parallel_sort)
+    if (use_parallel_sort) {
         printf("Start sorting parallelly...\n");
-    else
+    } else {
         printf("Start sorting...\n");
+    }
 
     printf("Sort result:\n");
     task->start();

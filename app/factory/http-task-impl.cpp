@@ -25,13 +25,13 @@ using namespace protocol;
 class ComplexHttpTask : public ComplexClientTask<HttpRequest, HttpResponse>
 {
 public:
-    ComplexHttpTask(int redirect_max, int retry_max, HttpCallback && callback)
-        : ComplexClientTask(retry_max, std::move(callback)), redirect_max_(redirect_max), redirect_count_(0)
+    ComplexHttpTask(int redirect_max, int retry_max, HttpCallback && callback, void* udata)
+        : ComplexClientTask(retry_max, std::move(callback), udata), redirect_max_(redirect_max), redirect_count_(0), mUdata(udata)
     {
-        HttpRequest *client_req = this->getReq();
+        HttpRequest *clientReq = this->getReq();
 
-        client_req->setMethod(HTTP_METHOD_GET);
-        client_req->setHttpVersion("HTTP/1.1");
+        clientReq->setMethod(HTTP_METHOD_GET);
+        clientReq->setHttpVersion("HTTP/1.1");
     }
 
 protected:
@@ -51,6 +51,7 @@ protected:
 private:
     int redirect_max_;
     int redirect_count_;
+    void*                   mUdata;
 };
 
 CommMessageOut *ComplexHttpTask::messageOut()
@@ -368,8 +369,8 @@ static SSL *__create_ssl(SSL_CTX *ssl_ctx)
 class ComplexHttpProxyTask : public ComplexHttpTask
 {
 public:
-    ComplexHttpProxyTask(int redirect_max, int retry_max, HttpCallback && callback)
-        : ComplexHttpTask(redirect_max, retry_max, std::move(callback)), is_user_request_(true)
+    ComplexHttpProxyTask(int redirect_max, int retry_max, HttpCallback && callback, void* udata)
+        : ComplexHttpTask(redirect_max, retry_max, std::move(callback), udata), is_user_request_(true), mUdata(udata)
     { }
 
     void setUserUri(ParsedURI&& uri) { user_uri_ = std::move(uri); }
@@ -421,12 +422,15 @@ private:
 
     int initSslConnection();
 
+private:
     std::string proxy_auth_;
     ParsedURI user_uri_;
     bool is_ssl_;
     bool is_user_request_;
     short state_;
     int error_;
+
+    void*           mUdata;
 };
 
 int ComplexHttpProxyTask::initSslConnection()
@@ -682,9 +686,9 @@ bool ComplexHttpProxyTask::finishOnce()
 
 /**********Client Factory**********/
 
-HttpTask *TaskFactory::createHttpTask(const std::string& url, int redirect_max, int retry_max, HttpCallback callback)
+HttpTask *TaskFactory::createHttpTask(const std::string& url, int redirect_max, int retry_max, HttpCallback callback, void* udata)
 {
-    auto *task = new ComplexHttpTask(redirect_max, retry_max, std::move(callback));
+    auto *task = new ComplexHttpTask(redirect_max, retry_max, std::move(callback), udata);
     ParsedURI uri;
 
     URIParser::parse(url, uri);
@@ -693,18 +697,18 @@ HttpTask *TaskFactory::createHttpTask(const std::string& url, int redirect_max, 
     return task;
 }
 
-HttpTask *TaskFactory::createHttpTask(const ParsedURI& uri, int redirect_max, int retry_max, HttpCallback callback)
+HttpTask *TaskFactory::createHttpTask(const ParsedURI& uri, int redirect_max, int retry_max, HttpCallback callback, void* udata)
 {
-    auto *task = new ComplexHttpTask(redirect_max, retry_max, std::move(callback));
+    auto *task = new ComplexHttpTask(redirect_max, retry_max, std::move(callback), udata);
 
     task->init(uri);
     task->setKeepAlive(HTTP_KEEPALIVE_DEFAULT);
     return task;
 }
 
-HttpTask *TaskFactory::createHttpTask(const std::string& url, const std::string& proxy_url, int redirect_max, int retry_max, HttpCallback callback)
+HttpTask *TaskFactory::createHttpTask(const std::string& url, const std::string& proxy_url, int redirect_max, int retry_max, HttpCallback callback, void* udata)
 {
-    auto *task = new ComplexHttpProxyTask(redirect_max, retry_max, std::move(callback));
+    auto *task = new ComplexHttpProxyTask(redirect_max, retry_max, std::move(callback), udata);
 
     ParsedURI uri, user_uri;
     URIParser::parse(url, user_uri);
@@ -716,9 +720,9 @@ HttpTask *TaskFactory::createHttpTask(const std::string& url, const std::string&
     return task;
 }
 
-HttpTask *TaskFactory::createHttpTask(const ParsedURI& uri, const ParsedURI& proxy_uri, int redirect_max, int retry_max, HttpCallback callback)
+HttpTask *TaskFactory::createHttpTask(const ParsedURI& uri, const ParsedURI& proxy_uri, int redirect_max, int retry_max, HttpCallback callback, void* udata)
 {
-    auto *task = new ComplexHttpProxyTask(redirect_max, retry_max, std::move(callback));
+    auto *task = new ComplexHttpProxyTask(redirect_max, retry_max, std::move(callback), udata);
 
     task->setUserUri(uri);
     task->setKeepAlive(HTTP_KEEPALIVE_DEFAULT);
@@ -731,8 +735,8 @@ HttpTask *TaskFactory::createHttpTask(const ParsedURI& uri, const ParsedURI& pro
 class HttpServerTask : public ServerTask<HttpRequest, HttpResponse>
 {
 public:
-    HttpServerTask(CommService *service, std::function<void (HttpTask *)>& process)
-        : ServerTask(service, Global::getScheduler(), process), req_is_alive_(false), req_has_keep_alive_header_(false)
+    HttpServerTask(CommService *service, std::function<void (HttpTask *)>& process, void* udata)
+        : ServerTask(service, Global::getScheduler(), process, udata), req_is_alive_(false), req_has_keep_alive_header_(false)
     {
         logv("");
     }
@@ -863,9 +867,9 @@ CommMessageOut *HttpServerTask::messageOut()
 
 /**********Server Factory**********/
 
-HttpTask *ServerTaskFactory::createHttpTask(CommService *service, std::function<void (HttpTask*)>& process)
+HttpTask *ServerTaskFactory::createHttpTask(CommService *service, std::function<void (HttpTask*)>& process, void* udata)
 {
     logv("");
-    return new HttpServerTask(service, process);
+    return new HttpServerTask(service, process, udata);
 }
 

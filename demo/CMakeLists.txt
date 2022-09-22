@@ -73,3 +73,9 @@ target_link_libraries(demo-reducer
         PRIVATE
         PUBLIC
         ${OPENSSL_LIBRARIES})
+
+add_executable(demo-spider ${CMAKE_SOURCE_DIR}/demo/demo-spider.cpp ${MODULE_SPIDER_SRC})
+target_link_libraries(demo-spider
+        PRIVATE
+        PUBLIC
+        ${OPENSSL_LIBRARIES})

@@ -83,7 +83,7 @@ void show_result(protocol::DnsResultCursor& cursor)
     printf("\n");
 }
 
-void dns_callback(DnsTask *task)
+void dns_callback(DnsTask *task, void*)
 {
     int state = task->getState();
     int error = task->getError();
@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
     }
 
     std::string url = "dns://8.8.8.8/";
-    DnsTask *task = TaskFactory::createDnsTask(url, 0, dns_callback);
+    DnsTask *task = TaskFactory::createDnsTask(url, 0, dns_callback, nullptr);
 
     protocol::DnsRequest *req = task->getReq();
     req->set_rd(1);
