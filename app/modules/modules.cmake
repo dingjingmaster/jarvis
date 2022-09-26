@@ -1,5 +1,6 @@
 include(${CMAKE_SOURCE_DIR}/app/core/core.cmake)
 include(${CMAKE_SOURCE_DIR}/app/utils/utils.cmake)
+include(${CMAKE_SOURCE_DIR}/app/sqlite/sqlite.cmake)
 include(${CMAKE_SOURCE_DIR}/app/client/client.cmake)
 include(${CMAKE_SOURCE_DIR}/app/spider/spider.cmake)
 include(${CMAKE_SOURCE_DIR}/app/factory/factory.cmake)
@@ -27,3 +28,4 @@ file(GLOB MODULE_SPIDER_SRC ${UTILS_SRC} ${ALGORITHM_SRC} ${CLIENT_SRC}
         ${CORE_SRC} ${SPIDER_SRC} ${FACTORY_SRC} ${HTTP_SRC} ${PROTOCOL_SRC} ${MANAGER_SRC} ${DNS_SRC} ${NAME_SERVICE_SRC}
         )
 
+file(GLOB MODULE_SQLITE_SRC ${SQLITE_SRC})

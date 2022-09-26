@@ -45,8 +45,9 @@ Future<Facilities::NetworkResult<RESP>> Facilities::asyncRequest(TransportType t
         res.seqid = task->get_task_seq();
         res.task_state = task->get_state();
         res.task_error = task->get_error();
-        if (res.task_state == TASK_STATE_SUCCESS)
+        if (res.task_state == TASK_STATE_SUCCESS) {
             res.resp = std::move(*task->get_resp());
+        }
 
         pr->setValue(std::move(res));
         delete pr;
