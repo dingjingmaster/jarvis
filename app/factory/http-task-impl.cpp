@@ -686,6 +686,21 @@ bool ComplexHttpProxyTask::finishOnce()
 
 /**********Client Factory**********/
 
+Spider* TaskFactory::createSpider(std::string name, std::string uri, RootParser parser)
+{
+    return new Spider(name, uri, parser);
+}
+
+Spider* TaskFactory::createSpider(std::string &name, std::string &uri, RootParser& parser)
+{
+    return new Spider(name, uri, parser);
+}
+
+Spider* TaskFactory::createSpider(std::string &name, std::string &uri, RootParser &parser, const std::string &method)
+{
+    return new Spider(name, uri, parser, method);
+}
+
 HttpTask *TaskFactory::createHttpTask(const std::string& url, int redirect_max, int retry_max, HttpCallback callback, void* udata)
 {
     auto *task = new ComplexHttpTask(redirect_max, retry_max, std::move(callback), udata);

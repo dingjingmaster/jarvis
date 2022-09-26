@@ -238,9 +238,9 @@ public:
     friend class Communicator;
 };
 
-# include "io-service.h"
 #include "m-poll.h"
 #include "msg-queue.h"
+#include "io-service.h"
 #include "thread-pool.h"
 
 class Communicator

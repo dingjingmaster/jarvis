@@ -1693,7 +1693,7 @@ int Communicator::push(const void *buf, size_t size, CommSession *session)
 int Communicator::sleep(SleepSession *session)
 {
     logv("");
-    struct timespec value;
+    struct timespec value{};
 
     if (session->duration(&value) >= 0) {
         if (m_poll_add_timer(&value, session, mPoll) >= 0) {

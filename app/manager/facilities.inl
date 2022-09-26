@@ -161,8 +161,7 @@ inline void Facilities::__fsync_future_callback(FileSyncTask *task)
 
 inline Facilities::WaitGroup::WaitGroup(int n) : mNLeft(n)
 {
-    if (n <= 0)
-    {
+    if (n <= 0) {
         this->mNLeft = -1;
         return;
     }

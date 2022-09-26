@@ -79,3 +79,9 @@ target_link_libraries(demo-spider
         PRIVATE
         PUBLIC
         ${OPENSSL_LIBRARIES})
+
+add_executable(demo-timer-task ${CMAKE_SOURCE_DIR}/demo/demo-timer-task.cpp ${MODULE_SPIDER_SRC})
+target_link_libraries(demo-timer-task
+        PRIVATE
+        PUBLIC
+        ${OPENSSL_LIBRARIES})

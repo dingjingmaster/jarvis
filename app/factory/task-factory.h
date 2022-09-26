@@ -18,6 +18,7 @@
 #include "../manager/endpoint-params.h"
 #include "../protocol/dns/dns-message.h"
 #include "../protocol/http/http-message.h"
+#include "../protocol/http/http-util.h"
 
 
 using HttpTask = NetworkTask<protocol::HttpRequest, protocol::HttpResponse>;
@@ -83,10 +84,53 @@ using ModuleCallback = std::function<void (const ModuleTask*)>;
 using DnsTask = NetworkTask<protocol::DnsRequest, protocol::DnsResponse>;
 using DnsCallback = std::function<void (DnsTask*, void*)>;
 
+// Spider
+using Request = protocol::HttpRequest;
+using Response = protocol::HttpResponse;
+
+using SpiderContext = std::string;
+using RootParser = std::function<void (SpiderContext*)>;
+using Parser = std::function<std::string (SpiderContext*, void* data)>;
+
+class Spider
+{
+public:
+    explicit Spider (std::string& name, std::string& uri, RootParser& rootParser, const std::string& method=HTTP_METHOD_GET);
+
+    void run ();
+
+    void addRule (std::string& name, Parser& parser);
+    bool executeRule(std::string& rule, void* udata);
+
+
+private:
+    static void http_request_callback(HttpTask *task, void*);
+
+
+public:
+    std::map<std::string, std::string>      mField;         // use for save result
+
+private:
+    std::string                             mSpiderName;
+    std::string                             mBaseUrl;
+
+    SpiderContext                           mContext;
+
+    RootParser                              mRootParser;
+    std::map<std::string, Parser>           mParser;
+
+    HttpTask*                               mHttpTask;
+};
+
 
 class TaskFactory
 {
 public:
+    // spider
+    static Spider* createSpider (std::string name, std::string uri, RootParser parser);
+    static Spider* createSpider (std::string& name, std::string& uri, RootParser& parser);
+    static Spider* createSpider (std::string& name, std::string& uri, RootParser& parser, const std::string& method);
+
     static HttpTask* createHttpTask(const ParsedURI& uri, int redirectMax, int retryMax, HttpCallback callback, void* udata);
     static HttpTask* createHttpTask(const std::string& url, int redirectMax, int retryMax, HttpCallback callback, void* udata);
     static HttpTask* createHttpTask(const ParsedURI& uri, const ParsedURI& proxyUri, int redirectMax, int retryMax, HttpCallback callback, void* udata);

@@ -402,7 +402,6 @@ protected:
         SeriesWork *series = seriesOf(this);
 
         if (mCallback) {
-            logv("");
             mCallback(this);
         }
 
@@ -1010,11 +1009,5 @@ protected:
 
 
 #include "task.inl"
-
-
-
-
-
-
 
 #endif //JARVIS_TASK_H
