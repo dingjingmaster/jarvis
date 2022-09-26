@@ -55,7 +55,7 @@ public:
 
 private:
     virtual void release(int keepAlive); /* final */
-    virtual CommTarget *acquire(int waitTimeout); /* final */
+    virtual CommTarget* acquire(int waitTimeout); /* final */
 
 private:
     CommSchedGroup*                 mGroup;
@@ -107,11 +107,11 @@ public:
     }
 
     /* wait_timeout in milliseconds, -1 for no timeout. */
-    int request(CommSession *session, CommSchedObject *object, int wait_timeout, CommTarget **target)
+    int request(CommSession *session, CommSchedObject *object, int waitTimeout, CommTarget **target)
     {
         int ret = -1;
 
-        *target = object->acquire(wait_timeout);
+        *target = object->acquire(waitTimeout);
         if (*target) {
             ret = this->mCommon.request(session, *target);
             if (ret < 0) {
@@ -162,7 +162,7 @@ public:
     }
 
 public:
-    int isHandlerThread() const
+    [[nodiscard]] int isHandlerThread() const
     {
         return this->mCommon.isHandlerThread();
     }

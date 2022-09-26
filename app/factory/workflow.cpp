@@ -166,8 +166,9 @@ SubTask *SeriesWork::pop()
     bool canceled = mCanceled;
     SubTask *task = popTask();
 
-    if (!canceled)
+    if (!canceled) {
         return task;
+    }
 
     while (task) {
         delete task;
@@ -228,16 +229,18 @@ SubTask *SeriesWork::popTask()
         task = mLast;
         mLast = NULL;
     }
-
     mMutex.unlock();
+
     if (!task) {
         mFinished = true;
 
-        if (mCallback)
+        if (mCallback) {
             mCallback(this);
+        }
 
-        if (!mInParallel)
+        if (!mInParallel) {
             delete this;
+        }
     }
 
     return task;

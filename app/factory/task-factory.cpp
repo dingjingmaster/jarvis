@@ -116,6 +116,7 @@ protected:
     {
         value->tv_sec = this->seconds;
         value->tv_nsec = this->nanoseconds;
+
         return 0;
     }
 
@@ -129,6 +130,8 @@ public:
     {
         this->seconds = seconds;
         this->nanoseconds = nanoseconds;
+
+        setRepeat(false);
     }
 };
 

@@ -379,19 +379,16 @@ public:
 public:
     int getState() const
     {
-        logv("");
         return mState;
     }
     int getError() const
     {
-        logv("");
         return mError;
     }
 
 public:
     void setCallback(std::function<void (TimerTask*)> cb)
     {
-        logv("");
         mCallback = std::move(cb);
     }
 
@@ -405,6 +402,10 @@ protected:
             mCallback(this);
         }
 
+        if (mRepeat) {
+            return this;
+        }
+
         delete this;
         return series->pop();
     }
@@ -415,9 +416,15 @@ public:
         : SleepRequest(scheduler), mCallback(std::move(cb))
     {
         logv("");
+        mError = 0;
+        mRepeat = false;
         mUserData = NULL;
         mState = TASK_STATE_UNDEFINED;
-        mError = 0;
+    }
+
+    void setRepeat (bool repeat)
+    {
+        mRepeat = repeat;
     }
 
 protected:
@@ -431,6 +438,7 @@ public:
     void*                                       mUserData;
 
 protected:
+    bool                                        mRepeat;
     std::function<void (TimerTask*)>            mCallback;
 };
 

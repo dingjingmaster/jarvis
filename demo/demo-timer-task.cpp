@@ -10,9 +10,12 @@ static Facilities::WaitGroup waitGroup(1);
 
 int main (void)
 {
-    TimerTask* task = TaskFactory::createTimerTask(10000, [=] (TimerTask*) {
-        std::cout << "sss" << std::endl;
+    TimerTask* task = TaskFactory::createTimerTask(1000000, [=] (TimerTask*) {
+        static int a = 0;
+        std::cout << "sss: " << a++ << std::endl;
     });
+
+    task->setRepeat(true);
 
     task->start();
 

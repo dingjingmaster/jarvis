@@ -131,7 +131,7 @@ static inline int _poll_set_timer_fd(int fd, const struct timespec *absTime, CPo
 {
     logv("");
     struct itimerspec timer = {
-            .it_interval	=	{ },
+            .it_interval	=	0,
             .it_value		=	*absTime
     };
     return timerfd_settime(fd, TFD_TIMER_ABSTIME, &timer, NULL);
@@ -1252,8 +1252,9 @@ int poll_mod(const CPollData *data, int timeout, CPoll *poll)
         node->inRBTree = 0;
         node->removed = 0;
         node->res = res;
-        if (timeout >= 0)
+        if (timeout >= 0) {
             _poll_node_set_timeout(timeout, node);
+        }
 
         pthread_mutex_lock(&poll->mutex);
         old = poll->nodes[data->fd];
@@ -1303,8 +1304,7 @@ int poll_set_timeout(int fd, int timeout, CPoll *poll)
     CPollNode time_node;
     CPollNode *node;
 
-    if ((size_t)fd >= poll->maxOpenFiles)
-    {
+    if ((size_t)fd >= poll->maxOpenFiles) {
         errno = fd < 0 ? EBADF : EMFILE;
         return -1;
     }
@@ -1339,9 +1339,7 @@ int poll_set_timeout(int fd, int timeout, CPoll *poll)
 int poll_add_timer(const struct timespec *value, void *context, CPoll *poll)
 {
     logv("");
-    CPollNode *node;
-
-    node = (CPollNode *)malloc(sizeof (CPollNode));
+    CPollNode *node = (CPollNode *)malloc(sizeof (CPollNode));
     if (node) {
         memset(&node->data, 0, sizeof (CPollData));
         node->data.operation = PD_OP_TIMER;

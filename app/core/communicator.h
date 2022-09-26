@@ -265,7 +265,7 @@ public:
     void ioUnbind(IOService *service);
 
 public:
-    int isHandlerThread() const;
+    [[nodiscard]] int isHandlerThread() const;
     int increaseHandlerThread();
 
 private:

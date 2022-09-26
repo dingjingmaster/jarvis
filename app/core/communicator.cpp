@@ -1026,10 +1026,12 @@ void Communicator::handleSleepResult(CPollResult *res)
     SleepSession *session = (SleepSession *)res->data.context;
     int state;
 
-    if (res->state == PR_ST_STOPPED)
+    if (res->state == PR_ST_STOPPED) {
         state = SS_STATE_DISRUPTED;
-    else
+    }
+    else {
         state = SS_STATE_COMPLETE;
+    }
 
     session->handle(state, 0);
 }
@@ -1375,16 +1377,16 @@ void Communicator::deInit()
 int Communicator::nonblockConnect(CommTarget *target)
 {
     logv("");
-    int sockfd = target->createConnectFd();
+    int sockFd = target->createConnectFd();
 
-    if (sockfd >= 0) {
-        if (_set_fd_nonblock(sockfd) >= 0) {
-            if (connect(sockfd, target->mAddr, target->mAddrLen) >= 0 ||errno == EINPROGRESS) {
-                return sockfd;
+    if (sockFd >= 0) {
+        if (_set_fd_nonblock(sockFd) >= 0) {
+            if (connect(sockFd, target->mAddr, target->mAddrLen) >= 0 || errno == EINPROGRESS) {
+                return sockFd;
             }
         }
 
-        close(sockfd);
+        close(sockFd);
     }
 
     return -1;
