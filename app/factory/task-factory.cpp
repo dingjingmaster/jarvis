@@ -35,7 +35,7 @@ void Spider::addRule(std::string &name, Parser &parser)
 bool Spider::executeRule(std::string &rule, void* udata)
 {
     if (mParser.find(rule) != mParser.end()) {
-        mParser[rule](&mContext, udata);
+        mParser[rule](this, udata);
         return true;
     }
 
@@ -59,7 +59,7 @@ void Spider::run()
         return;
     }
 
-    mRootParser(&mContext);
+    mRootParser(this);
 }
 
 void Spider::http_request_callback(HttpTask *task, void* spider)
@@ -121,6 +121,11 @@ void Spider::addRequestHeader(std::string &key, std::string &value)
 void Spider::setParsers(std::map<std::string, Parser> &p)
 {
     mParser = p;
+}
+
+std::string &Spider::getContent()
+{
+    return mContext;
 }
 
 class __TimerTask : public TimerTask

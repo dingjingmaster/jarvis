@@ -90,8 +90,8 @@ using Request = protocol::HttpRequest;
 using Response = protocol::HttpResponse;
 
 using SpiderContext = std::string;
-using RootParser = std::function<void (SpiderContext *)>;
-using Parser = std::function<std::string (SpiderContext *, void* data)>;
+using RootParser = std::function<void (Spider*)>;
+using Parser = std::function<std::string (Spider*, void* data)>;
 
 class Spider
 {
@@ -101,6 +101,7 @@ public:
     void run ();
     std::string getName ();
 
+    std::string& getContent ();
     void addRule (std::string& name, Parser& parser);
     bool executeRule(std::string& rule, void* udata);
     void addRequestHeader(std::string key, std::string value);
@@ -119,7 +120,7 @@ private:
     std::string                             mSpiderName;
     std::string                             mBaseUrl;
 
-    SpiderContext                           mContext;
+    std::string                             mContext;
 
     RootParser                              mRootParser;
     std::map<std::string, Parser>           mParser;

@@ -14,9 +14,11 @@ static struct SpiderInfo gGoldSpider =
         .spiderName = "gold spider",
         .requestURI = "https://data-asg.goldprice.org/dbXRates/USD,CNY",
         .httpMethod = HTTP_METHOD_GET,
-        .rootParser = [] (SpiderContext* ctx) {
-            loge("\n%s", ctx->c_str());
+        .rootParser = [] (Spider* sp) {
+            loge("\n%s", sp->getContent().c_str());
             },
+        .parsers = {},
+        .requestHeaders = {}
 };
 
 

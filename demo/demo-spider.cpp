@@ -14,8 +14,8 @@ int main (int argc, char* argv[])
         loge("http:\n %s\n", ctx->c_str());
     });
 #endif
-    Spider* sp = TaskFactory::createSpider("international gold price", "https://data-asg.goldprice.org/dbXRates/USD,CNY", [=] (SpiderContext* ctx) {
-        logi("http:\n %s\n", ctx->c_str());
+    Spider* sp = TaskFactory::createSpider("international gold price", "https://data-asg.goldprice.org/dbXRates/USD,CNY", [=] (Spider* ctx) {
+        logi("http:\n %s\n", ctx->getContent().c_str());
     });
 
     sp->run();
