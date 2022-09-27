@@ -49,21 +49,13 @@ void Spider::run()
 
     waitGroup.wait();
 
-    const void* body;
-    size_t bodyLen;
-
-    if (mHttpTask->getResp()->getParsedBody(&body, &bodyLen)) {
-        logi("http request success!!!");
-        mContext = move(std::string((char*)body, bodyLen));
-    }
-
     if (nullptr == mRootParser) {
         loge("http Not set root parser!");
         return;
     }
 
     if (mContext.empty()) {
-        loge("http response is empty!");
+        logd("http response is empty! %s", mContext.c_str());
         return;
     }
 
@@ -107,6 +99,28 @@ void Spider::http_request_callback(HttpTask *task, void* spider)
         sp->mContext = move(std::string((const char*)body, bodyLen));
     }
     waitGroup.done();
+}
+
+std::string Spider::getName()
+{
+    return mSpiderName;
+}
+
+void Spider::addRequestHeader(std::string key, std::string value)
+{
+    protocol::HttpRequest *req = mHttpTask->getReq();
+    req->addHeaderPair(key, value);
+}
+
+void Spider::addRequestHeader(std::string &key, std::string &value)
+{
+    protocol::HttpRequest *req = mHttpTask->getReq();
+    req->addHeaderPair(key, value);
+}
+
+void Spider::setParsers(std::map<std::string, Parser> &p)
+{
+    mParser = p;
 }
 
 class __TimerTask : public TimerTask

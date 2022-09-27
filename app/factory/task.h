@@ -204,14 +204,12 @@ public:
     /* start(), dismiss() are for client tasks only. */
     void start()
     {
-        logv("");
         assert(!seriesOf(this));
         Workflow::startSeriesWork(this, nullptr);
     }
 
     void dismiss()
     {
-        logv("");
         assert(!seriesOf(this));
         delete this;
     }
@@ -219,12 +217,10 @@ public:
 public:
     REQ *getReq()
     {
-        logv("");
         return &mReq;
     }
     RESP *getResp()
     {
-        logv("resp: %p", &mResp);
         return &mResp;
     }
 
@@ -232,12 +228,10 @@ public:
 public:
     int getState() const
     {
-        logv("");
         return mState;
     }
     int getError() const
     {
-        logv("");
         return mError;
     }
 
@@ -250,7 +244,6 @@ public:
     /* Call only in callback or server's process. */
     long long getTaskSeq() const
     {
-        logv("");
         if (!mTarget) {
             errno = ENOTCONN;
             return -1;
@@ -267,17 +260,14 @@ public:
     /* All in milliseconds. timeout == -1 for unlimited. */
     void setSendTimeout(int timeout)
     {
-        logv("");
         mSendTime = timeout;
     }
     void setKeepAlive(int timeout)
     {
-        logv("");
         mKeepAliveTime = timeout;
     }
     void setReceiveTimeout(int timeout)
     {
-        logv("");
         mReceiveTime = timeout;
     }
 
@@ -285,38 +275,32 @@ public:
     /* noReply(), push() are for server tasks only. */
     void noReply()
     {
-        logv("");
         if (this->state == TASK_STATE_TOREPLY)
             this->state = TASK_STATE_NOREPLY;
     }
 
     virtual int push(const void *buf, size_t size)
     {
-        logv("");
         return this->mScheduler->push(buf, size, this);
     }
 
 public:
     void setCallback(std::function<void (NetworkTask<REQ, RESP>*, void*)> cb)
     {
-        logv("");
         mCallback = std::move(cb);
     }
 
 protected:
     virtual int sendTimeout()
     {
-        logv("");
         return mSendTime;
     }
     virtual int receiveTimeout()
     {
-        logv("");
         return mReceiveTime;
     }
     virtual int keepAliveTimeout()
     {
-        logv("");
         return mKeepAliveTime;
     }
 
@@ -333,13 +317,10 @@ protected:
         mUserData = NULL;
         mState = TASK_STATE_UNDEFINED;
         mTimeoutReason = TOR_NOT_TIMEOUT;
-
-        logv("");
     }
 
     virtual ~NetworkTask()
     {
-        logv("");
     }
 
 public:
@@ -363,14 +344,12 @@ class TimerTask : public SleepRequest
 public:
     void start()
     {
-        logv("");
         assert(!seriesOf(this));
         Workflow::startSeriesWork(this, nullptr);
     }
 
     void dismiss()
     {
-        logv("");
         assert(!seriesOf(this));
         delete this;
     }
@@ -395,7 +374,6 @@ public:
 protected:
     virtual SubTask *done()
     {
-        logv("");
         SeriesWork *series = seriesOf(this);
 
         if (mCallback) {
@@ -415,7 +393,6 @@ public:
     TimerTask(CommScheduler *scheduler, std::function<void (TimerTask*)> cb)
         : SleepRequest(scheduler), mCallback(std::move(cb))
     {
-        logv("");
         mError = 0;
         mRepeat = false;
         mUserData = NULL;
@@ -430,7 +407,6 @@ public:
 protected:
     virtual ~TimerTask()
     {
-        logv("");
     }
 
 
@@ -449,14 +425,12 @@ class FileTask : public IORequest
 public:
     void start()
     {
-        logv("");
         assert(!seriesOf(this));
         Workflow::startSeriesWork(this, nullptr);
     }
 
     void dismiss()
     {
-        logv("");
         assert(!seriesOf(this));
         delete this;
     }
@@ -464,13 +438,11 @@ public:
 public:
     ARGS* getArgs()
     {
-        logv("");
         return &mArgs;
     }
 
     long getRetVal() const
     {
-        logv("");
         if (mState == TASK_STATE_SUCCESS)
             return this->getRes();
         else
@@ -481,26 +453,22 @@ public:
 public:
     int getState() const
     {
-        logv("");
         return mState;
     }
     int getError() const
     {
-        logv("");
         return mError;
     }
 
 public:
     void setCallback(std::function<void (FileTask<ARGS>*)> cb)
     {
-        logv("");
         mCallback = std::move(cb);
     }
 
 protected:
     virtual SubTask *done()
     {
-        logv("");
         SeriesWork *series = seriesOf(this);
 
         if (mCallback)
@@ -515,7 +483,6 @@ public:
     FileTask(IOService *service, std::function<void (FileTask<ARGS>*)>&& cb)
         : IORequest(service), mCallback(std::move(cb))
     {
-        logv("");
         mError = 0;
         mUserData = NULL;
         mState = TASK_STATE_UNDEFINED;
@@ -524,7 +491,6 @@ public:
 protected:
     virtual ~FileTask()
     {
-        logv("");
     }
 
 public:
@@ -541,14 +507,12 @@ class GenericTask : public SubTask
 public:
     void start()
     {
-        logv("");
         assert(!seriesOf(this));
         Workflow::startSeriesWork(this, nullptr);
     }
 
     void dismiss()
     {
-        logv("");
         assert(!seriesOf(this));
         delete this;
     }
@@ -557,25 +521,21 @@ public:
 public:
     int getState() const
     {
-        logv("");
         return mState;
     }
     int getError() const
     {
-        logv("");
         return mError;
     }
 
 protected:
     virtual void dispatch()
     {
-        logv("");
         subTaskDone();
     }
 
     virtual SubTask *done()
     {
-        logv("");
         SeriesWork *series = seriesOf(this);
         delete this;
         return series->pop();
@@ -584,7 +544,6 @@ protected:
 public:
     GenericTask()
     {
-        logv("");
         mUserData = NULL;
         mState = TASK_STATE_UNDEFINED;
         mError = 0;
@@ -593,7 +552,6 @@ public:
 protected:
     virtual ~GenericTask()
     {
-        logv("");
     }
 
 
@@ -611,7 +569,6 @@ class CounterTask : public GenericTask
 public:
     virtual void count()
     {
-        logv("");
         if (--this->mValue == 0) {
             mState = TASK_STATE_SUCCESS;
             subTaskDone();
@@ -621,20 +578,17 @@ public:
 public:
     void setCallback(std::function<void (CounterTask*)> cb)
     {
-        logv("");
         mCallback = std::move(cb);
     }
 
 protected:
     virtual void dispatch()
     {
-        logv("");
         CounterTask::count();
     }
 
     virtual SubTask *done()
     {
-        logv("");
         SeriesWork *series = seriesOf(this);
 
         if (mCallback)
@@ -649,13 +603,11 @@ public:
     CounterTask(unsigned int targetValue, std::function<void (CounterTask*)>&& cb)
         : mValue(targetValue + 1), mCallback(std::move(cb))
     {
-        logv("");
     }
 
 protected:
     virtual ~CounterTask()
     {
-        logv("");
     }
 
 protected:
@@ -669,14 +621,12 @@ class MailboxTask : public GenericTask
 public:
     void send(void *msg)
     {
-        logv("");
         *mNext++ = msg;
         count();
     }
 
     void **getMailbox(size_t *n)
     {
-        logv("");
         *n = mNext - mMailbox;
         return mMailbox;
     }
@@ -684,14 +634,12 @@ public:
 public:
     void setCallback(std::function<void (MailboxTask *)> cb)
     {
-        logv("");
         mCallback = std::move(cb);
     }
 
 public:
     virtual void count()
     {
-        logv("");
         if (--mValue == 0) {
             mState = TASK_STATE_SUCCESS;
             subTaskDone();
@@ -701,13 +649,11 @@ public:
 protected:
     virtual void dispatch()
     {
-        logv("");
         MailboxTask::count();
     }
 
     virtual SubTask *done()
     {
-        logv("");
         SeriesWork *series = seriesOf(this);
 
         if (mCallback)
@@ -722,21 +668,18 @@ public:
     MailboxTask(void** mailbox, size_t size, std::function<void (MailboxTask*)>&& cb)
         : mNext(mailbox), mValue(size + 1), mCallback(std::move(cb))
     {
-        logv("");
         mMailbox = mailbox;
     }
 
     MailboxTask(std::function<void (MailboxTask*)>&& cb)
         : mNext(&mUserData), mValue(2), mCallback(std::move(cb))
     {
-        logv("");
         mMailbox = &mUserData;
     }
 
 protected:
     virtual ~MailboxTask()
     {
-        logv("");
     }
 
 protected:
@@ -752,7 +695,6 @@ class Conditional : public GenericTask
 public:
     virtual void signal(void *msg)
     {
-        logv("");
         *mMsgBuf = msg;
         if (mFlag.exchange(true)) {
             subTaskDone();
@@ -762,7 +704,6 @@ public:
 protected:
     virtual void dispatch()
     {
-        logv("");
         seriesOf(this)->pushFront(mTask);
         mTask = NULL;
         if (mFlag.exchange(true)) {

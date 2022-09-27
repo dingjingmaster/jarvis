@@ -696,7 +696,7 @@ Spider* TaskFactory::createSpider(std::string &name, std::string &uri, RootParse
     return new Spider(name, uri, parser);
 }
 
-Spider* TaskFactory::createSpider(std::string &name, std::string &uri, RootParser &parser, const std::string &method)
+Spider* TaskFactory::createSpider(std::string name, std::string uri, RootParser parser, const std::string method)
 {
     return new Spider(name, uri, parser, method);
 }
@@ -718,6 +718,7 @@ HttpTask *TaskFactory::createHttpTask(const ParsedURI& uri, int redirect_max, in
 
     task->init(uri);
     task->setKeepAlive(HTTP_KEEPALIVE_DEFAULT);
+
     return task;
 }
 

@@ -8,7 +8,7 @@
 
 static Facilities::WaitGroup waitGroup(1);
 
-int main (void)
+int main ()
 {
     TimerTask* task = TaskFactory::createTimerTask(1000000, [=] (TimerTask*) {
         static int a = 0;

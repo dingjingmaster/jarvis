@@ -85,12 +85,13 @@ using DnsTask = NetworkTask<protocol::DnsRequest, protocol::DnsResponse>;
 using DnsCallback = std::function<void (DnsTask*, void*)>;
 
 // Spider
+class Spider;
 using Request = protocol::HttpRequest;
 using Response = protocol::HttpResponse;
 
 using SpiderContext = std::string;
-using RootParser = std::function<void (SpiderContext*)>;
-using Parser = std::function<std::string (SpiderContext*, void* data)>;
+using RootParser = std::function<void (SpiderContext *)>;
+using Parser = std::function<std::string (SpiderContext *, void* data)>;
 
 class Spider
 {
@@ -98,10 +99,14 @@ public:
     explicit Spider (std::string& name, std::string& uri, RootParser& rootParser, const std::string& method=HTTP_METHOD_GET);
 
     void run ();
+    std::string getName ();
 
     void addRule (std::string& name, Parser& parser);
     bool executeRule(std::string& rule, void* udata);
+    void addRequestHeader(std::string key, std::string value);
+    void addRequestHeader(std::string& key, std::string& value);
 
+    void setParsers (std::map<std::string, Parser>& p);
 
 private:
     static void http_request_callback(HttpTask *task, void*);
@@ -129,7 +134,7 @@ public:
     // spider
     static Spider* createSpider (std::string name, std::string uri, RootParser parser);
     static Spider* createSpider (std::string& name, std::string& uri, RootParser& parser);
-    static Spider* createSpider (std::string& name, std::string& uri, RootParser& parser, const std::string& method);
+    static Spider* createSpider (std::string name, std::string uri, RootParser parser, std::string method);
 
     static HttpTask* createHttpTask(const ParsedURI& uri, int redirectMax, int retryMax, HttpCallback callback, void* udata);
     static HttpTask* createHttpTask(const std::string& url, int redirectMax, int retryMax, HttpCallback callback, void* udata);
