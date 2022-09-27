@@ -85,3 +85,9 @@ target_link_libraries(demo-timer-task
         PRIVATE
         PUBLIC
         ${OPENSSL_LIBRARIES})
+
+add_executable(demo-json-parser ${CMAKE_SOURCE_DIR}/demo/demo-json.cpp)
+target_link_libraries(demo-json-parser
+        PRIVATE
+        PUBLIC
+        ${OPENSSL_LIBRARIES} ${JSON_LIBRARIES})

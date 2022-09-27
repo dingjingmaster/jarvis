@@ -27,10 +27,13 @@ find_package (PkgConfig)
 
 pkg_check_modules(GIO REQUIRED gio-2.0)
 pkg_check_modules(OPENSSL REQUIRED openssl)
+pkg_check_modules(JSON REQUIRED json-glib-1.0)
 
 enable_testing()
 set_tests_properties(${noArgsTests} PROPERTIES TIMEOUT 1000)
 set_tests_properties(${withArgsTests} PROPERTIES TIMEOUT 20000)
+
+include_directories(${JSON_INCLUDE_DIRS})
 
 add_subdirectory(app)
 add_subdirectory(demo)
