@@ -7,6 +7,8 @@
 
 #include "../factory/task-factory.h"
 
+#define SPIDER_DB               ("/data/db/spider.db")
+
 class Spider;
 using SpiderTask = TimerTask;
 using SpiderInit = std::function<Spider*()>;
@@ -21,5 +23,8 @@ struct SpiderInfo
     std::map<std::string, Parser>       parsers;                // 解析
     std::map<std::string, std::string>  requestHeaders;         // 请求头
 };
+
+void sqlite_lock();
+void sqlite_unlock();
 
 #endif //JARVIS_SPIDER_H
