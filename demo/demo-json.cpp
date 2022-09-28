@@ -2,8 +2,11 @@
 // Created by dingjing on 9/27/22.
 //
 
-#include <nlohmann/json.hpp>
 #include <iostream>
+
+#include <nlohmann/json.hpp>
+
+#include <ctime>
 
 using json = nlohmann::json;
 
@@ -35,4 +38,26 @@ int main ()
 
     json js = json::parse (jsonStr);
     std::cout << std::setw(4) << js << std::endl;
+
+    std::cout << std::setw(4) << js["items"] << std::endl;
+    std::cout << std::setw(4) << js["ts"] << std::endl;
+
+    time_t tim = js["ts"];
+    tim /= 1000;
+
+    std::cout << tim << std::endl;
+
+    struct tm* ltm = localtime(&tim);
+
+    std::cout << "年: "<< 1900 + ltm->tm_year << std::endl;
+    std::cout << "月: "<< 1 + ltm->tm_mon<< std::endl;
+    std::cout << "日: "<<  ltm->tm_mday << std::endl;
+    std::cout << "时间: "<< ltm->tm_hour << ":" ;
+    std::cout << ltm->tm_min << ":" ;
+    std::cout << ltm->tm_sec << std::endl;
+
+    char buf[32] = {0};
+
+    strftime(buf, sizeof buf, "%Y%m%d", ltm);
+    std::cout << buf << std::endl;
 }
