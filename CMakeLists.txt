@@ -26,6 +26,7 @@ add_definitions(
 find_package (PkgConfig)
 
 pkg_check_modules(GIO REQUIRED gio-2.0)
+pkg_check_modules(SQLITE REQUIRED sqlite3)
 pkg_check_modules(OPENSSL REQUIRED openssl)
 #pkg_check_modules(JSON REQUIRED json-glib-1.0)
 

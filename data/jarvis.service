@@ -1,0 +1,12 @@
+[Unit]
+Description=run jarvis instance
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/jarvis/bin/jarvis
+ExecStop=killall jarvis
+
+[Install]
+WantedBy=multi-user.target
