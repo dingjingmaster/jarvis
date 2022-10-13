@@ -28,7 +28,7 @@ static inline void save_data (GoldData&);
 
 static struct SpiderInfo gGoldSpider =
 {
-        .interval = 5,
+        .interval = 3600,                                               // 每小时更新一次数据
         .spiderName = "gold spider",
         .requestURI = "https://data-asg.goldprice.org/dbXRates/CNY",
         .httpMethod = HTTP_METHOD_GET,

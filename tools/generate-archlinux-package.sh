@@ -57,7 +57,7 @@ prepare() {
     cd \${srcdir}/\${pkgname}-\$pkgver 
     [ ! -d build ] && mkdir build
     cd build
-    cmake ..
+    cmake -D DEBUG=OFF ..
 }
 
 build() {
@@ -92,12 +92,11 @@ EOF
 
 cat>${pkg_dir}/${pkg_name}/${pkg_name}.install<<EOF
 pre_install() {
-    systemctl stop jarvis
 }
 
 post_install() {
-    systemctl enable jarvis
-    systemctl start jarvis
+    systemctl enable jarvis.service
+    systemctl start jarvis.service
 }
 
 pre_upgrade() {
