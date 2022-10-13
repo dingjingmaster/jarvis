@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+#set -e
 
 pkgver=0.0.1
 pkg_name='jarvis'
@@ -16,8 +16,7 @@ echo "打包路径: $pkg_dir"
 cd $work_dir
 
 echo '开始推送新版本...'
-git tag -f ${pkgver} > /dev/null 2>&1
-git push --tag > /dev/null 2>&1
+git tag -f ${pkgver} > /dev/null 2>&1 && git push --tag > /dev/null 2>&1
 [ $? -ne 0 ] && echo '版本推送出错!' && exit
 echo '推送版本OK!'
 
@@ -84,7 +83,14 @@ package() {
 }
 EOF
 
-cat>${pkg_dir}/${pkg_name}.install<<EOF
+cat>${pkg_dir}/${pkg_name}/.gitignore<<EOF
+*.tar.gz
+*.tar.zst
+pkg/
+src/
+EOF
+
+cat>${pkg_dir}/${pkg_name}/${pkg_name}.install<<EOF
 pre_install() {
     systemctl stop jarvis
 }
@@ -114,4 +120,10 @@ cd $pkg_dir/$pkg_name && $build --printsrcinfo > .SRCINFO
 # build
 cd $pkg_dir/$pkg_name && $build -f
 
-#[ -d $work_dir/$pkg_name ] && rm -rf $work_dir/$pkg_name
+# push
+cd $pkg_dir/$pkg_name
+[ $? -ne 0 ] && echo '构建出错!' && exit
+git add -A && git commit -m "${pkg_name} V${pkgver}" && git push -f
+
+[ $? -eq 0 ] && echo 'OK!' && exit 0
+
