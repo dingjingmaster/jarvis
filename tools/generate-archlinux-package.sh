@@ -15,31 +15,6 @@ echo "打包路径: $pkg_dir"
 
 cd $work_dir
 
-echo "生成 .service 文件..."
-cat>${work_dir}/data/${pkg_name}.install<<EOF
-pre_install() {
-    systemctl stop jarvis
-}
-
-post_install() {
-    systemctl enable jarvis
-    systemctl start jarvis
-}
-
-pre_upgrade() {
-}
-
-post_upgrade() {
-}
-
-pre_remove() {
-    systemctl stop jarvis
-}
-post_remove() {
-    systemctl disable jarvis
-}
-EOF
-
 echo '开始推送新版本...'
 git tag -f ${pkgver} > /dev/null 2>&1
 git push --tag > /dev/null 2>&1
@@ -106,6 +81,30 @@ package() {
 
     install -Dm755 ../../README.md                                                      "\${pkgdir}/usr/share/doc/\${pkgname}/README"
     install -Dm755 ../../LICENSE                                                        "\${pkgdir}/usr/share/licenses/\${pkgname}/LICENSE"
+}
+EOF
+
+cat>${pkg_dir}/${pkg_name}.install<<EOF
+pre_install() {
+    systemctl stop jarvis
+}
+
+post_install() {
+    systemctl enable jarvis
+    systemctl start jarvis
+}
+
+pre_upgrade() {
+}
+
+post_upgrade() {
+}
+
+pre_remove() {
+    systemctl stop jarvis
+}
+post_remove() {
+    systemctl disable jarvis
 }
 EOF
 
