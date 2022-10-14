@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <sys/file.h>
 
-#define SPIDER_DB_LOCK          ("/data/db/spider.db.lock")
+#define SPIDER_DB_LOCK          SPIDER_DB"/spider.db.lock"
 
 std::mutex lock;
 static FILE* locker = nullptr;

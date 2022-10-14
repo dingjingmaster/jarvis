@@ -7,7 +7,7 @@
 
 #include "../factory/task-factory.h"
 
-#define SPIDER_DB               ("/var/lib/jarvis/db/spider.db")
+#define SPIDER_DB               "/var/lib/jarvis/db/spider.db"
 
 class Spider;
 using SpiderTask = TimerTask;
