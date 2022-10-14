@@ -2,7 +2,7 @@
 
 #set -e
 
-pkgver=0.0.2
+pkgver=0.0.3
 pkg_name='jarvis'
 work_dir=$(dirname $(dirname $(realpath -- $0)))
 pkg_dir=${work_dir}/pkg
@@ -70,6 +70,7 @@ package() {
     cd \${srcdir}/\${pkgname}-\${pkgver}
     msg \${srcdir}/\${pkgname}-\${pkgver}
 
+    install -dm755 "\${pkgdir}/var/lib/jarvis/db/"
     install -dm755 "\${pkgdir}/usr/lib/systemd/system/"
     install -dm755 "\${pkgdir}/usr/local/\${pkgname}/bin"
     install -dm755 "\${pkgdir}/usr/share/doc/\${pkgname}/"
