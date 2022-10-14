@@ -6,8 +6,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/file.h>
-
-#define SPIDER_DB_LOCK          SPIDER_DB"/spider.db.lock"
+#include <sys/stat.h>
 
 std::mutex lock;
 static FILE* locker = nullptr;
@@ -18,16 +17,13 @@ void sqlite_lock()
     do {
         if (!locker) {
             if (access (SPIDER_DB_LOCK, F_OK)) {
-                if (creat(SPIDER_DB_LOCK, S_IRWXU | S_IRWXG | S_IRWXO)) {
-                    loge("spider lock file create error");
+                mode_t pre = umask(0);
+                locker = fopen(SPIDER_DB_LOCK, "w+");
+                if (!locker) {
+                    loge("spider lock file '%s' open error", SPIDER_DB_LOCK);
                     exit(-1);
                 }
-            }
-
-            locker = fopen(SPIDER_DB_LOCK, "a+");
-            if (!locker) {
-                loge("spider lock file open error");
-                exit(-1);
+                umask(pre);
             }
         }
     } while (0);
