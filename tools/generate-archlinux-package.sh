@@ -16,7 +16,7 @@ echo "打包路径: $pkg_dir"
 cd $work_dir
 
 echo '开始推送新版本...'
-git tag -f ${pkgver} > /dev/null 2>&1 && git push --tag > /dev/null 2>&1
+git tag -f ${pkgver} > /dev/null 2>&1 && git push --tags -f > /dev/null 2>&1
 [ $? -ne 0 ] && echo '版本推送出错!' && exit
 echo '推送版本OK!'
 
