@@ -8,7 +8,7 @@
 #include "../factory/task-factory.h"
 
 #define SPIDER_DB               "/var/lib/jarvis/db/spider.db"
-#define SPIDER_DB_LOCK          SPIDER_DB"/spider.db.lock"
+#define SPIDER_DB_LOCK          "/var/lib/jarvis/db/spider.db.lock"
 
 class Spider;
 using SpiderTask = TimerTask;
