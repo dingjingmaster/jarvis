@@ -345,21 +345,16 @@ static SSL *__create_ssl(SSL_CTX *ssl_ctx)
     SSL *ssl;
 
     rbio = BIO_new(BIO_s_mem());
-    if (rbio)
-    {
+    if (rbio) {
         wbio = BIO_new(BIO_s_mem());
-        if (wbio)
-        {
+        if (wbio) {
             ssl = SSL_new(ssl_ctx);
-            if (ssl)
-            {
+            if (ssl) {
                 SSL_set_bio(ssl, rbio, wbio);
                 return ssl;
             }
-
             BIO_free(wbio);
         }
-
         BIO_free(rbio);
     }
 

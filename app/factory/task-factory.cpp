@@ -23,8 +23,9 @@ Spider::Spider(std::string &name, std::string &uri, RootParser& rootParser, cons
     protocol::HttpRequest *req = mHttpTask->getReq();
 
     req->addHeaderPair("Accept", "*/*");
-    req->addHeaderPair("User-Agent", "Wget/1.14 (linux-gnu)");
     req->addHeaderPair("Connection", "close");
+    req->addHeaderPair("Cache-Control", "no-cache");
+    req->addHeaderPair("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:105.0) Gecko/20100101 Firefox/105.0");
 }
 
 void Spider::addRule(std::string &name, Parser &parser)
@@ -55,11 +56,12 @@ void Spider::run()
     }
 
     if (mContext.empty()) {
-        logd("http response is empty! %s", mContext.c_str());
+        loge("http response is empty! %s", mContext.c_str());
         return;
     }
 
     mRootParser(this);
+    mFinished = true;
 }
 
 void Spider::http_request_callback(HttpTask *task, void* spider)
@@ -81,17 +83,18 @@ void Spider::http_request_callback(HttpTask *task, void* spider)
             loge("Task error: %d", error);
             break;
         case TASK_STATE_SUCCESS:
+            logw ("http request failed!!!");
             break;
-    }
-
-    if (state != TASK_STATE_SUCCESS) {
-        loge ("http request failed!!!");
     }
 
     const void* body;
     size_t bodyLen;
-    if (task->getResp()->getParsedBody(&body, &bodyLen)) {
-        logd("http request success!!!\n%s\n", (const char*)body);
+
+    for (int i = 10; i > 0; ++i) {
+        if (task->getResp()->getParsedBody(&body, &bodyLen)) {
+            logd("http request success!!!\n%s\n", (const char*)body);
+            break;
+        }
     }
 
     auto sp = static_cast<Spider*>(spider);
@@ -126,6 +129,11 @@ void Spider::setParsers(std::map<std::string, Parser> &p)
 std::string &Spider::getContent()
 {
     return mContext;
+}
+
+bool Spider::finished()
+{
+    return mFinished;
 }
 
 class __TimerTask : public TimerTask
@@ -302,15 +310,13 @@ void __CounterMap::count_n_locked(struct __CounterList *counters,
             n -= node->target_value;
             node->target_value = 0;
             list_move_tail(pos, task_list);
-            if (counters->empty())
-            {
+            if (counters->empty()) {
                 rb_erase(&counters->rb, &counters_map_);
                 delete counters;
                 return;
             }
         }
-        else
-        {
+        else {
             node->target_value -= n;
             n = 0;
         }

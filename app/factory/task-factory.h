@@ -99,6 +99,7 @@ public:
     explicit Spider (std::string& name, std::string& uri, RootParser& rootParser, const std::string& method=HTTP_METHOD_GET);
 
     void run ();
+    bool finished();
     std::string getName ();
 
     std::string& getContent ();
@@ -117,6 +118,7 @@ public:
     std::map<std::string, std::string>      mField;         // use for save result
 
 private:
+    bool                                    mFinished;
     std::string                             mSpiderName;
     std::string                             mBaseUrl;
 

@@ -82,7 +82,16 @@ void SpiderManager::runAll()
             } else if (it.second->interval > 0) {
                 SpiderTask* task = TaskFactory::createTimerTask(it.second->interval * 1000000, [=] (TimerTask*) {
                     std::shared_ptr<SpiderInfo> spInfo = mSpiders[it.first];
+                    if (mSpiderFilter.find(spInfo->spiderName) != mSpiderFilter.end()) {
+                        if (!mSpiderFilter[spInfo->spiderName]->finished()) {
+                            return;
+                        }
+                        delete mSpiderFilter[spInfo->spiderName];
+                        mSpiderFilter.erase(spInfo->spiderName);
+                    }
+                    logi("start spider: %s", spInfo->spiderName.c_str());
                     Spider* sp = TaskFactory::createSpider(spInfo->spiderName, spInfo->requestURI, spInfo->rootParser, spInfo->httpMethod);
+                    mSpiderFilter[spInfo->spiderName] = sp;
                     sp->run();
                 });
                 task->setRepeat(true);
@@ -90,10 +99,11 @@ void SpiderManager::runAll()
                 mTasks[it.second->spiderName] = task;
                 logi("spider '%s' start running!", it.second->spiderName.c_str());
             } else {
-                auto task = TaskFactory::createTimerTask(it.second->interval * 1000000, [=] (TimerTask*) {
-                });
-                task->setRepeat(false);
-                task->start();
+                logw("");
+                //auto task = TaskFactory::createTimerTask(it.second->interval * 1000000, [=] (TimerTask*) {
+                //});
+                //task->setRepeat(false);
+                //task->start();
             }
         }
     }

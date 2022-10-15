@@ -124,7 +124,6 @@ namespace protocol
 
         bool getParsedBody (const void** body, size_t* size) const
         {
-            logv("");
             return http_parser_get_body(body, size, mParser) == 0;
         }
 

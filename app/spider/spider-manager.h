@@ -8,6 +8,7 @@
 #include <map>
 #include <memory>
 #include <functional>
+#include <set>
 
 #include "spider.h"
 #include "../factory/task-factory.h"
@@ -34,6 +35,8 @@ private:
 
     std::map<std::string, SpiderTask*>                  mTasks;
     std::map<std::string, std::shared_ptr<SpiderInfo>>  mSpiders;
+
+    std::map<std::string, Spider*>                      mSpiderFilter;
 };
 
 
