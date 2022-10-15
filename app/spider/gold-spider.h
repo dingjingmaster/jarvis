@@ -52,6 +52,8 @@ static struct SpiderInfo gGoldSpider =
             double agPrice = js["items"][0]["xagPrice"];
             std::string area = js["items"][0]["curr"];
 
+            logi("au: %f, ag:%f", auPrice, agPrice);
+
             snprintf(idx, sizeof idx, "%s-%s-%s", buf, "au", "cn");
             GoldData gd {
                 .idx = idx,
