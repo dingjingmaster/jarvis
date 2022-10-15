@@ -87,8 +87,8 @@ void Spider::http_request_callback(HttpTask *task, void* spider)
             break;
     }
 
-    const void* body;
-    size_t bodyLen;
+    const void* body = nullptr;
+    size_t bodyLen = 0;
 
     for (int i = 10; i > 0; ++i) {
         if (task->getResp()->getParsedBody(&body, &bodyLen)) {
