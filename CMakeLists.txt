@@ -13,13 +13,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(DEBUG "USE DEBUG" ON)
 
 if(DEBUG)
-    add_definitions(-g -DDEBUG)
+    set(INSTALL_NAME ${CMAKE_BINARY_DIR}/app/jarvis)
+    add_definitions(-O0 -g -ggdb -rdynamic -Wl,--export-dynamic -DDEBUG)
 else()
-    add_definitions(-w)
+    set(INSTALL_NAME /usr/local/jarvis/bin/jarvis)
+    add_definitions(-O0 -g -ggdb -rdynamic -Wl,--export-dynamic)
 endif()
 
 add_definitions(
         -D LOG_TAG=\\"${CMAKE_PROJECT_NAME}\\"
+        -D INSTALL_NAME=\\"${INSTALL_NAME}\\"
 )
 
 

@@ -32,9 +32,8 @@ SpiderManager::SpiderManager()
             loge("spider db file '%s' create error", SPIDER_DB);
             exit(-1);
         }
-    } else {
-        chmod(SPIDER_DB, S_IRWXU | S_IRWXG | S_IRWXO);
     }
+    chmod(SPIDER_DB, S_IRWXU | S_IRWXG | S_IRWXO);
 
     if (access(SPIDER_DB_LOCK, F_OK)) {
         int fd = creat(SPIDER_DB_LOCK, S_IRWXU | S_IRWXG | S_IRWXO);
@@ -42,11 +41,9 @@ SpiderManager::SpiderManager()
             loge("spider db lock file '%s' create error", SPIDER_DB_LOCK);
             exit(-1);
         }
-    } else {
-        chmod(SPIDER_DB_LOCK, S_IRWXU | S_IRWXG | S_IRWXO);
     }
+    chmod(SPIDER_DB_LOCK, S_IRWXU | S_IRWXG | S_IRWXO);
     umask(pre);
-
 
     SPIDER_REGISTER(GoldSpider);
 }

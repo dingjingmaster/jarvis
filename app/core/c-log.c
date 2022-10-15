@@ -192,10 +192,10 @@ static int _open_file()
         fprintf(stderr, "check_dir error, log_init failed\n");
         return -1;
     }
-    char time_str[LOG_FILENAME_LEN] = {0};
-    _log_get_time(time_str, sizeof(time_str), 1);
-    if(0 >= snprintf(_path_name, sizeof(_path_name), "%s/%s_%s.%s",
-                _log_dir, _log_prefix, time_str, _log_suffix)) {
+    //char time_str[LOG_FILENAME_LEN] = {0};
+    //_log_get_time(time_str, sizeof(time_str), 1);
+    if(0 >= snprintf(_path_name, sizeof(_path_name), "%s/%s.%s",
+            _log_dir, _log_prefix, _log_suffix)) {
         return -1;
     }
     _log_fd = open(_path_name, O_CREAT | O_RDWR | O_APPEND, 0664);

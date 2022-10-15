@@ -16,14 +16,15 @@ void sqlite_lock()
     lock.lock();
     do {
         if (!locker) {
-            if (access (SPIDER_DB_LOCK, F_OK)) {
-                mode_t pre = umask(0);
+            if (!access (SPIDER_DB_LOCK, F_OK)) {
                 locker = fopen(SPIDER_DB_LOCK, "w+");
                 if (!locker) {
                     loge("spider lock file '%s' open error", SPIDER_DB_LOCK);
                     exit(-1);
                 }
-                umask(pre);
+            } else {
+                loge("lock file not exists!");
+                exit(-2);
             }
         }
     } while (0);
@@ -32,7 +33,6 @@ void sqlite_lock()
         if (flock (locker->_fileno, LOCK_EX | LOCK_NB) == 0) {
             break;
         }
-        usleep(100);
     }
 
     lock.unlock();

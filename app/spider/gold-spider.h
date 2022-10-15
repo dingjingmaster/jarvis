@@ -28,16 +28,16 @@ static inline void save_data (GoldData&);
 
 static struct SpiderInfo gGoldSpider =
 {
-        .interval = 600,                                                // 每10分钟更新一次数据
+        .interval = 600,                                                        // 每10分钟更新一次数据
         .spiderName = "gold spider",
         .requestURI = "https://data-asg.goldprice.org/dbXRates/CNY",
         .httpMethod = HTTP_METHOD_GET,
         .rootParser = [] (Spider* sp) {
-            loge("\n%s", sp->getContent().c_str());
-            if (sp->getContent().empty()) {
+            if (!sp || sp->getContent().empty()) {
                 loge("content is empty!");
                 return;
             }
+            logd("\n%s", sp->getContent().c_str());
             json js = json::parse (sp->getContent().c_str());
 
             time_t tim = js["ts"];
