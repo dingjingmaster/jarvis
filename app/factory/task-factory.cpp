@@ -83,7 +83,7 @@ void Spider::http_request_callback(HttpTask *task, void* spider)
             loge("Task error: %d", error);
             break;
         case TASK_STATE_SUCCESS:
-            logw ("http request failed!!!");
+            logi ("http request success");
             break;
     }
 
@@ -98,7 +98,7 @@ void Spider::http_request_callback(HttpTask *task, void* spider)
     }
 
     auto sp = static_cast<Spider*>(spider);
-    if (spider && sp) {
+    if (sp && bodyLen > 0) {
         sp->mContext = move(std::string((const char*)body, bodyLen));
     }
     waitGroup.done();
