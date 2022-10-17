@@ -62,7 +62,7 @@ prepare() {
 
 build() {
     cd \${srcdir}/\${pkgname}-\${pkgver}/build
-    make jarvis
+    make -j8 
 }
 
 package() {
@@ -106,6 +106,8 @@ pre_upgrade() {
 }
 
 post_upgrade() {
+    systemctl stop jarvis.service
+    systemctl start jarvis.service
 }
 
 pre_remove() {
