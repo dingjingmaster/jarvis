@@ -2,6 +2,7 @@
 // Created by dingjing on 9/22/22.
 //
 
+#include "../app/spider/spider.h"
 #include "../app/manager/facilities.h"
 #include "../app/factory/task-factory.h"
 

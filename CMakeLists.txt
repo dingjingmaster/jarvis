@@ -39,7 +39,11 @@ set_tests_properties(${withArgsTests} PROPERTIES TIMEOUT 20000)
 
 #include_directories(${JSON_INCLUDE_DIRS})
 
-add_subdirectory(app)
+if(DEBUG)
 add_subdirectory(demo)
+endif()
+
+
+add_subdirectory(app)
 add_subdirectory(test)
 add_subdirectory(tools)
