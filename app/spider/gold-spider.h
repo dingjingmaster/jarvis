@@ -19,7 +19,7 @@ struct GoldData
 {
     std::string     idx;            // 主键: dateTime+itemType+area
     int             dateTime;       // 时间: 20110101 主键
-    std::string     itemType;       // 类型: au/ag
+    std::string     itemType;       // 类型: Au/Ag
     std::string     area;           // 地区: USD/CNY
     double          price;          // 价格: 美国是美元、中国是人民币
 };
@@ -54,7 +54,7 @@ static struct SpiderInfo gGoldSpider =
 
             logi("au: %f, ag:%f", auPrice, agPrice);
 
-            snprintf(idx, sizeof idx, "%s-%s-%s", buf, "au", "cn");
+            snprintf(idx, sizeof idx, "%s-%s-%s", buf, "Au", "CNY");
             GoldData gd {
                 .idx = idx,
                 .dateTime = atoi(buf),
@@ -64,7 +64,7 @@ static struct SpiderInfo gGoldSpider =
             };
             save_data(gd);
 
-            snprintf(idx, sizeof idx, "%s-%s-%s", buf, "ag", "cn");
+            snprintf(idx, sizeof idx, "%s-%s-%s", buf, "Ag", "CNY");
             gd.idx = idx;
             gd.itemType = "ag";
             gd.area = area;
