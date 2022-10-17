@@ -189,19 +189,20 @@ inline void Facilities::WaitGroup::done()
 
 inline void Facilities::WaitGroup::wait() const
 {
-    if (this->mNLeft < 0)
+    if (this->mNLeft < 0) {
         return;
+    }
 
     this->mFuture.wait();
 }
 
 inline std::future_status Facilities::WaitGroup::wait(int timeout) const
 {
-    if (this->mNLeft < 0)
+    if (this->mNLeft < 0) {
         return std::future_status::ready;
+    }
 
-    if (timeout < 0)
-    {
+    if (timeout < 0) {
         this->mFuture.wait();
         return std::future_status::ready;
     }

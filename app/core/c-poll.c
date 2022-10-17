@@ -991,8 +991,8 @@ CPoll *_poll_create(void **nodes_buf, const CPollParams *params)
 CPoll* poll_create(const CPollParams *params)
 {
     logv("");
-    CPoll* poll;
-    void** nodesBuf = (void **)calloc(params->maxOpenFiles, sizeof (void *));
+    CPoll* poll = NULL;
+    void** nodesBuf = (void **)calloc(params->maxOpenFiles, sizeof(void *));
 
     if (nodesBuf) {
         poll = _poll_create(nodesBuf, params);

@@ -73,9 +73,12 @@ int main (int argc, char* argv[])
 
     sqlite_lock();
     if (!strcasecmp(argv[1], "u")) {
-        gold.update(data);
+        gold.replace(data);
     } else if (!strcasecmp(argv[1], "i")) {
-        gold.insert(data);
+        auto rows = gold.select(columns(&GoldData::idx), where(is_equal(&GoldData::idx, data.idx)));
+        if (rows.empty()) {
+            gold.replace(data);
+        }
     }
     sqlite_unlock();
 

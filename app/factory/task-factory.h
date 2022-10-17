@@ -13,16 +13,13 @@
 #include "task.h"
 #include "workflow.h"
 #include "graph-task.h"
-#include "../utils/uri-parser.h"
 #include "algorithm-task-factory.h"
+
+#include "../protocol/http/http-util.h"
 #include "../manager/endpoint-params.h"
 #include "../protocol/dns/dns-message.h"
 #include "../protocol/http/http-message.h"
-#include "../protocol/http/http-util.h"
 
-
-using HttpTask = NetworkTask<protocol::HttpRequest, protocol::HttpResponse>;
-using HttpCallback = std::function<void (HttpTask*, void*)>;
 
 typedef struct _FileIOArgs              FileIOArgs;
 typedef struct _FileVIOArgs             FileVIOArgs;
@@ -60,6 +57,9 @@ using FileVIOCallback = std::function<void (FileVIOTask*)>;
 using FileSyncTask = FileTask<FileSyncArgs>;
 using FileSyncCallback = std::function<void (FileSyncTask*)>;
 
+using HttpTask = NetworkTask<protocol::HttpRequest, protocol::HttpResponse>;
+using HttpCallback = std::function<void (HttpTask*, void*)>;
+
 // Timer and counter
 using TimerCallback = std::function<void (TimerTask*)>;
 using CounterCallback = std::function<void (CounterTask*)>;
@@ -84,53 +84,10 @@ using ModuleCallback = std::function<void (const ModuleTask*)>;
 using DnsTask = NetworkTask<protocol::DnsRequest, protocol::DnsResponse>;
 using DnsCallback = std::function<void (DnsTask*, void*)>;
 
-// Spider
 class Spider;
-using Request = protocol::HttpRequest;
-using Response = protocol::HttpResponse;
-
 using SpiderContext = std::string;
 using RootParser = std::function<void (Spider*)>;
 using Parser = std::function<std::string (Spider*, void* data)>;
-
-class Spider
-{
-public:
-    explicit Spider (std::string& name, std::string& uri, RootParser& rootParser, const std::string& method=HTTP_METHOD_GET);
-
-    void run ();
-    bool finished();
-    std::string getName ();
-
-    std::string& getContent ();
-    void addRule (std::string& name, Parser& parser);
-    bool executeRule(std::string& rule, void* udata);
-    void addRequestHeader(std::string key, std::string value);
-    void addRequestHeader(std::string& key, std::string& value);
-
-    void setParsers (std::map<std::string, Parser>& p);
-
-private:
-    static void http_request_callback(HttpTask *task, void*);
-
-
-public:
-    std::map<std::string, std::string>      mField;         // use for save result
-
-private:
-    bool                                    mFinished;
-    std::string                             mSpiderName;
-    std::string                             mBaseUrl;
-
-    std::string                             mContext;
-
-    RootParser                              mRootParser;
-    std::map<std::string, Parser>           mParser;
-
-    HttpTask*                               mHttpTask;
-};
-
-
 class TaskFactory
 {
 public:

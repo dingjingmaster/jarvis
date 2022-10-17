@@ -10,10 +10,11 @@
 #include <openssl/ssl.h>
 #include "task-error.h"
 #include "task-factory.h"
-#include "../utils/string-util.h"
+#include "../spider/spider.h"
 #include "../manager/global.h"
-#include "../protocol/http/http-util.h"
+#include "../utils/string-util.h"
 #include "../protocol/ssl-wrapper.h"
+#include "../protocol/http/http-util.h"
 
 using namespace protocol;
 
