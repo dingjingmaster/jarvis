@@ -52,6 +52,10 @@ static struct SpiderInfo gGoldSpider =
             // 获取的质量单位是 oz，需要转成克
             double auPrice = js["items"][0]["xauPrice"];
             double agPrice = js["items"][0]["xagPrice"];
+
+            auPrice /= oz;
+            agPrice /= oz;
+
             std::string area = js["items"][0]["curr"];
 
             logi("au: %f, ag:%f", auPrice, agPrice);
@@ -62,7 +66,7 @@ static struct SpiderInfo gGoldSpider =
                 .dateTime = atoi(buf),
                 .itemType = "au",
                 .area = area,
-                .price = auPrice / oz
+                .price = auPrice
             };
             save_data(gd);
 
@@ -70,7 +74,7 @@ static struct SpiderInfo gGoldSpider =
             gd.idx = idx;
             gd.itemType = "ag";
             gd.area = area;
-            gd.price = agPrice / oz;
+            gd.price = agPrice;
             save_data(gd);
             },
         .parsers = {},

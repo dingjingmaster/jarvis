@@ -2,7 +2,7 @@
 
 #set -e
 
-pkgver=0.0.4
+pkgver=0.0.5
 pkg_name='jarvis'
 work_dir=$(dirname $(dirname $(realpath -- $0)))
 pkg_dir=${work_dir}/pkg
