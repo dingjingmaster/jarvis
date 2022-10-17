@@ -26,6 +26,7 @@ struct GoldData
 
 static inline void save_data (GoldData&);
 
+const float oz = 28.3495231;
 static struct SpiderInfo gGoldSpider =
 {
         .interval = 600,
@@ -48,6 +49,7 @@ static struct SpiderInfo gGoldSpider =
             char idx[1024] = {0};
             strftime(buf, sizeof buf, "%Y%m%d", ltm);
 
+            // 获取的质量单位是 oz，需要转成克
             double auPrice = js["items"][0]["xauPrice"];
             double agPrice = js["items"][0]["xagPrice"];
             std::string area = js["items"][0]["curr"];
@@ -60,7 +62,7 @@ static struct SpiderInfo gGoldSpider =
                 .dateTime = atoi(buf),
                 .itemType = "au",
                 .area = area,
-                .price = auPrice
+                .price = auPrice / oz
             };
             save_data(gd);
 
@@ -68,7 +70,7 @@ static struct SpiderInfo gGoldSpider =
             gd.idx = idx;
             gd.itemType = "ag";
             gd.area = area;
-            gd.price = agPrice;
+            gd.price = agPrice / oz;
             save_data(gd);
             },
         .parsers = {},
