@@ -21,22 +21,22 @@ int main (int argc, char* argv[])
         exit(1);
     }
 
-    if (!strcmp(argv[1], "u") || !strcmp(argv[1], "i")) {
+    if (!strcmp(argv[3], "u") && !strcmp(argv[3], "i")) {
         printf("option error\n");
         exit(1);
     }
 
-    if (8 != strlen(argv[2]) || !atoi(argv[2])) {
+    if (8 != strlen(argv[2]) && !atoi(argv[2])) {
         printf("date error\n");
         exit(1);
     }
 
-    if (!strcmp(argv[3], "Au") || !strcmp(argv[3], "Ag")) {
+    if (!strcmp(argv[3], "Au") && !strcmp(argv[3], "Ag")) {
         printf("type error\n");
         exit(1);
     }
 
-    if (!strcmp(argv[4], "USD") || !strcmp(argv[4], "CNY")) {
+    if (!strcmp(argv[4], "USD") && !strcmp(argv[4], "CNY")) {
         printf("area error\n");
         exit(1);
     }
