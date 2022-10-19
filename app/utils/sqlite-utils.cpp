@@ -7,9 +7,9 @@
 
 #include <glib.h>
 
-static inline std::tuple<int, int> getMinAndMax (std::list<int>& ls)
+static inline std::tuple<int, int> getMinAndMax ()
 {
-    auto days = DateUtils::getCurrentPeriodBeforeDate(30);
+    auto days = DateUtils::getCurrentPeriodBeforeDate(60);
     int minTime = 0, maxTime = 0;
     for (auto day : days) {
         minTime = minTime == 0 ? day : minTime;
@@ -47,7 +47,10 @@ static inline void getD3D7D30AveragePrice (auto rows, GoldDataClient* data)
         if (id < 30) {
             ++d30d;
             d30 += std::get<0>(row);
+        } else {
+            break;
         }
+
         ++id;
     }
 
@@ -72,15 +75,13 @@ GoldDataClient SqliteUtils::getCurrentGoldPrice()
 
     auto gold = getGoldStorage();
 
-    auto days = DateUtils::getCurrentPeriodBeforeDate(30);
-
     int minTime = 0, maxTime = 0;
-    std::tie(minTime, maxTime) = getMinAndMax(days);
+    std::tie(minTime, maxTime) = getMinAndMax();
 
     logd("%d -- %d", minTime, maxTime);
 
     auto rows = gold.select(columns(&GoldData::price, &GoldData::itemType, &GoldData::dateTime),
-                            where(between(&GoldData::dateTime, minTime, maxTime) && is_equal(&GoldData::itemType, "Au") && is_equal(&GoldData::area, "CNY")));
+            where(between(&GoldData::dateTime, minTime, maxTime) && is_equal(&GoldData::itemType, "Au") && is_equal(&GoldData::area, "CNY")), order_by(&GoldData::dateTime).desc());
 
     getD3D7D30AveragePrice(rows, &d);
 
@@ -103,15 +104,13 @@ GoldDataClient SqliteUtils::getCurrentSilverPrice()
 
     auto gold = getGoldStorage();
 
-    auto days = DateUtils::getCurrentPeriodBeforeDate(30);
-
     int minTime = 0, maxTime = 0;
-    std::tie(minTime, maxTime) = getMinAndMax(days);
+    std::tie(minTime, maxTime) = getMinAndMax();
 
     logd("%d -- %d", minTime, maxTime);
 
     auto rows = gold.select(columns(&GoldData::price, &GoldData::itemType, &GoldData::dateTime),
-            where(between(&GoldData::dateTime, minTime, maxTime) && is_equal(&GoldData::itemType, "Ag") && is_equal(&GoldData::area, "CNY")));
+            where(between(&GoldData::dateTime, minTime, maxTime) && is_equal(&GoldData::itemType, "Ag") && is_equal(&GoldData::area, "CNY")), order_by(&GoldData::dateTime).desc());
 
     getD3D7D30AveragePrice(rows, &d);
 
