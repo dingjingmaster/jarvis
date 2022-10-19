@@ -64,7 +64,7 @@ static struct SpiderInfo gGoldSpider =
             GoldData gd {
                 .idx = idx,
                 .dateTime = atoi(buf),
-                .itemType = "au",
+                .itemType = "Au",
                 .area = area,
                 .price = auPrice
             };
@@ -72,7 +72,7 @@ static struct SpiderInfo gGoldSpider =
 
             snprintf(idx, sizeof idx, "%s-%s-%s", buf, "Ag", "CNY");
             gd.idx = idx;
-            gd.itemType = "ag";
+            gd.itemType = "Ag";
             gd.area = area;
             gd.price = agPrice;
             save_data(gd);
@@ -81,20 +81,28 @@ static struct SpiderInfo gGoldSpider =
         .requestHeaders = {}
 };
 
+static auto getGoldStorage()
+{
+    using namespace sqlite_orm;
+
+    auto gold = make_storage(SPIDER_DB,
+                             make_unique_index("idx_date_type_area", &GoldData::dateTime, &GoldData::itemType, &GoldData::area),
+                             make_table("gold",
+                                        make_column("idx", &GoldData::idx, primary_key()),
+                                        make_column("dateTime", &GoldData::dateTime),
+                                        make_column("itemType", &GoldData::itemType),
+                                        make_column("area", &GoldData::area),
+                                        make_column("price", &GoldData::price)));
+    gold.sync_schema();
+
+    return gold;
+}
 
 static void save_data (GoldData& sp)
 {
     using namespace sqlite_orm;
 
-    auto gold = make_storage(SPIDER_DB,
-            make_unique_index("idx_date_type_area", &GoldData::dateTime, &GoldData::itemType, &GoldData::area),
-            make_table("gold",
-                    make_column("idx", &GoldData::idx, primary_key()),
-                    make_column("dateTime", &GoldData::dateTime),
-                    make_column("itemType", &GoldData::itemType),
-                    make_column("area", &GoldData::area),
-                    make_column("price", &GoldData::price)));
-    gold.sync_schema();
+    auto gold = getGoldStorage();
 
     sqlite_lock();
     try {
@@ -102,7 +110,6 @@ static void save_data (GoldData& sp)
     } catch (...) {
         gold.update(sp);
     }
-
     sqlite_unlock();
 }
 

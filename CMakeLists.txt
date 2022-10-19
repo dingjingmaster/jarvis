@@ -6,7 +6,8 @@ set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 0)
 set(PROJECT_VERSION_PATCH 0)
 
-set(CMAKE_CXX_STANDARD 17)
+set(DEBUG ON)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -14,10 +15,10 @@ option(DEBUG "USE DEBUG" ON)
 
 if(DEBUG)
     set(INSTALL_NAME ${CMAKE_BINARY_DIR}/app/jarvis)
-    add_definitions(-O0 -g -ggdb -rdynamic -Wl,--export-dynamic -DDEBUG)
+    add_definitions(-O0 -g -rdynamic -Wl,--export-dynamic -DDEBUG -D WEB_HOME=\\"/data/code/skynet-web/dist/\\")
 else()
     set(INSTALL_NAME /usr/local/jarvis/bin/jarvis)
-    add_definitions(-O0 -g -ggdb -rdynamic -Wl,--export-dynamic)
+    add_definitions(-O0 -g -rdynamic -Wl,--export-dynamic -D WEB_HOME=\\"/usr/local/jarvis/html/\\")
 endif()
 
 add_definitions(
@@ -28,7 +29,7 @@ add_definitions(
 
 find_package (PkgConfig)
 
-pkg_check_modules(GIO REQUIRED gio-2.0)
+pkg_check_modules(GLIB REQUIRED gio-2.0 json-glib-1.0)
 pkg_check_modules(SQLITE REQUIRED sqlite3)
 pkg_check_modules(OPENSSL REQUIRED openssl)
 #pkg_check_modules(JSON REQUIRED json-glib-1.0)

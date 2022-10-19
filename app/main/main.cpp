@@ -8,6 +8,7 @@
 #include "manager/facilities.h"
 #include "../modules/http-server.h"
 #include "../spider/spider-manager.h"
+#include "http-router.h"
 
 static Facilities::WaitGroup waitGroup(1);
 
@@ -34,10 +35,20 @@ int main (int argc, char* argv[])
 
     SpiderManager::instance()->runAll();
 
+#ifdef DEBUG
+    int port = 8889;
+#else
     int port = 8888;
+#endif
     HttpServer server ([] (HttpTask* task) {
-        logv("");
-        task->getResp()->appendOutputBody("<html>Hello World!</html>");
+        // 静态资源请求，请求成功则直接返回
+        if (!strcmp(HTTP_METHOD_GET, task->getReq()->getMethod())
+            && HttpRouter::getInstance()->responseStaticResource(task)) {
+            return;
+        }
+        else if (HttpRouter::getInstance()->responseDynamicResource(task)) {
+            return;
+        }
     });
 
     if (0 == server.start(port)) {

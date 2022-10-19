@@ -437,9 +437,9 @@ int log_print(log_level_t level, const char *tag, const char *file, int line, co
         return -1;
     }
     va_start(ap, fmt);
-    n = vsnprintf(buf, LOG_BUF_SIZE, fmt, ap);
+    n = vsnprintf(buf, LOG_BUF_SIZE - 1, fmt, ap);
     va_end(ap);
-    if(n < 0) {
+    if (n < 0) {
         return -1;
     }
 

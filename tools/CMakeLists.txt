@@ -6,4 +6,5 @@ add_executable(gold-tool ${CMAKE_SOURCE_DIR}/tools/gold-tool.cpp ${HTTP_SERVER_S
 target_link_libraries(gold-tool
         PRIVATE
         PUBLIC
-        ${OPENSSL_LIBRARIES} ${SQLITE_LIBRARIES})
+        ${OPENSSL_LIBRARIES} ${SQLITE_LIBRARIES} ${GLIB_LIBRARIES})
+target_include_directories(gold-tool PUBLIC ${GLIB_INCLUDE_DIRS})

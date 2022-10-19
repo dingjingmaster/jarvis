@@ -56,9 +56,6 @@ int main (int argc, char* argv[])
             .price = atof(argv[5])
     };
 
-
-
-
     using namespace sqlite_orm;
 
     auto gold = make_storage(SPIDER_DB,
