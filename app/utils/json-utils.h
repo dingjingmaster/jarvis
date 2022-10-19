@@ -5,7 +5,7 @@
 #ifndef JARVIS_JSONUTILS_H
 #define JARVIS_JSONUTILS_H
 
-#include "../spider/gold-spider.h"
+#include "../main/client-data.h"
 
 class JsonUtils
 {
@@ -16,7 +16,7 @@ public:
         INDEX_PRICE_TYPE_AG,
     };
 public:
-    static std::string jsonBuildIndexPrice (PriceType type, GoldData& data);
+    static std::string jsonBuildIndexPrice (PriceType type, GoldDataClient& data);
 
 };
 

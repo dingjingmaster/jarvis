@@ -2,7 +2,7 @@
 
 #set -e
 
-pkgver=0.0.5
+pkgver=0.0.6
 pkg_name='jarvis'
 work_dir=$(dirname $(dirname $(realpath -- $0)))
 pkg_dir=${work_dir}/pkg
@@ -72,14 +72,18 @@ package() {
 
     install -dm755 "\${pkgdir}/var/lib/jarvis/db/"
     install -dm755 "\${pkgdir}/usr/lib/systemd/system/"
-    install -dm755 "\${pkgdir}/usr/local/\${pkgname}/bin"
     install -dm755 "\${pkgdir}/usr/share/doc/\${pkgname}/"
     install -dm755 "\${pkgdir}/usr/share/licenses/\${pkgname}/"
 
+    install -dm755 "\${pkgdir}/usr/local/\${pkgname}/bin"
+    install -dm744 "\${pkgdir}/usr/local/\${pkgname}/html"
+
+    install -Dm755 \${srcdir}/\${pkgname}-\${pkgver}/data/html/*                        "\${pkgdir}/usr/local/\${pkgname}/html/"
     install -Dm755 \${srcdir}/\${pkgname}-\${pkgver}/build/app/\${pkgname}              "\${pkgdir}/usr/local/\${pkgname}/bin/"
     install -Dm755 \${srcdir}/\${pkgname}-\${pkgver}/build/tools/gold-tool              "\${pkgdir}/usr/local/\${pkgname}/bin/"
     install -Dm755 \${srcdir}/\${pkgname}-\${pkgver}/tools/gold-tool.py                 "\${pkgdir}/usr/local/\${pkgname}/bin/"
     install -Dm755 \${srcdir}/\${pkgname}-\${pkgver}/data/\${pkgname}.service           "\${pkgdir}/usr/lib/systemd/system/\${pkgname}.service"
+
 
     install -Dm755 ../../README.md                                                      "\${pkgdir}/usr/share/doc/\${pkgname}/README"
     install -Dm755 ../../LICENSE                                                        "\${pkgdir}/usr/share/licenses/\${pkgname}/LICENSE"

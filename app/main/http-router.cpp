@@ -3,6 +3,7 @@
 //
 
 #include "http-router.h"
+#include "client-data.h"
 #include "../utils/sqlite-utils.h"
 #include "../utils/file-read-write.h"
 

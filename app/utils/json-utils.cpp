@@ -4,38 +4,28 @@
 
 #include "json-utils.h"
 
+#include "../core/c-log.h"
 #include <json-glib/json-glib.h>
 
-std::string JsonUtils::jsonBuildIndexPrice(JsonUtils::PriceType type, GoldData &data)
+std::string JsonUtils::jsonBuildIndexPrice(JsonUtils::PriceType type, GoldDataClient& data)
 {
     g_autoptr(JsonBuilder) builder = json_builder_new ();
 
-    switch (type) {
-        case INDEX_PRICE_TYPE_AU: {
-            json_builder_begin_object (builder);
-            json_builder_set_member_name (builder, "auPrice");
-            json_builder_add_double_value (builder, data.price);
+    json_builder_begin_object (builder);
+    json_builder_set_member_name (builder, "price");
+    json_builder_add_double_value (builder, data.price);
 
-            json_builder_set_member_name (builder, "auUTime");
-            json_builder_add_int_value (builder, data.dateTime);
+    json_builder_set_member_name (builder, "uTime");
+    json_builder_add_int_value (builder, data.dateTime);
 
-            //json_builder_set_member_name(builder, "auDetail");
-            //json_builder_add_null_value(builder);
-            break;
-        }
-        case INDEX_PRICE_TYPE_AG: {
-            json_builder_begin_object (builder);
-            json_builder_set_member_name (builder, "agPrice");
-            json_builder_add_double_value (builder, data.price);
+    json_builder_set_member_name (builder, "d3");
+    json_builder_add_double_value (builder, data.priceAvg7);
 
-            json_builder_set_member_name (builder, "agUTime");
-            json_builder_add_int_value (builder, data.dateTime);
+    json_builder_set_member_name (builder, "d7");
+    json_builder_add_double_value (builder, data.priceAvg7);
 
-            //json_builder_set_member_name(builder, "agDetail");
-            //json_builder_add_null_value(builder);
-            break;
-        }
-    }
+    json_builder_set_member_name (builder, "d30");
+    json_builder_add_double_value (builder, data.priceAvg30);
 
     json_builder_end_object (builder);
 

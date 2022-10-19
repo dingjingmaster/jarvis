@@ -3,66 +3,117 @@
 //
 
 #include "sqlite-utils.h"
-
 #include "../utils/date-utils.h"
 
-GoldData SqliteUtils::getCurrentGoldPrice()
+#include <glib.h>
+
+static inline std::tuple<int, int> getMinAndMax (std::list<int>& ls)
 {
-    using namespace sqlite_orm;
-
-    auto gold = getGoldStorage();
-
-    int curDate = DateUtils::getCurrentDate1();
-
-    loge("%d", curDate);
-
-    auto rows = gold.select(columns(&GoldData::price, &GoldData::itemType, &GoldData::dateTime),
-            where(is_equal(&GoldData::dateTime, curDate) && is_equal(&GoldData::itemType, "Au") && is_equal(&GoldData::area, "CNY")));
-    if (!rows.empty()) {
-        auto it = rows[0];
-
-        GoldData d = {
-                .idx = "",
-                .dateTime = std::get<2>(it),
-                .itemType = std::get<1>(it),
-                .area = "CNY",
-                .price = std::get<0>(it),
-        };
-
-        return std::move(d);
+    auto days = DateUtils::getCurrentPeriodBeforeDate(30);
+    int minTime = 0, maxTime = 0;
+    for (auto day : days) {
+        minTime = minTime == 0 ? day : minTime;
+        minTime = MIN(day, minTime);
+        maxTime = MAX(day, maxTime);
     }
 
-    loge("empty");
-    return GoldData();
+    return std::move(std::make_tuple(minTime, maxTime));
 }
 
-GoldData SqliteUtils::getCurrentSilverPrice()
+static inline void getD3D7D30AveragePrice (auto rows, GoldDataClient* data)
+{
+    if (rows.empty() || nullptr == data) {
+        return;
+    }
+
+    int curMaxTime = 0;
+    double d3 = 0, d7 = 0, d30 = 0;
+    int id = 0, d3d = 0, d7d = 0, d30d = 0;
+    for (auto row : rows) {
+        if (curMaxTime <= std::get<2>(row)) {
+            data->dateTime = curMaxTime = std::get<2>(row);
+            data->price = std::get<0>(row);
+        }
+        if (id < 3) {
+            ++d3d;
+            d3 += std::get<0>(row);
+        }
+
+        if (id < 7) {
+            ++d7d;
+            d7 += std::get<0>(row);
+        }
+
+        if (id < 30) {
+            ++d30d;
+            d30 += std::get<0>(row);
+        }
+        ++id;
+    }
+
+    if (d3d > 0)        data->priceAvg3 = d3 / d3d;
+    if (d7d > 0)        data->priceAvg7 = d7 / d7d;
+    if (d30d > 0)       data->priceAvg30 = d30 / d30d;
+}
+
+GoldDataClient SqliteUtils::getCurrentGoldPrice()
 {
     using namespace sqlite_orm;
 
+    GoldDataClient d = {
+            .dateTime = 0,
+            .itemType = "Au",
+            .area = "CNY",
+            .price = 0,
+            .priceAvg3 = 0,
+            .priceAvg7 = 0,
+            .priceAvg30 = 0,
+    };
+
     auto gold = getGoldStorage();
 
-    int curDate = DateUtils::getCurrentDate1();
+    auto days = DateUtils::getCurrentPeriodBeforeDate(30);
 
-    loge("%d", curDate);
+    int minTime = 0, maxTime = 0;
+    std::tie(minTime, maxTime) = getMinAndMax(days);
+
+    logd("%d -- %d", minTime, maxTime);
 
     auto rows = gold.select(columns(&GoldData::price, &GoldData::itemType, &GoldData::dateTime),
-            where(is_equal(&GoldData::dateTime, curDate) && is_equal(&GoldData::itemType, "Ag") && is_equal(&GoldData::area, "CNY")));
-    if (!rows.empty()) {
-        auto it = rows[0];
+                            where(between(&GoldData::dateTime, minTime, maxTime) && is_equal(&GoldData::itemType, "Au") && is_equal(&GoldData::area, "CNY")));
 
-        GoldData d = {
-                .idx = "",
-                .dateTime = std::get<2>(it),
-                .itemType = std::get<1>(it),
-                .area = "CNY",
-                .price = std::get<0>(it),
-        };
+    getD3D7D30AveragePrice(rows, &d);
 
-        return std::move(d);
-    }
+    return std::move(d);
+}
 
-    loge("empty");
+GoldDataClient SqliteUtils::getCurrentSilverPrice()
+{
+    using namespace sqlite_orm;
 
-    return GoldData();
+    GoldDataClient d = {
+            .dateTime = 0,
+            .itemType = "Ag",
+            .area = "CNY",
+            .price = 0,
+            .priceAvg3 = 0,
+            .priceAvg7 = 0,
+            .priceAvg30 = 0,
+    };
+
+    auto gold = getGoldStorage();
+
+    auto days = DateUtils::getCurrentPeriodBeforeDate(30);
+
+    int minTime = 0, maxTime = 0;
+    std::tie(minTime, maxTime) = getMinAndMax(days);
+
+    logd("%d -- %d", minTime, maxTime);
+
+    auto rows = gold.select(columns(&GoldData::price, &GoldData::itemType, &GoldData::dateTime),
+            where(between(&GoldData::dateTime, minTime, maxTime) && is_equal(&GoldData::itemType, "Ag") && is_equal(&GoldData::area, "CNY")));
+
+    getD3D7D30AveragePrice(rows, &d);
+
+    return std::move(d);
 }

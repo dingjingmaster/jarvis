@@ -5,14 +5,15 @@
 #ifndef JARVIS_SQLITEUTILS_H
 #define JARVIS_SQLITEUTILS_H
 
+#include "../main/client-data.h"
 #include "../spider/gold-spider.h"
+
 
 class SqliteUtils
 {
 public:
-    static GoldData getCurrentGoldPrice();
-    static GoldData getCurrentSilverPrice();
-
+    static GoldDataClient getCurrentGoldPrice();
+    static GoldDataClient getCurrentSilverPrice();
 };
 
 

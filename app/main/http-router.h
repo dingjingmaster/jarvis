@@ -14,7 +14,6 @@ public:
 
     std::string requestStaticResource (protocol::HttpRequest& request) const;
 
-
     bool responseStaticResource (HttpTask* task);
     bool responseDynamicResource (HttpTask* task);
 
