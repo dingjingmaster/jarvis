@@ -4,6 +4,7 @@ import re
 import os
 import sys
 
+
 def price_float (str):
     try:
         float(str)
@@ -15,7 +16,7 @@ def price_float (str):
 exe = "/usr/local/jarvis/bin/gold-tool"
 if __name__ == '__main__':
     if len(sys.argv) != 4:
-        print("Usage: gold-tool.py option(Au/Ag) area(USD/CNY) <.csv file>\n"
+        print("Usage: gold-tool.py option(Au/Ag) area(US/CN/UK) <.csv file>\n"
               ".csv文件格式: 日期,价格\n")
         exit(1)
     with open(sys.argv[3]) as fr:

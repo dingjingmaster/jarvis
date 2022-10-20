@@ -7,7 +7,7 @@
 #include "../core/c-log.h"
 #include <json-glib/json-glib.h>
 
-std::string JsonUtils::jsonBuildIndexPrice(JsonUtils::PriceType type, GoldDataClient& data)
+std::string JsonUtils::jsonBuildIndexPrice(GoldDataClient& data)
 {
     g_autoptr(JsonBuilder) builder = json_builder_new ();
 

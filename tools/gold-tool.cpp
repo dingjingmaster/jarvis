@@ -9,14 +9,14 @@
     std::string     idx;            // 主键: dateTime+itemType+area
     int             dateTime;       // 时间: 20110101 主键
     std::string     itemType;       // 类型: Au/Ag
-    std::string     area;           // 地区: USD/CNY
+    std::string     area;           // 地区: US/CN/UK
     double          price;          // 价格: 美国是美元、中国是人民币
  */
 
 int main (int argc, char* argv[])
 {
     if (argc != 6) {
-        printf("Usage: gold-tool option(u/i) date(20220909) type(Au/Ag) area(USD/CNY) price(1000.00)\n");
+        printf("Usage: gold-tool option(u/i) date(20220909) type(Au/Ag) area(US/CN/UK) price(1000.00)\n");
         printf("\toption: u(update price); i(insert price)\n");
         exit(1);
     }
@@ -36,7 +36,7 @@ int main (int argc, char* argv[])
         exit(1);
     }
 
-    if (!strcmp(argv[4], "USD") && !strcmp(argv[4], "CNY")) {
+    if (!strcmp(argv[4], "US") && !strcmp(argv[4], "CN") && !strcmp(argv[4], "UK")) {
         printf("area error\n");
         exit(1);
     }

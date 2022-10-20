@@ -12,8 +12,8 @@
 class SqliteUtils
 {
 public:
-    static GoldDataClient getCurrentGoldPrice();
-    static GoldDataClient getCurrentSilverPrice();
+    static GoldDataClient getCurrentGoldPrice(std::string& area);
+    static GoldDataClient getCurrentSilverPrice(std::string& area);
 };
 
 

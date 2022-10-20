@@ -3,6 +3,8 @@
 //
 
 #include "sqlite-utils.h"
+
+#include "../common/area.h"
 #include "../utils/date-utils.h"
 
 #include <glib.h>
@@ -59,19 +61,25 @@ static inline void getD3D7D30AveragePrice (auto rows, GoldDataClient* data)
     if (d30d > 0)       data->priceAvg30 = d30 / d30d;
 }
 
-GoldDataClient SqliteUtils::getCurrentGoldPrice()
+GoldDataClient SqliteUtils::getCurrentGoldPrice(std::string& area)
 {
-    using namespace sqlite_orm;
-
     GoldDataClient d = {
             .dateTime = 0,
             .itemType = "Au",
-            .area = "CNY",
+            .area = "CN",
             .price = 0,
             .priceAvg3 = 0,
             .priceAvg7 = 0,
             .priceAvg30 = 0,
     };
+
+    if (!g_strv_contains(gAreaString, area.c_str())) {
+        return d;
+    }
+
+    d.area = area;
+
+    using namespace sqlite_orm;
 
     auto gold = getGoldStorage();
 
@@ -81,26 +89,32 @@ GoldDataClient SqliteUtils::getCurrentGoldPrice()
     logd("%d -- %d", minTime, maxTime);
 
     auto rows = gold.select(columns(&GoldData::price, &GoldData::itemType, &GoldData::dateTime),
-            where(between(&GoldData::dateTime, minTime, maxTime) && is_equal(&GoldData::itemType, "Au") && is_equal(&GoldData::area, "CNY")), order_by(&GoldData::dateTime).desc());
+            where(between(&GoldData::dateTime, minTime, maxTime) && is_equal(&GoldData::itemType, "Au") && is_equal(&GoldData::area, area)), order_by(&GoldData::dateTime).desc());
 
     getD3D7D30AveragePrice(rows, &d);
 
     return std::move(d);
 }
 
-GoldDataClient SqliteUtils::getCurrentSilverPrice()
+GoldDataClient SqliteUtils::getCurrentSilverPrice(std::string& area)
 {
-    using namespace sqlite_orm;
-
     GoldDataClient d = {
             .dateTime = 0,
             .itemType = "Ag",
-            .area = "CNY",
+            .area = "CN",
             .price = 0,
             .priceAvg3 = 0,
             .priceAvg7 = 0,
             .priceAvg30 = 0,
     };
+
+    if (!g_strv_contains(gAreaString, area.c_str())) {
+        return d;
+    }
+
+    d.area = area;
+
+    using namespace sqlite_orm;
 
     auto gold = getGoldStorage();
 
@@ -110,7 +124,7 @@ GoldDataClient SqliteUtils::getCurrentSilverPrice()
     logd("%d -- %d", minTime, maxTime);
 
     auto rows = gold.select(columns(&GoldData::price, &GoldData::itemType, &GoldData::dateTime),
-            where(between(&GoldData::dateTime, minTime, maxTime) && is_equal(&GoldData::itemType, "Ag") && is_equal(&GoldData::area, "CNY")), order_by(&GoldData::dateTime).desc());
+            where(between(&GoldData::dateTime, minTime, maxTime) && is_equal(&GoldData::itemType, "Ag") && is_equal(&GoldData::area, area)), order_by(&GoldData::dateTime).desc());
 
     getD3D7D30AveragePrice(rows, &d);
 

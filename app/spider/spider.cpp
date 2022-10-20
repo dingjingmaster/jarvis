@@ -33,6 +33,7 @@ void sqlite_lock()
         if (flock (locker->_fileno, LOCK_EX | LOCK_NB) == 0) {
             break;
         }
+        sleep(1);
     }
 
     lock.unlock();

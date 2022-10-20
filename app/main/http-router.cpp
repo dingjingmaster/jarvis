@@ -3,6 +3,8 @@
 //
 
 #include "http-router.h"
+
+#include "common/area.h"
 #include "client-data.h"
 #include "../utils/sqlite-utils.h"
 #include "../utils/file-read-write.h"
@@ -79,15 +81,19 @@ bool HttpRouter::responseDynamicResource(HttpTask *task)
     std::string uri = task->getReq()->getRequestUri();
     logd(uri.c_str());
 
-    if ("/index/au-price" == uri) {
-        auto info = SqliteUtils::getCurrentGoldPrice();
+    if (uri.starts_with("/index/au-price/")) {
+        std::string param = uri.substr(16);
+        logd(param.c_str());
+        auto info = SqliteUtils::getCurrentGoldPrice(param);
         task->getResp()->setHeaderPair("content-type", "application/json;charset=utf-8");
-        task->getResp()->appendOutputBody(JsonUtils::jsonBuildIndexPrice(JsonUtils::INDEX_PRICE_TYPE_AU, info));
+        task->getResp()->appendOutputBody(JsonUtils::jsonBuildIndexPrice(info));
         return true;
-    } else if ("/index/ag-price" == uri) {
-        auto info = SqliteUtils::getCurrentSilverPrice();
+    } else if (uri.starts_with("/index/ag-price/")) {
+        std::string param = uri.substr(16);
+        logd(param.c_str());
+        auto info = SqliteUtils::getCurrentSilverPrice(param);
         task->getResp()->setHeaderPair("content-type", "application/json;charset=utf-8");
-        task->getResp()->appendOutputBody(JsonUtils::jsonBuildIndexPrice(JsonUtils::INDEX_PRICE_TYPE_AG, info));
+        task->getResp()->appendOutputBody(JsonUtils::jsonBuildIndexPrice(info));
         return true;
     }
 

@@ -10,13 +10,7 @@
 class JsonUtils
 {
 public:
-    enum PriceType
-    {
-        INDEX_PRICE_TYPE_AU,
-        INDEX_PRICE_TYPE_AG,
-    };
-public:
-    static std::string jsonBuildIndexPrice (PriceType type, GoldDataClient& data);
+    static std::string jsonBuildIndexPrice (GoldDataClient& data);
 
 };
 
