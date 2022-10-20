@@ -65,7 +65,7 @@ std::string HttpRouter::requestStaticResource(protocol::HttpRequest &request) co
         }
     }
     else if (uri.ends_with(".js")) {
-        std::string path = WEB_HOME + uri;
+        std::string path = std::string(WEB_HOME) + uri;
         if (!access(path.c_str(), R_OK)) {
             return std::move(path);
         } else {

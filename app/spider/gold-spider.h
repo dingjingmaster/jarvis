@@ -27,6 +27,8 @@ struct GoldData
 static inline void save_data (GoldData&);
 
 const float oz = 31.1034768;
+
+// 此处得到的是伦敦金价和银价
 static struct SpiderInfo gGoldSpider =
 {
         .interval = 600,
@@ -112,6 +114,33 @@ static void save_data (GoldData& sp)
     }
     sqlite_unlock();
 }
+
+// 此处得到的是中国金价和银价
+static struct SpiderInfo gChinaGoldSpider =
+{
+        .interval = 10,
+        .spiderName = "china gold spider (python)",
+        .requestURI = "https://www.sge.com.cn",
+        .httpMethod = HTTP_METHOD_GET,
+        .rootParser = [] (Spider* sp) {
+
+#ifdef DEBUG
+            if (0 == system("python /data/code/Jarvis/tools/au-sge.py /tmp/au-jarvis.csv")) {
+                if (0 == system("python /data/code/Jarvis/tools/gold-tool.py Au CN /tmp/au-jarvis.csv")) {
+#else
+            if (0 == system("python " WEB_HOME "/../bin/au-sge.py /tmp/au-jarvis.csv")) {
+                if (0 == system("python " WEB_HOME "/../bin/gold-tool.py Au CN /tmp/au-jarvis.csv")) {
+#endif
+                    logi("spider: %s OK!", sp->getName().c_str());
+                } else {
+                    loge("spider: %s error!", sp->getName().c_str());
+                }
+            } else {
+                loge("spider: %s error!", sp->getName().c_str());
+            }
+        }
+};
+
 
 
 

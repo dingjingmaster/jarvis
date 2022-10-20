@@ -15,7 +15,7 @@ option(DEBUG "USE DEBUG" ON)
 
 if(DEBUG)
     set(INSTALL_NAME ${CMAKE_BINARY_DIR}/app/jarvis)
-    add_definitions(-O0 -g -rdynamic -Wl,--export-dynamic -DDEBUG -D WEB_HOME=\\"/data/code/skynet-web/dist/\\")
+    add_definitions(-O0 -g -rdynamic -Wl,--export-dynamic -D DEBUG -D WEB_HOME=\\"/data/code/skynet-web/dist/\\")
 else()
     set(INSTALL_NAME /usr/local/jarvis/bin/jarvis)
     add_definitions(-O0 -g -rdynamic -Wl,--export-dynamic -D WEB_HOME=\\"/usr/local/jarvis/html/\\")

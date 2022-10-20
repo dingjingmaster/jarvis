@@ -85,6 +85,7 @@ package() {
     install -Dm755 \${srcdir}/\${pkgname}-\${pkgver}/build/app/\${pkgname}              "\${pkgdir}/usr/local/\${pkgname}/bin/"
     install -Dm755 \${srcdir}/\${pkgname}-\${pkgver}/build/tools/gold-tool              "\${pkgdir}/usr/local/\${pkgname}/bin/"
     install -Dm755 \${srcdir}/\${pkgname}-\${pkgver}/tools/gold-tool.py                 "\${pkgdir}/usr/local/\${pkgname}/bin/"
+    install -Dm755 \${srcdir}/\${pkgname}-\${pkgver}/tools/au-sge.py                    "\${pkgdir}/usr/local/\${pkgname}/bin/"
     install -Dm755 \${srcdir}/\${pkgname}-\${pkgver}/data/\${pkgname}.service           "\${pkgdir}/usr/lib/systemd/system/\${pkgname}.service"
 
 

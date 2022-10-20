@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import re
+import sys
 import requests
 from bs4 import BeautifulSoup
 
@@ -8,6 +9,10 @@ baseURL = 'https://www.sge.com.cn'
 requestURL = 'https://www.sge.com.cn/sjzx/mrhqsj'
 
 if __name__ == '__main__':
+
+    if len(sys.argv) != 2:
+        print("请输入要保存的路径")
+        exit(-1)
 
     endPage = 0
     beginPage = 0
@@ -28,7 +33,7 @@ if __name__ == '__main__':
         endPage = max(beginPage, int(num[1]))
     print("获取抓取范围 %d - %d" % (beginPage, endPage))
 
-    fw = open('/data/au.csv', 'w+')
+    fw = open(sys.argv[1], 'w+')
 
     # 开始抓取
     for i in range(beginPage, endPage):

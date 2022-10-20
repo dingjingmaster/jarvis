@@ -46,6 +46,7 @@ SpiderManager::SpiderManager()
     umask(pre);
 
     SPIDER_REGISTER(GoldSpider);
+    SPIDER_REGISTER(ChinaGoldSpider);
 }
 
 SpiderManager::~SpiderManager()
