@@ -128,7 +128,7 @@ static struct SpiderInfo gChinaGoldSpider =
             if (0 == system("python /data/code/Jarvis/tools/au-sge.py /tmp/au-jarvis.csv")) {
                 if (0 == system("python /data/code/Jarvis/tools/gold-tool.py Au CN /tmp/au-jarvis.csv")) {
 #else
-            if (0 == system("python " WEB_HOME "/../bin/au-sge.py /tmp/au-jarvis.csv")) {
+            if (0 == system("python " WEB_HOME " /../bin/au-sge.py /tmp/au-jarvis.csv")) {
                 if (0 == system("python " WEB_HOME "/../bin/gold-tool.py Au CN /tmp/au-jarvis.csv")) {
 #endif
                     logi("spider: %s OK!", sp->getName().c_str());
