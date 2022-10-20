@@ -28,8 +28,8 @@ if __name__ == '__main__':
             date = arr[0]
             price = arr[1]
             if len(date) == 8 and price_float(price) > 0:
-                print('%s "i" "%s" "%s" "%s" "%s"' % (exe, date, sys.argv[1], sys.argv[2], price))
-                os.system('%s "i" "%s" "%s" "%s" "%s"' % (exe, date, sys.argv[1], sys.argv[2], price))
+                print('%s "u" "%s" "%s" "%s" "%s"' % (exe, date, sys.argv[1], sys.argv[2], price))
+                os.system('%s "u" "%s" "%s" "%s" "%s"' % (exe, date, sys.argv[1], sys.argv[2], price))
             else:
                 print("error line:" + line)
         pass

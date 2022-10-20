@@ -19,7 +19,7 @@ std::string JsonUtils::jsonBuildIndexPrice(JsonUtils::PriceType type, GoldDataCl
     json_builder_add_int_value (builder, data.dateTime);
 
     json_builder_set_member_name (builder, "d3");
-    json_builder_add_double_value (builder, data.priceAvg7);
+    json_builder_add_double_value (builder, data.priceAvg3);
 
     json_builder_set_member_name (builder, "d7");
     json_builder_add_double_value (builder, data.priceAvg7);
