@@ -80,7 +80,7 @@ void SpiderManager::runAll()
                 logw("spider '%s' not running!", it.second->spiderName.c_str());
                 continue;
             } else if (it.second->interval > 0) {
-                SpiderTask* task = TaskFactory::createTimerTask(it.second->interval * 1000000, [=] (TimerTask*) {
+                SpiderTask* task = TaskFactory::createTimerTask(it.second->interval * 1000000, [&] (TimerTask*) {
                     std::shared_ptr<SpiderInfo> spInfo = mSpiders[it.first];
                     if (mSpiderFilter.find(spInfo->spiderName) != mSpiderFilter.end()) {
                         if (!mSpiderFilter[spInfo->spiderName]->finished()) {
