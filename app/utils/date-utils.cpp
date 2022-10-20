@@ -33,7 +33,7 @@ std::list<int> DateUtils::getCurrentPeriodBeforeDate(int days)
     }
 
     g_autoptr(GDateTime) nowTmp = g_date_time_new_now_local();
-    g_autoptr(GDateTime) now = g_date_time_add_days(now, -1);
+    g_autoptr(GDateTime) now = g_date_time_add_days(nowTmp, -1);
 
     std::list<int> ret{};
 
