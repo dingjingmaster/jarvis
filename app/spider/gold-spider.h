@@ -118,7 +118,7 @@ static void save_data (GoldData& sp)
 // 此处得到的是中国金价和银价
 static struct SpiderInfo gChinaGoldSpider =
 {
-        .interval = 10,
+        .interval = 6000,
         .spiderName = "china gold spider (python)",
         .requestURI = "https://www.sge.com.cn",
         .httpMethod = HTTP_METHOD_GET,
