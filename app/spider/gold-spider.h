@@ -26,7 +26,7 @@ struct GoldData
 
 static inline void save_data (GoldData&);
 
-const float oz = 28.3495231;
+const float oz = 31.1034768;
 static struct SpiderInfo gGoldSpider =
 {
         .interval = 600,
