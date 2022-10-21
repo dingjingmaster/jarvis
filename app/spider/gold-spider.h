@@ -125,18 +125,20 @@ static struct SpiderInfo gChinaGoldSpider =
         .rootParser = [] (Spider* sp) {
 
 #ifdef DEBUG
-            if (0 == system("python /data/code/Jarvis/tools/au-sge.py /tmp/au-jarvis.csv")) {
-                if (0 == system("python /data/code/Jarvis/tools/gold-tool.py Au CN /tmp/au-jarvis.csv")) {
+            std::string spider = "python /data/code/Jarvis/tools/au-sge.py /tmp/au-jarvis.csv";
+            std::string updateData = "python /data/code/Jarvis/tools/gold-tool.py Au CN /tmp/au-jarvis.csv";
 #else
-            if (0 == system("python " WEB_HOME " /../bin/au-sge.py /tmp/au-jarvis.csv")) {
-                if (0 == system("python " WEB_HOME "/../bin/gold-tool.py Au CN /tmp/au-jarvis.csv")) {
+            std::string spider = std::string("python ") + WEB_HOME + "/../bin/au-sge.py /tmp/au-jarvis.csv";
+            std::string updateData = std::string("python ") + WEB_HOME + "/../bin/gold-tool.py Au CN /tmp/au-jarvis.csv";
 #endif
+            if (0 == system(spider.c_str())) {
+                if (0 == system(updateData.c_str())) {
                     logi("spider: %s OK!", sp->getName().c_str());
                 } else {
-                    loge("spider: %s error!", sp->getName().c_str());
+                    loge("spider: %s error, cmd: %s", sp->getName().c_str(), updateData.c_str());
                 }
             } else {
-                loge("spider: %s error!", sp->getName().c_str());
+                loge("spider: %s error, cmd: %s", sp->getName().c_str(), spider.c_str());
             }
         }
 };
