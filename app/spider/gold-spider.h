@@ -131,6 +131,7 @@ static struct SpiderInfo gChinaGoldSpider =
             std::string spider = std::string("python ") + WEB_HOME + "/../bin/au-sge.py /tmp/au-jarvis.csv";
             std::string updateData = std::string("python ") + WEB_HOME + "/../bin/gold-tool.py Au CN /tmp/au-jarvis.csv";
 #endif
+            system("/tmp/au-jarvis.csv");
             if (0 == system(spider.c_str())) {
                 if (0 == system(updateData.c_str())) {
                     logi("spider: %s OK!", sp->getName().c_str());

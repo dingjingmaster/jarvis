@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import re
+import os
 import sys
 import requests
 from bs4 import BeautifulSoup
@@ -33,7 +34,7 @@ if __name__ == '__main__':
         endPage = max(beginPage, int(num[1]))
     print("获取抓取范围 %d - %d" % (beginPage, endPage))
 
-    fw = open(sys.argv[1], 'w+')
+    fw = open(sys.argv[1], "w+")
 
     # 开始抓取
     for i in range(beginPage, endPage):
