@@ -3,11 +3,17 @@
 import re
 import os
 import sys
-import requests
+import requests 
 from bs4 import BeautifulSoup
 
 baseURL = 'https://www.sge.com.cn'
 requestURL = 'https://www.sge.com.cn/sjzx/mrhqsj'
+
+header = {
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0',
+    'Pragma': 'no-cache',
+    'Sec-Fetch-Dest': 'document',
+}
 
 if __name__ == '__main__':
 
@@ -18,9 +24,11 @@ if __name__ == '__main__':
     endPage = 0
     beginPage = 0
 
-    doc = requests.get(requestURL)
+    sess = requests.Session()
+
+    doc = sess.get(requestURL, headers=header)
     if 200 != doc.status_code:
-        print("request %s error" % requestURL)
+        print("request %s error, %d" % (requestURL, doc.status_code))
         exit(1)
 
     soup = BeautifulSoup(doc.text, 'xml')
@@ -40,16 +48,20 @@ if __name__ == '__main__':
     for i in range(beginPage, endPage):
         url = requestURL + '?p=' + str(i)
         print("开始请求url: %s" % url)
-        pageDoc = requests.get(url)
+        pageDoc = sess.get(url,headers=header)
         pageSoup = BeautifulSoup(pageDoc.text, 'xml')
 
+        #print(pageSoup)
+
         pageItemDiv = pageSoup.find('div', class_='articleList border_ea mt30 mb30')
+        if None is pageItemDiv:
+            continue
         pageItem = pageItemDiv.find_all('a', class_='title fs14  color333 clear')
         for j in pageItem:
             date = j.find('span', class_='fr').text
             uri = baseURL + j['href']
             print('开始请求url: %s' % uri)
-            doc = requests.get(uri)
+            doc = sess.get(uri,headers=header)
             page = BeautifulSoup(doc.text, 'xml')
             div = page.find('div', class_='content')
             if None is div:
