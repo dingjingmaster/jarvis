@@ -436,6 +436,8 @@ int log_print(log_level_t level, const char *tag, const char *file, int line, co
         fprintf(stderr, "log has not been invalid!\n");
         return -1;
     }
+
+    // FIXME:// 此处太多数据会导致崩溃
     va_start(ap, fmt);
     n = vsnprintf(buf, LOG_BUF_SIZE - 1, fmt, ap);
     va_end(ap);

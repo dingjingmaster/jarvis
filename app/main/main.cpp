@@ -33,7 +33,7 @@ int main (int argc, char* argv[])
         return errno;
     }
 
-    SpiderManager::instance()->runAll();
+    //SpiderManager::instance()->runAll();
 
 #ifdef DEBUG
     int port = 8889;

@@ -80,11 +80,14 @@ struct _CPollParams
     size_t                      maxOpenFiles;
     CPollMessage* (*createMessage) (void*);
     int (*partialWritten) (size_t, void *);
-    void (*callback) (CPollResult *, void *);
+    void (*callback) (CPollResult*, void *);
     void* context;
 };
 
-
+/**
+ * @brief
+ *  根据 struct CPollParams* 创建 CPoll, 在 CPoll 中包含有 CPollParams 所有元素
+ */
 CPoll*  poll_create         (const CPollParams* params);
 int     poll_start          (CPoll* poll);
 int     poll_add            (const CPollData* data, int timeout, CPoll* poll);

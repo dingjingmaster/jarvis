@@ -12,7 +12,7 @@ class HttpRouter
 public:
     static HttpRouter* getInstance();
 
-    std::string requestStaticResource (protocol::HttpRequest& request) const;
+    std::string requestStaticResource (HttpTask& task) const;
 
     bool responseStaticResource (HttpTask* task);
     bool responseDynamicResource (HttpTask* task);

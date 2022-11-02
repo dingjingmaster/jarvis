@@ -44,43 +44,47 @@ struct _CPollNode
     char                    inRBTree;
     char                    removed;
     int                     event;
-    struct timespec         timeout;
+    struct timespec         timeout;                    // 超时返回,
     CPollNode*              res;
 };
 
 struct _CPoll
 {
     size_t                  maxOpenFiles;
-    CPollMessage* (*createMessage) (void *);
-    int (*partialWritten)(size_t, void *);
-    void (*cb)(CPollResult *, void *);
+    CPollMessage* (*createMessage) (void*);
+    int (*partialWritten)(size_t, void*);
+    void (*cb)(CPollResult *, void*);
     void *ctx;
 
     pthread_t               tid;
-    int                     pfd;
-    int                     timerFd;
-    int                     pipeRd;
-    int                     pipeWr;
+    int                     timerFd;                    // 定时返回 timerfd_create()
+
+    int                     pfd;                        // epoll fd
+    int                     pipeRd;                     // 读
+    int                     pipeWr;                     // 写
+
     int                     stopped;
+
     RBRoot                  timeoutTree;
     RBNode*                 treeFirst;
     RBNode*                 treeLast;
+
     struct list_head        timeoutList;
     struct list_head        noTimeoutList;
-    CPollNode**             nodes;
-    pthread_mutex_t         mutex;
-    char                    buf[C_POLL_BUF_SIZE];
+
+    CPollNode**             nodes;                      //
+    pthread_mutex_t         mutex;                      // 操作任何 CPoll 结构体成员都该上锁
+
+    char                    buf[C_POLL_BUF_SIZE];       // CPollNode，用于管道
 };
 
 static inline int _poll_create_pfd()
 {
-    logv("");
     return epoll_create(1);
 }
 
 static inline int _poll_add_fd(int fd, int event, void *data, CPoll *poll)
 {
-    logv("");
     struct epoll_event ev = {
             .events		=	event,
             .data		=	{
@@ -93,31 +97,35 @@ static inline int _poll_add_fd(int fd, int event, void *data, CPoll *poll)
 
 static inline int _poll_del_fd(int fd, int event, CPoll *poll)
 {
-    logv("");
     return epoll_ctl(poll->pfd, EPOLL_CTL_DEL, fd, NULL);
 }
 
-static inline int _poll_mod_fd(int fd, int old_event, int new_event, void *data, CPoll *poll)
+static inline int _poll_mod_fd(int fd, int oldEvent, int newEvent, void *data, CPoll *poll)
 {
-    logv("");
     struct epoll_event ev = {
-            .events		=	new_event,
+            .events		=	newEvent,
             .data		=	{
                     .ptr	=	data
             }
     };
+
     return epoll_ctl(poll->pfd, EPOLL_CTL_MOD, fd, &ev);
 }
 
 static inline int _poll_create_timerfd()
 {
-    logv("");
+    // CLOCK_REALTIME: 可设置的系统范围实时时钟
+    // CLOCK_MONOTONIC: 不可设置的单调递增时钟，从固定某个时间点开始
+    // CLOCK_BOOTTIME: 类似 CLOCK_MONOTONIC,
+    // CLOCK_REALTIME_ALARM: 类似CLOCK_REALTIME，如果系统挂起会被唤醒，需要进程有对应权限
+    // CLOCK_BOOTTIME_ALARM
+    // TFD_NONBLOCK
+    // TFD_CLOEXEC
     return timerfd_create(CLOCK_MONOTONIC, 0);
 }
 
 static inline int _poll_add_timerfd(int fd, CPoll *poll)
 {
-    logv("");
     struct epoll_event ev = {
             .events		=	EPOLLIN | EPOLLET,
             .data		=	{
@@ -129,11 +137,11 @@ static inline int _poll_add_timerfd(int fd, CPoll *poll)
 
 static inline int _poll_set_timer_fd(int fd, const struct timespec *absTime, CPoll *poll)
 {
-    logv("");
     struct itimerspec timer = {
             .it_interval	=	0,
             .it_value		=	*absTime
     };
+
     return timerfd_settime(fd, TFD_TIMER_ABSTIME, &timer, NULL);
 }
 
@@ -141,20 +149,16 @@ typedef struct epoll_event _poll_event_t;
 
 static inline int _poll_wait(_poll_event_t *events, int maxEvents, CPoll *poll)
 {
-    logv("poll fd: %d, events: 0X%0X, maxEvents: %d", poll->pfd, events, maxEvents);
     return epoll_wait(poll->pfd, events, maxEvents, -1);
 }
 
 static inline void* _poll_event_data(const _poll_event_t *event)
 {
-    logv("");
     return event->data.ptr;
 }
 
-
 static inline long __timeout_cmp(const CPollNode *node1, const CPollNode *node2)
 {
-    logv("");
     long ret = node1->timeout.tv_sec - node2->timeout.tv_sec;
 
     if (ret == 0) {
@@ -166,7 +170,6 @@ static inline long __timeout_cmp(const CPollNode *node1, const CPollNode *node2)
 
 static void _poll_tree_insert(CPollNode *node, CPoll *poll)
 {
-    logv("");
     RBNode **p = &poll->timeoutTree.rbNode;
     RBNode *parent = NULL;
     CPollNode *entry;
@@ -200,7 +203,6 @@ static void _poll_tree_insert(CPollNode *node, CPoll *poll)
 
 static inline void _poll_tree_erase(CPollNode *node, CPoll *poll)
 {
-    logv("");
     if (&node->rb == poll->treeFirst)
         poll->treeFirst = rb_next(&node->rb);
 
@@ -213,7 +215,6 @@ static inline void _poll_tree_erase(CPollNode *node, CPoll *poll)
 
 static int _poll_remove_node(CPollNode *node, CPoll *poll)
 {
-    logv("");
     int removed;
 
     pthread_mutex_lock(&poll->mutex);
@@ -236,15 +237,15 @@ static int _poll_remove_node(CPollNode *node, CPoll *poll)
 
 static int _poll_append_message(const void *buf, size_t *n, CPollNode *node, CPoll *poll)
 {
-    logv("");
     CPollMessage *msg = node->data.message;
     CPollNode *res;
     int ret;
 
     if (!msg) {
-        res = (CPollNode*)malloc(sizeof (CPollNode));
-        if (!res)
+        res = (CPollNode*) malloc (sizeof(CPollNode));
+        if (!res) {
             return -1;
+        }
 
         msg = poll->createMessage(node->data.context);
         if (!msg) {
@@ -274,7 +275,6 @@ static int _poll_append_message(const void *buf, size_t *n, CPollNode *node, CPo
 
 static int _poll_handle_ssl_error(CPollNode *node, int ret, CPoll *poll)
 {
-    logv("");
     int error = SSL_get_error(node->data.ssl, ret);
     int event;
 
@@ -291,14 +291,16 @@ static int _poll_handle_ssl_error(CPollNode *node, int ret, CPoll *poll)
             return -1;
     }
 
-    if (event == node->event)
+    if (event == node->event) {
         return 0;
+    }
 
     pthread_mutex_lock(&poll->mutex);
     if (!node->removed) {
         ret = _poll_mod_fd(node->data.fd, node->event, event, node, poll);
-        if (ret >= 0)
+        if (ret >= 0) {
             node->event = event;
+        }
     } else {
         ret = 0;
     }
@@ -310,48 +312,53 @@ static int _poll_handle_ssl_error(CPollNode *node, int ret, CPoll *poll)
 
 static void _poll_handle_read(CPollNode *node, CPoll *poll)
 {
-    logv("");
-    ssize_t nleft;
+    ssize_t nLeft;
     size_t n;
-    char *p;
+    char* p = NULL;
 
     while (1) {
         p = poll->buf;
         if (!node->data.ssl) {
-            nleft = read(node->data.fd, p, C_POLL_BUF_SIZE);
-            if (nleft < 0) {
-                if (errno == EAGAIN)
+            nLeft = read(node->data.fd, p, C_POLL_BUF_SIZE);
+            if (nLeft < 0) {
+                if (errno == EAGAIN) {
                     return;
+                }
             }
-        } else {
-            nleft = SSL_read(node->data.ssl, p, C_POLL_BUF_SIZE);
-            if (nleft < 0) {
-                if (_poll_handle_ssl_error(node, nleft, poll) >= 0)
+        }
+        else {
+            nLeft = SSL_read(node->data.ssl, p, C_POLL_BUF_SIZE);
+            if (nLeft < 0) {
+                if (_poll_handle_ssl_error(node, nLeft, poll) >= 0) {
                     return;
+                }
             }
         }
 
-        if (nleft <= 0)
+        if (nLeft <= 0) {
             break;
+        }
 
         do {
-            n = nleft;
+            n = nLeft;
             if (_poll_append_message(p, &n, node, poll) >= 0) {
-                nleft -= n;
+                nLeft -= n;
                 p += n;
             } else {
-                nleft = -1;
+                nLeft = -1;
             }
-        } while (nleft > 0);
+        } while (nLeft > 0);
 
-        if (nleft < 0)
+        if (nLeft < 0) {
             break;
+        }
     }
 
-    if (_poll_remove_node(node, poll))
+    if (_poll_remove_node(node, poll)) {
         return;
+    }
 
-    if (nleft == 0) {
+    if (nLeft == 0) {
         node->error = 0;
         node->state = PR_ST_FINISHED;
     } else {
@@ -373,7 +380,6 @@ static void _poll_handle_read(CPollNode *node, CPoll *poll)
 
 static void _poll_handle_write(CPollNode *node, CPoll *poll)
 {
-    logv("");
     struct iovec *iov = node->data.writeIov;
     size_t count = 0;
     ssize_t nleft;
@@ -711,17 +717,14 @@ static void _poll_handle_notify(CPollNode *node, CPoll *poll)
 
 static int _poll_handle_pipe(CPoll *poll)
 {
-    logv("");
-    CPollNode **node = (CPollNode **)poll->buf;
+    CPollNode **node = (CPollNode**)poll->buf;
     int stop = 0;
-    int n;
-    int i;
 
-    n = read(poll->pipeRd, node, C_POLL_BUF_SIZE) / sizeof (void *);
-    for (i = 0; i < n; i++) {
+    unsigned long n = read(poll->pipeRd, node, C_POLL_BUF_SIZE) / sizeof (void*);
+    for (int i = 0; i < n; i++) {
         if (node[i]) {
             free(node[i]->res);
-            poll->cb((CPollResult *)node[i], poll->ctx);
+            poll->cb((CPollResult*) node[i], poll->ctx);
         } else {
             stop = 1;
         }
@@ -732,7 +735,6 @@ static int _poll_handle_pipe(CPoll *poll)
 
 static void _poll_handle_timeout(const CPollNode* timeNode, CPoll *poll)
 {
-    logv("in");
     CPollNode*                      node;
     struct list_head                *pos, *tmp;
 
@@ -765,8 +767,9 @@ static void _poll_handle_timeout(const CPollNode* timeNode, CPoll *poll)
                 poll->treeFirst = rb_next(poll->treeFirst);
                 rb_erase(&node->rb, &poll->timeoutTree);
                 list_add_tail(&node->list, &timeList);
-                if (poll->treeFirst)
+                if (poll->treeFirst) {
                     continue;
+                }
 
                 poll->treeLast = NULL;
             }
@@ -784,17 +787,13 @@ static void _poll_handle_timeout(const CPollNode* timeNode, CPoll *poll)
         free(node->res);
         poll->cb((CPollResult *)node, poll->ctx);
     }
-    logv("ok");
 }
 
 static void _poll_set_timer(CPoll *poll)
 {
-    logv("in");
-    CPollNode *node = NULL;
-    CPollNode *first;
+    CPollNode* node = NULL;
+    CPollNode* first = NULL;
     struct timespec absTime;
-
-    logv("poll is %s", poll ? "not null" : "error null");
 
     pthread_mutex_lock(&poll->mutex);
     if (!list_empty(&poll->timeoutList)) {
@@ -804,6 +803,7 @@ static void _poll_set_timer(CPoll *poll)
     if (poll->treeFirst) {
         first = RB_ENTRY(poll->treeFirst, CPollNode, rb);
         if (!node || __timeout_cmp(first, node) < 0) {
+            // first时间 < node时间 或 node == NULL
             node = first;
         }
     }
@@ -817,7 +817,6 @@ static void _poll_set_timer(CPoll *poll)
 
     _poll_set_timer_fd (poll->timerFd, &absTime, poll);
     pthread_mutex_unlock (&poll->mutex);
-    logv("ok");
 }
 
 static void* _poll_handle_read_routine(void *arg)
@@ -825,70 +824,59 @@ static void* _poll_handle_read_routine(void *arg)
     int                 nEvents;
     int                 hasPipeEvent;
     CPoll*              poll = (CPoll*)arg;
-    _poll_event_t       events[C_POLL_EVENTS_MAX];
+    _poll_event_t       events[C_POLL_EVENTS_MAX];          // epoll_event_t
     CPollNode           timeNode;
     CPollNode*          node;
-
-    logv("CPoll is %s", poll ? "not null" : "null");
 
     while (1) {
         _poll_set_timer(poll);
         nEvents = _poll_wait(events, C_POLL_EVENTS_MAX, poll);
         clock_gettime(CLOCK_MONOTONIC, &timeNode.timeout);
         hasPipeEvent = 0;
-        for (int i = 0; i < nEvents; i++) {
-            node = (CPollNode *)_poll_event_data(&events[i]);
-            if (node > (CPollNode *)1) {
+        for (int i = 0; i < nEvents; ++i) {
+            node = (CPollNode*)_poll_event_data(&events[i]);
+            if (node > (CPollNode*)1) {
                 switch (node->data.operation) {
                     case PD_OP_READ: {
-                        logv("POLL READ");
                         _poll_handle_read(node, poll);
                         break;
                     }
                     case PD_OP_WRITE: {
-                        logv("POLL WRITE");
                         _poll_handle_write(node, poll);
                         break;
                     }
                     case PD_OP_LISTEN: {
-                        logv("POLL LISTEN");
                         _poll_handle_listen(node, poll);
                         break;
                     }
                     case PD_OP_CONNECT: {
-                        logv("POLL CONNECT");
                         _poll_handle_connect(node, poll);
                         break;
                     }
                     case PD_OP_SSL_ACCEPT: {
-                        logv("POLL ACCEPT");
                         _poll_handle_ssl_accept(node, poll);
                         break;
                     }
                     case PD_OP_SSL_CONNECT: {
-                        logv("POLL SSL CONNECT");
                         _poll_handle_ssl_connect(node, poll);
                         break;
                     }
                     case PD_OP_SSL_SHUTDOWN: {
-                        logv("POLL SSL SHUTDOWN");
                         _poll_handle_ssl_shutdown(node, poll);
                         break;
                     }
                     case PD_OP_EVENT: {
-                        logv("POLL EVENT");
                         _poll_handle_event(node, poll);
                         break;
                     }
                     case PD_OP_NOTIFY: {
-                        logv("POLL NOTIFY");
                         _poll_handle_notify(node, poll);
                         break;
                     }
                 }
-            } else if (node == (CPollNode*)1) {
+            }
+            else if (node == (CPollNode*)1) {
                 hasPipeEvent = 1;
-                logv("has pipe event");
             }
         }
 
@@ -912,18 +900,18 @@ static void* _poll_handle_read_routine(void *arg)
 
 static int _poll_open_pipe(CPoll *poll)
 {
-    logv("");
-    int pipefd[2];
+    int pipeFd[2];
 
-    if (pipe(pipefd) >= 0) {
-        if (_poll_add_fd(pipefd[0], EPOLLIN, (void *)1, poll) >= 0) {
-            poll->pipeRd = pipefd[0];
-            poll->pipeWr = pipefd[1];
+    // pipe() 返回 pipeFd[0] 用于读, pipeFd[1] 用于写，实现进程通信
+    if (pipe(pipeFd) >= 0) {
+        if (_poll_add_fd(pipeFd[0], EPOLLIN, (void*)1, poll) >= 0) {
+            poll->pipeRd = pipeFd[0];
+            poll->pipeWr = pipeFd[1];
             return 0;
         }
 
-        close(pipefd[0]);
-        close(pipefd[1]);
+        close(pipeFd[0]);
+        close(pipeFd[1]);
     }
 
     return -1;
@@ -931,36 +919,34 @@ static int _poll_open_pipe(CPoll *poll)
 
 static int _poll_create_timer(CPoll *poll)
 {
-    logv("");
-    int timerfd = _poll_create_timerfd();
+    int timerFd = _poll_create_timerfd();
 
-    if (timerfd >= 0) {
-        if (_poll_add_timerfd(timerfd, poll) >= 0) {
-            poll->timerFd = timerfd;
+    if (timerFd >= 0) {
+        if (_poll_add_timerfd(timerFd, poll) >= 0) {
+            poll->timerFd = timerFd;
             return 0;
         }
 
-        close(timerfd);
+        close(timerFd);
     }
 
     return -1;
 }
 
-CPoll *_poll_create(void **nodes_buf, const CPollParams *params)
+CPoll* _poll_create(void** nodesBuf, const CPollParams *params)
 {
-    logv("");
-    CPoll *poll = (CPoll *)malloc(sizeof (CPoll));
-    int ret;
-
-    if (!poll)
+    CPoll *poll = (CPoll*) malloc (sizeof (CPoll));
+    if (!poll) {
         return NULL;
+    }
 
+    int ret;
     poll->pfd = _poll_create_pfd();
     if (poll->pfd >= 0) {
         if (_poll_create_timer(poll) >= 0) {
             ret = pthread_mutex_init(&poll->mutex, NULL);
             if (ret == 0) {
-                poll->nodes = (CPollNode **)nodes_buf;
+                poll->nodes = (CPollNode**) nodesBuf;
                 poll->maxOpenFiles = params->maxOpenFiles;
                 poll->createMessage = params->createMessage;
                 poll->partialWritten = params->partialWritten;
@@ -974,17 +960,18 @@ CPoll *_poll_create(void **nodes_buf, const CPollParams *params)
                 INIT_LIST_HEAD(&poll->noTimeoutList);
 
                 poll->stopped = 1;
+
                 return poll;
             }
 
             errno = ret;
             close(poll->timerFd);
         }
-
         close(poll->pfd);
     }
 
     free(poll);
+
     return NULL;
 }
 
@@ -992,7 +979,7 @@ CPoll* poll_create(const CPollParams *params)
 {
     logv("");
     CPoll* poll = NULL;
-    void** nodesBuf = (void **)calloc(params->maxOpenFiles, sizeof(void *));
+    void** nodesBuf = (void**) calloc (params->maxOpenFiles, sizeof(void*));
 
     if (nodesBuf) {
         poll = _poll_create(nodesBuf, params);
@@ -1024,7 +1011,6 @@ void poll_destroy(CPoll *poll)
 
 int poll_start (CPoll *poll)
 {
-    logv("");
     int                 ret;
     pthread_t           tid;
 
@@ -1036,7 +1022,7 @@ int poll_start (CPoll *poll)
             poll->stopped = 0;
         } else {
             errno = ret;
-            logd("pthread_create error: %d", ret);
+            loge("pthread_create error: %d", ret);
             close(poll->pipeWr);
             close(poll->pipeRd);
         }
@@ -1073,7 +1059,6 @@ static void _poll_insert_node(CPollNode *node, CPoll *poll)
 
 static void _poll_node_set_timeout(int timeout, CPollNode *node)
 {
-    logv("");
     clock_gettime(CLOCK_MONOTONIC, &node->timeout);
     node->timeout.tv_sec += timeout / 1000;
     node->timeout.tv_nsec += timeout % 1000 * 1000000;
@@ -1085,7 +1070,6 @@ static void _poll_node_set_timeout(int timeout, CPollNode *node)
 
 static int _poll_data_get_event(int *event, const CPollData *data)
 {
-    logv("");
     switch (data->operation) {
         case PD_OP_READ:
             *event = EPOLLIN | EPOLLET;
@@ -1122,7 +1106,6 @@ static int _poll_data_get_event(int *event, const CPollData *data)
 
 int poll_add (const CPollData *data, int timeout, CPoll *poll)
 {
-    logv("");
     CPollNode *res = NULL;
     CPollNode *node;
     int need_res;
@@ -1183,7 +1166,6 @@ int poll_add (const CPollData *data, int timeout, CPoll *poll)
 
 int poll_del(int fd, CPoll *poll)
 {
-    logv("");
     CPollNode *node;
 
     if ((size_t)fd >= poll->maxOpenFiles) {
@@ -1223,7 +1205,6 @@ int poll_del(int fd, CPoll *poll)
 
 int poll_mod(const CPollData *data, int timeout, CPoll *poll)
 {
-    logv("");
     CPollNode *res = NULL;
     CPollNode *node;
     CPollNode *old;
@@ -1300,7 +1281,6 @@ int poll_mod(const CPollData *data, int timeout, CPoll *poll)
 
 int poll_set_timeout(int fd, int timeout, CPoll *poll)
 {
-    logv("");
     CPollNode time_node;
     CPollNode *node;
 
@@ -1338,7 +1318,6 @@ int poll_set_timeout(int fd, int timeout, CPoll *poll)
 
 int poll_add_timer(const struct timespec *value, void *context, CPoll *poll)
 {
-    logv("");
     CPollNode *node = (CPollNode *)malloc(sizeof (CPollNode));
     if (node) {
         memset(&node->data, 0, sizeof (CPollData));
@@ -1368,7 +1347,6 @@ int poll_add_timer(const struct timespec *value, void *context, CPoll *poll)
 
 void poll_stop (CPoll *poll)
 {
-    logv("");
     CPollNode *node;
     struct list_head *pos, *tmp;
     void *p = NULL;

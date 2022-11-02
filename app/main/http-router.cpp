@@ -40,7 +40,7 @@ bool HttpRouter::responseStaticResource(HttpTask *task)
         return true;
     }
 
-    std::string f = requestStaticResource(*task->getReq());
+    std::string f = requestStaticResource(*task);
     if (!f.empty()) {
         task->getResp()->appendOutputBody(FileReadWrite::getFileContent(f));
         return true;
@@ -50,9 +50,9 @@ bool HttpRouter::responseStaticResource(HttpTask *task)
     return false;
 }
 
-std::string HttpRouter::requestStaticResource(protocol::HttpRequest &request) const
+std::string HttpRouter::requestStaticResource(HttpTask& task) const
 {
-    std::string uri = request.getRequestUri();
+    std::string uri = task.getReq()->getRequestUri();
     logd(WEB_HOME);
     logd("request uri: %s", uri.c_str());
 
@@ -67,6 +67,7 @@ std::string HttpRouter::requestStaticResource(protocol::HttpRequest &request) co
     else if (uri.ends_with(".js")) {
         std::string path = std::string(WEB_HOME) + uri;
         if (!access(path.c_str(), R_OK)) {
+            task.getResp()->addHeaderPair("Content-type", "application/x-javascript");
             return std::move(path);
         } else {
             loge("%d - %s", errno, strerror(errno));
