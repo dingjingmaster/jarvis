@@ -13,17 +13,29 @@ class SubTask
 {
     friend class ParallelTask;
 public:
+    /**
+     * @brief
+     *  开始执行任务
+     */
     virtual void dispatch() = 0;
 
 private:
+    /**
+     * @brief
+     *
+     */
     virtual SubTask* done() = 0;
 
 protected:
+    /**
+     * @brief
+     *  当所有子任务都执行完成之后调用
+     */
     void subTaskDone();
 
 public:
-    ParallelTask* getParentTask() const { return mParent; }
-    void* getPointer() const { return mPointer; }
+    [[nodiscard]] ParallelTask* getParentTask() const { return mParent; }
+    [[nodiscard]] void* getPointer() const { return mPointer; }
     void setPointer(void *pointer) { mPointer = pointer; }
 
 private:
@@ -66,6 +78,10 @@ public:
     }
 
 public:
+    /**
+     * @brief
+     *  开始依次执行各个任务
+     */
     virtual void dispatch();
 
 protected:

@@ -43,9 +43,11 @@ MPoll* m_poll_create(const CPollParams* params, size_t nthreads)
     MPoll* poll;
     size_t size;
 
-    if (nthreads == 0)
+    if (nthreads == 0) {
         nthreads = 1;
+    }
 
+    // 获取在 MPoll 中 poll 偏移位置
     size = offsetof(MPoll, poll) + nthreads * sizeof (void *);
     poll = (MPoll*)malloc(size);
     if (poll) {

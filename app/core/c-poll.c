@@ -60,10 +60,10 @@ struct _CPoll
     int                     timerFd;                    // 定时返回 timerfd_create()
 
     int                     pfd;                        // epoll fd
-    int                     pipeRd;                     // 读
-    int                     pipeWr;                     // 写
+    int                     pipeRd;                     // 管道 读
+    int                     pipeWr;                     // 管道 写
 
-    int                     stopped;
+    int                     stopped;                    // 启动/停止标志
 
     RBRoot                  timeoutTree;
     RBNode*                 treeFirst;
@@ -977,7 +977,6 @@ CPoll* _poll_create(void** nodesBuf, const CPollParams *params)
 
 CPoll* poll_create(const CPollParams *params)
 {
-    logv("");
     CPoll* poll = NULL;
     void** nodesBuf = (void**) calloc (params->maxOpenFiles, sizeof(void*));
 
@@ -1004,7 +1003,6 @@ void _poll_destroy(CPoll *poll)
 
 void poll_destroy(CPoll *poll)
 {
-    logv("");
     free(poll->nodes);
     _poll_destroy(poll);
 }
@@ -1108,7 +1106,6 @@ int poll_add (const CPollData *data, int timeout, CPoll *poll)
 {
     CPollNode *res = NULL;
     CPollNode *node;
-    int need_res;
     int event;
 
     if ((size_t)data->fd >= poll->maxOpenFiles) {
@@ -1116,11 +1113,12 @@ int poll_add (const CPollData *data, int timeout, CPoll *poll)
         return -1;
     }
 
-    need_res = _poll_data_get_event(&event, data);
-    if (need_res < 0)
+    int needRes = _poll_data_get_event(&event, data);
+    if (needRes < 0) {
         return -1;
+    }
 
-    if (need_res) {
+    if (needRes) {
         res = (CPollNode *)malloc(sizeof (CPollNode));
         if (!res) {
             return -1;
@@ -1289,28 +1287,31 @@ int poll_set_timeout(int fd, int timeout, CPoll *poll)
         return -1;
     }
 
-    if (timeout >= 0)
+    if (timeout >= 0) {
         _poll_node_set_timeout(timeout, &time_node);
+    }
 
     pthread_mutex_lock(&poll->mutex);
     node = poll->nodes[fd];
-    if (node)
-    {
-        if (node->inRBTree)
+    if (node) {
+        if (node->inRBTree) {
             _poll_tree_erase(node, poll);
-        else
+        }
+        else {
             list_del(&node->list);
+        }
 
-        if (timeout >= 0)
-        {
+        if (timeout >= 0) {
             node->timeout = time_node.timeout;
             _poll_insert_node(node, poll);
         }
-        else
+        else {
             list_add_tail(&node->list, &poll->noTimeoutList);
+        }
     }
-    else
+    else {
         errno = ENOENT;
+    }
 
     pthread_mutex_unlock(&poll->mutex);
     return -!node;
@@ -1339,6 +1340,7 @@ int poll_add_timer(const struct timespec *value, void *context, CPoll *poll)
         pthread_mutex_lock(&poll->mutex);
         _poll_insert_node(node, poll);
         pthread_mutex_unlock(&poll->mutex);
+
         return 0;
     }
 
@@ -1382,7 +1384,7 @@ void poll_stop (CPoll *poll)
         node->error = 0;
         node->state = PR_ST_STOPPED;
         free(node->res);
-        poll->cb((CPollResult *)node, poll->ctx);
+        poll->cb((CPollResult*)node, poll->ctx);
     }
 
     pthread_mutex_unlock(&poll->mutex);

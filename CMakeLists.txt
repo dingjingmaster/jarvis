@@ -24,6 +24,8 @@ endif()
 add_definitions(
         -D LOG_TAG=\\"${CMAKE_PROJECT_NAME}\\"
         -D INSTALL_NAME=\\"${INSTALL_NAME}\\"
+
+        -fno-exceptions
 )
 
 
@@ -39,6 +41,8 @@ set_tests_properties(${noArgsTests} PROPERTIES TIMEOUT 1000)
 set_tests_properties(${withArgsTests} PROPERTIES TIMEOUT 20000)
 
 #include_directories(${JSON_INCLUDE_DIRS})
+
+include_directories(${GLIB_INCLUDE_DIRS})
 
 if(DEBUG)
 add_subdirectory(demo)

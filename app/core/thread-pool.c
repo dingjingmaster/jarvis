@@ -6,6 +6,7 @@
 #include <string.h>
 #include <pthread.h>
 
+#include "c-log.h"
 #include "msg-queue.h"
 #include "thread-pool.h"
 
@@ -44,6 +45,7 @@ static void* _thread_pool_routine(void *arg)
     while (!pool->terminate) {
         entry = (ThreadPoolTaskEntry*)msg_queue_get(pool->msgQueue);
         if (!entry) {
+            loge("msg_queue_get nullptr");
             break;
         }
 
@@ -137,7 +139,7 @@ ThreadPool* thread_pool_create(size_t nthreads, size_t stackSize)
     int                     ret;
     ThreadPool*             pool;
 
-    pool = (ThreadPool*)malloc(sizeof (ThreadPool));
+    pool = (ThreadPool*) malloc (sizeof (ThreadPool));
     if (!pool) {
         return NULL;
     }
@@ -146,6 +148,9 @@ ThreadPool* thread_pool_create(size_t nthreads, size_t stackSize)
     if (pool->msgQueue) {
         ret = pthread_mutex_init(&pool->mutex, NULL);
         if (ret == 0) {
+            // 创建一个线程特定的数据键，对于进程中的线程都是可见的，主要创建线程私有数据，
+            // 第二个参数是销毁函数，为空则调用默认销毁函数(pthread_exit()时候调用)
+            // pthread_key_delete() 销毁
             ret = pthread_key_create(&pool->key, NULL);
             if (ret == 0) {
                 pool->stackSize = stackSize;

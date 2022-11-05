@@ -7,12 +7,14 @@
 
 void SubTask::subTaskDone()
 {
-    SubTask *cur = this;
-    ParallelTask *parent;
-    SubTask **entry;
+    SubTask* cur = this;
+    ParallelTask* parent;
+    SubTask** entry;
 
-    while (1) {
+    while (true) {
+        // mParent 表示 所有子任务的父任务
         parent = cur->mParent;
+        // mEntry 表示子任务的入口，也就是第一个子任务
         entry = cur->mEntry;
         cur = cur->done();
         if (cur) {

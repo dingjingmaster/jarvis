@@ -12,12 +12,12 @@ target_link_libraries(test-rb-tree
         ${OPENSSL_LIBRARIES})
 gtest_discover_tests(test-rb-tree)
 
-#add_executable(test-c-poll ${CMAKE_SOURCE_DIR}/test/test-c-poll.cpp ${CORE_SRC})
-#target_link_libraries(test-c-poll
-#        PRIVATE ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} ${GMOCK_LIBRARIES}
-#        PUBLIC
-#        ${OPENSSL_LIBRARIES})
-#gtest_discover_tests(test-c-poll)
+add_executable(test-c-poll ${CMAKE_SOURCE_DIR}/test/test-c-poll.cpp ${CORE_SRC})
+target_link_libraries(test-c-poll
+        PRIVATE ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} ${GMOCK_LIBRARIES}
+        PUBLIC
+        ${OPENSSL_LIBRARIES})
+gtest_discover_tests(test-c-poll)
 
 #add_executable(test-msg-queue ${CMAKE_SOURCE_DIR}/test/test-msg-queue.cpp ${CORE_SRC})
 #target_link_libraries(test-msg-queue
