@@ -4,7 +4,7 @@
 
 #include "date-utils.h"
 
-#include "../core/c-log.h"
+#include "../common/c-log.h"
 
 #include <glib.h>
 #include <time.h>

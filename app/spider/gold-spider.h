@@ -12,7 +12,7 @@
 using json = nlohmann::json;
 
 #include "spider.h"
-#include "../core/c-log.h"
+#include "../common/c-log.h"
 
 
 struct GoldData

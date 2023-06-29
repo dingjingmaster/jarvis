@@ -11,6 +11,10 @@
 extern "C" {
 #endif
 
+#ifndef LOG_TAG
+#define LOG_TAG "UNKNOWN"
+#endif
+
 typedef enum {
     LOG_TYPE_FILE       =   0,              /* 输出日志到文件 */
     LOG_TYPE_CONSOLE,                       /* 输出到控制台 */

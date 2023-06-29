@@ -3,7 +3,7 @@
 //
 
 #include "msg-queue.h"
-#include "c-log.h"
+#include "../common/c-log.h"
 
 #include <errno.h>
 #include <stdlib.h>

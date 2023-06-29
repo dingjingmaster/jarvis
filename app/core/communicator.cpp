@@ -24,7 +24,7 @@
 #include "c-list.h"
 #include "msg-queue.h"
 #include "thread-pool.h"
-#include "c-log.h"
+#include "../common/c-log.h"
 
 struct _CommConnEntry
 {

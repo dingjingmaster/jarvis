@@ -9,8 +9,8 @@
 #include <string.h>
 
 #include "http-parser.h"
-#include "../../core/c-log.h"
 #include "../../core/c-list.h"
+#include "../../common/c-log.h"
 #include "../protocol-message.h"
 
 

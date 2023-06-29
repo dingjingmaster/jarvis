@@ -14,7 +14,7 @@
 #include <openssl/ssl.h>
 #include <condition_variable>
 
-#include "../core/c-log.h"
+#include "../common/c-log.h"
 #include "../factory/task-factory.h"
 
 typedef struct _ServerParams                ServerParams;

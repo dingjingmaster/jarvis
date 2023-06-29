@@ -4,7 +4,7 @@
 #include <signal.h>
 #include <execinfo.h>
 
-#include "../core/c-log.h"
+#include "common/c-log.h"
 #include "manager/facilities.h"
 #include "../modules/http-server.h"
 #include "../spider/spider-manager.h"

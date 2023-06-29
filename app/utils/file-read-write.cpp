@@ -6,7 +6,7 @@
 #include <gio/gio.h>
 #include <glib-2.0/glib.h>
 
-#include "../core/c-log.h"
+#include "../common/c-log.h"
 
 std::string FileReadWrite::getFileContent(std::string &path)
 {

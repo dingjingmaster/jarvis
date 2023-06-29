@@ -6,9 +6,10 @@
 #include <string.h>
 #include <pthread.h>
 
-#include "c-log.h"
 #include "msg-queue.h"
 #include "thread-pool.h"
+#include "../common/c-log.h"
+
 
 typedef struct _ThreadPoolTaskEntry ThreadPoolTaskEntry;
 

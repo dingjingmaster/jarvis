@@ -2,7 +2,7 @@
 // Created by dingjing on 8/17/22.
 //
 
-#include "../app/core/c-log.h"
+#include "../../common/c-log.h"
 #include "../app/modules/http-server.h"
 
 int main (int argc, char* argv[])

@@ -22,16 +22,21 @@ else()
 endif()
 
 add_definitions(
-        -D LOG_TAG=\\"${CMAKE_PROJECT_NAME}\\"
         -D INSTALL_NAME=\\"${INSTALL_NAME}\\"
+        -D PACKAGE_VERSION=\\"${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}\\"
+        -D PACKAGE_NAME=\\"${CMAKE_PROJECT_NAME}\\"
 )
 
 
 find_package (PkgConfig)
+find_package(Qt5 COMPONENTS Core Network Widgets Gui X11Extras REQUIRED)
 
-pkg_check_modules(GLIB REQUIRED gio-2.0 json-glib-1.0)
+pkg_check_modules(X11 REQUIRED x11)
 pkg_check_modules(SQLITE REQUIRED sqlite3)
 pkg_check_modules(OPENSSL REQUIRED openssl)
+pkg_check_modules(PROTOBUF REQUIRED protobuf)
+pkg_check_modules(GLIB REQUIRED gio-2.0 json-glib-1.0)
+#pkg_check_modules(QT5 REQUIRED Qt5Core Qt5Network Qt5Widgets Qt5Gui Qt5X11Extras)
 #pkg_check_modules(JSON REQUIRED json-glib-1.0)
 
 enable_testing()
@@ -43,10 +48,11 @@ set_tests_properties(${withArgsTests} PROPERTIES TIMEOUT 20000)
 include_directories(${GLIB_INCLUDE_DIRS})
 
 if(DEBUG)
-add_subdirectory(demo)
+#add_subdirectory(demo)
 endif()
 
 
 add_subdirectory(app)
-add_subdirectory(test)
-add_subdirectory(tools)
+add_subdirectory(gui)
+#add_subdirectory(test)
+#add_subdirectory(tools)

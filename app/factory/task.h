@@ -14,7 +14,7 @@
 
 #include "workflow.h"
 #include "connection.h"
-#include "../core/c-log.h"
+#include "../common/c-log.h"
 #include "../core/executor.h"
 #include "../core/io-request.h"
 #include "../core/exec-request.h"

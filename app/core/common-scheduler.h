@@ -11,7 +11,7 @@
 #include <openssl/ssl.h>
 
 #include "communicator.h"
-#include "c-log.h"
+#include "../common/c-log.h"
 
 class CommSchedGroup;
 

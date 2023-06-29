@@ -23,7 +23,7 @@
 #include "c-list.h"
 #include "c-poll.h"
 #include "rb-tree.h"
-#include "c-log.h"
+#include "../common/c-log.h"
 
 #define C_POLL_BUF_SIZE			    (256 * 1024)
 #define C_POLL_EVENTS_MAX		     256

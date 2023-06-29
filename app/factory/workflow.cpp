@@ -3,7 +3,7 @@
 //
 
 #include "workflow.h"
-#include "../core/c-log.h"
+#include "../common/c-log.h"
 
 #include <mutex>
 #include <utility>
