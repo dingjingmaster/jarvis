@@ -239,16 +239,13 @@ int IOService::init(int maxevents)
     }
 
     mIoCtx = NULL;
-    if (io_setup(maxevents, &mIoCtx) >= 0)
-    {
+    if (io_setup(maxevents, &mIoCtx) >= 0) {
         ret = pthread_mutex_init(&mMutex, NULL);
-        if (ret == 0)
-        {
+        if (ret == 0) {
             INIT_LIST_HEAD(&mSessionList);
             mEventFd = -1;
             return 0;
         }
-
         errno = ret;
         io_destroy(mIoCtx);
     }

@@ -17,7 +17,7 @@ static void signal_handler (int sig, siginfo_t* siginfo, void* context);
 int main (int argc, char* argv[])
 {
 #if DEBUG
-    log_init(LOG_TYPE_CONSOLE, LOG_DEBUG, LOG_ROTATE_FALSE, -1, "/tmp/", LOG_TAG, "log");
+    log_init(LOG_TYPE_CONSOLE, LOG_DEBUG, LOG_ROTATE_FALSE, -1, NULL, LOG_TAG, NULL);
 #else
     log_init(LOG_TYPE_FILE, LOG_INFO, LOG_ROTATE_FALSE, -1, "/tmp/", LOG_TAG, "log");
 #endif

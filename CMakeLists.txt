@@ -6,7 +6,7 @@ set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 0)
 set(PROJECT_VERSION_PATCH 0)
 
-#set(DEBUG ON)
+set(DEBUG ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -24,8 +24,6 @@ endif()
 add_definitions(
         -D LOG_TAG=\\"${CMAKE_PROJECT_NAME}\\"
         -D INSTALL_NAME=\\"${INSTALL_NAME}\\"
-
-        -fno-exceptions
 )
 
 
