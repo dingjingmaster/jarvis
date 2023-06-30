@@ -17,6 +17,7 @@ MainHeader::MainHeader(QWidget *parent)
 
     setContentsMargins(0, 0, 0, 0);
     setCursor(Qt::PointingHandCursor);
+    setContextMenuPolicy (Qt::CustomContextMenu);
     setAttribute(Qt::WidgetAttribute::WA_StyledBackground);
 
     mOpacity.setParent (this);
@@ -40,6 +41,13 @@ MainHeader::MainHeader(QWidget *parent)
     mRightLayout = new QHBoxLayout;
     mRightLayout->setSpacing(3);
 
+    // menu
+    mHeaderMenu = new QMenu;
+    mHeaderMenu->addAction ("111");
+    mHeaderMenu->addAction ("222");
+    // menu - end
+
+
     // title
     mHeaderName->setText(tr(WINDOW_TITLE));
     mLeftLayout->addWidget(mHeaderName);
@@ -47,8 +55,10 @@ MainHeader::MainHeader(QWidget *parent)
     // button
     mMinBtn = new HeaderButton(nullptr, HeaderButton::MIN);
     mMaxBtn = new HeaderButton(nullptr, HeaderButton::MAX);
+    mMenuBtn = new HeaderButton (nullptr, HeaderButton::MENU);
     mCloseBtn = new HeaderButton(nullptr, HeaderButton::CLOSE);
 
+    mRightLayout->addWidget (mMenuBtn);
     mRightLayout->addWidget(mMinBtn);
     mRightLayout->addWidget(mMaxBtn);
     mRightLayout->addWidget(mCloseBtn);
@@ -62,6 +72,13 @@ MainHeader::MainHeader(QWidget *parent)
     connect(mMinBtn,    &QPushButton::clicked, this, &MainHeader::windowMin);
     connect(mMaxBtn,    &QPushButton::clicked, this, &MainHeader::windowMax);
     connect(mCloseBtn,  &QPushButton::clicked, this, &MainHeader::windowClose);
+
+    connect(mMenuBtn, &QPushButton::clicked, this, [&] (bool) -> void {
+        auto pos = mapToGlobal(mMenuBtn->rect().bottomLeft());
+        pos.setX (pos.x() + mMenuBtn->x());
+        pos.setY (pos.y() + 8);
+        mHeaderMenu->exec (pos);
+    });
 }
 
 int MainHeader::getHeaderHeight()

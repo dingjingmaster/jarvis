@@ -34,7 +34,7 @@ private:
     void region (const QPoint& cursorGlobalPoint);
 
 private:
-    const int                       mMinWidth = 300;
+    const int                       mMinWidth = 500;
     const int                       mMinHeight = 100;
 
     SystemTray*                     mTray = nullptr;

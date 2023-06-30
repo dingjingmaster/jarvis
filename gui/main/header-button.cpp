@@ -52,28 +52,33 @@ void HeaderButton::onTypeChanged(Type type)
     QString path = nullptr;
 
     switch (type) {
-    case MIN: {
-        //path = ":/data/min.png";
-        path = "window-minimize-symbolic";
-        break;
-    }
-    case MAX: {
-        //path = ":/data/max.png";
-        path = "window-maximize-symbolic";
-        break;
-    }
-    case CLOSE: {
-        //path = ":/data/close.png";
-        path = "window-close-symbolic";
-        break;
-    }
-    case RESTORE: {
-        //path = ":/data/restore.png";
-        path = "window-restore-symbolic";
-        break;
-    }
-    default:
-        break;
+        case MENU: {
+            path = "open-menu-symbolic";
+            break;
+        }
+        case MIN: {
+            //path = ":/data/min.png";
+            path = "window-minimize-symbolic";
+            break;
+        }
+        case MAX: {
+            //path = ":/data/max.png";
+            path = "window-maximize-symbolic";
+            break;
+        }
+        case CLOSE: {
+            //path = ":/data/close.png";
+            path = "window-close-symbolic";
+            break;
+        }
+        case RESTORE: {
+            //path = ":/data/restore.png";
+            path = "window-restore-symbolic";
+            break;
+        }
+        default: {
+            break;
+        }
     }
     
     setIcon(QIcon(transColor(QIcon::fromTheme(path).pixmap (width(), height()))));
@@ -91,7 +96,7 @@ QPixmap HeaderButton::transColor (const QPixmap &icon)
 
     for (auto i = 0; i < oldp.width(); ++i) {
         for (auto j = 0; j < oldp.height(); ++j) {
-            QColor c = QColor(oldp.pixel(i, j));
+            auto c = QColor(oldp.pixel(i, j));
 //            if (c.red () != 0 || c.green () != 0 || c.blue () != 0)
 //                usleep (1);
             //qDebug() << "r: " << c.red() << " g: " << c.green () << " b: " << c.blue ();

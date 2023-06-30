@@ -1,12 +1,5 @@
 project(jarvis-gui LANGUAGES C CXX)
 
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(${CMAKE_SOURCE_DIR}/3thrd/3thrd.cmake)
 include(${CMAKE_SOURCE_DIR}/common/common.cmake)

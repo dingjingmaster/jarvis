@@ -4,6 +4,7 @@
 
 #ifndef JARVIS_MAIN_HEADER_H
 #define JARVIS_MAIN_HEADER_H
+#include <QMenu>
 #include <QLabel>
 #include <QWidget>
 #include <QHBoxLayout>
@@ -14,10 +15,7 @@
 class MainHeader : public QWidget
 {
     Q_OBJECT
-    Q_PROPERTY(int headerHeight
-                READ getHeaderHeight
-                WRITE setHeaderHeight
-                USER true)
+    Q_PROPERTY(int headerHeight READ getHeaderHeight WRITE setHeaderHeight USER true)
 public:
     explicit MainHeader (QWidget* parent=nullptr);
 
@@ -28,6 +26,9 @@ Q_SIGNALS:
     void windowMin();
     void windowMax();
     void windowClose();
+
+    // menu - start
+    // menu - end
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent*) override;
@@ -40,10 +41,12 @@ private:
     QLayout*                mRightLayout;
     QHBoxLayout*            mMainLayout;
 
+    QMenu*                  mHeaderMenu;
     QLabel*                 mHeaderName;
 
     HeaderButton*           mMinBtn;
     HeaderButton*           mMaxBtn;
+    HeaderButton*           mMenuBtn;
     HeaderButton*           mCloseBtn;
 
     QGraphicsBlurEffect     mOpacity;

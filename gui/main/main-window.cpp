@@ -7,16 +7,14 @@
 #include <QDebug>
 #include <QX11Info>
 #include <QMouseEvent>
-#include <QResizeEvent>
 #include <QApplication>
 #include <QPropertyAnimation>
-
-#include <X11/Xlib.h>
 
 #include "system-tray.h"
 #include "main-header.h"
 #include "xatom-helper.h"
 
+#include <X11/Xlib.h>
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget (parent), mDirection(NONE)
@@ -25,7 +23,16 @@ MainWindow::MainWindow(QWidget *parent)
     setContentsMargins (0, 0, 0, 0);
     setMinimumSize (mMinWidth, mMinHeight);
     setWindowFlag (Qt::FramelessWindowHint);
+//    setAttribute (Qt::WA_TranslucentBackground);
     setWindowIcon(QIcon(":/img/icons/tray-icon.png"));
+
+#if 0
+    setWindowFlags (Qt::Dialog
+        | Qt::WindowStaysOnTopHint
+        | Qt::WindowTransparentForInput
+        | Qt::FramelessWindowHint
+        | Qt::WindowDoesNotAcceptFocus);
+#endif
 
     mHeader = new MainHeader;
     mHeaderAnimation = new QPropertyAnimation(mHeader, "headerHeight");
@@ -96,12 +103,10 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
                     else {
                         rMove.setX (globalPos.x ());
                     }
-//                    qDebug() << "pressed: " << (mIsPress ? "true" : "false") << " left";
                     break;
                 }
                 case RIGHT: {
                     rMove.setWidth (globalPos.x () - tl.x ());
-//                    qDebug() << "pressed: " << (mIsPress ? "true" : "false") << " right";
                     break;
                 }
                 case UP: {
@@ -111,12 +116,10 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
                     else {
                         rMove.setY (globalPos.y ());
                     }
-//                    qDebug() << "pressed: " << (mIsPress ? "true" : "false") << " up";
                     break;
                 }
                 case DOWN: {
                     rMove.setHeight (globalPos.y () - tl.y ());
-//                    qDebug() << "pressed: " << (mIsPress ? "true" : "false") << " down";
                     break;
                 }
                 case LEFT_TOP: {
@@ -133,25 +136,21 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
                     else {
                         rMove.setY (globalPos.y ());
                     }
-//                    qDebug() << "pressed: " << (mIsPress ? "true" : "false") << " left_top";
                     break;
                 }
                 case RIGHT_TOP: {
                     rMove.setWidth (globalPos.x () - tl.x ());
                     rMove.setY (globalPos.y ());
-//                    qDebug() << "pressed: " << (mIsPress ? "true" : "false") << " right_top";
                     break;
                 }
                 case LEFT_BOTTOM: {
                     rMove.setX (globalPos.x ());
                     rMove.setHeight (globalPos.y () - tl.y ());
-//                    qDebug() << "pressed: " << (mIsPress ? "true" : "false") << " left_bottom";
                     break;
                 }
                 case RIGHT_BOTTOM: {
                     rMove.setWidth (globalPos.x () - tl.x ());
                     rMove.setHeight (globalPos.y () - tl.y ());
-//                    qDebug() << "pressed: " << (mIsPress ? "true" : "false") << " right_bottom";
                     break;
                 }
                 default: {
@@ -184,7 +183,6 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
             XUngrabPointer (display, CurrentTime);
             XSendEvent (display, QX11Info::appRootWindow (QX11Info::appScreen ()), False,
                         SubstructureNotifyMask | SubstructureRedirectMask, &xEvent);
-            //XFlush(display);
             XEvent xevent;
             memset (&xevent, 0, sizeof (XEvent));
 
@@ -310,20 +308,25 @@ void MainWindow::showHeader(QMouseEvent *e)
 {
     auto posT = e->pos();
 
+#if DEBUG
+    headerToShow();
+#else
+
     if (mDrag) {
-        if (mHeader->height() < mHeader->maximumHeight()) {
+        if (mHeader->height() < mHeader->maximumHeight() + 20) {
             headerToShow();
         }
     }
     else {
         if (posT.x() > 0 && posT.x() < width()
-            && posT.y() > 0 && posT.y() < mHeader->maximumHeight()) {
+            && posT.y() > 0 && posT.y() < mHeader->maximumHeight() + 20) {
             headerToShow();
         }
         else if (mHeader->height() > 0) {
             headerToHidden();
         }
     }
+#endif
 }
 
 void MainWindow::leaveEvent(QEvent *e)

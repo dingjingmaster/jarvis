@@ -8,7 +8,7 @@ class HeaderButton : public QPushButton
     Q_OBJECT
     Q_PROPERTY(Type type MEMBER mType READ getType WRITE setType NOTIFY typeChanged)
 public:
-    enum Type { MIN, MAX, CLOSE, RESTORE }; Q_ENUM(Type)
+    enum Type { MENU, MIN, MAX, CLOSE, RESTORE }; Q_ENUM(Type)
 
 public:
     explicit HeaderButton(QWidget *parent = nullptr, Type type = MIN);
