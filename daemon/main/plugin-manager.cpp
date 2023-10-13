@@ -35,7 +35,7 @@ void PluginManager::managerStop()
         if (0 == r) {
             signal (SIGSEGV, recv_sigsegv);
 
-            typedef PluginIface* (*createPlugin) ();
+            typedef PluginInterface* (*createPlugin) ();
             auto pp = (createPlugin)p.value()->resolve("getInstance");
             if (!pp) {
                 loge("plugin: %s resolve 'getInstance' error!", p.key().toUtf8().constData());
@@ -77,7 +77,7 @@ void PluginManager::managerStart()
             continue;
         }
 
-        typedef PluginIface* (*createPlugin) ();
+        typedef PluginInterface* (*createPlugin) ();
         auto p = (createPlugin)lib->resolve("getInstance");
         if (!p) {
             loge ("create module class failed, error: '%s'", lib->errorString().toUtf8().data());
@@ -149,7 +149,7 @@ PluginManager *PluginManager::getInstance()
     return gInstance;
 }
 
-void PluginManager::registerPlugin(const std::shared_ptr<PluginIface>& p)
+void PluginManager::registerPlugin(const std::shared_ptr<PluginInterface>& p)
 {
     logd("register plugin");
 

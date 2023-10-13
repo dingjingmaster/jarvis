@@ -9,7 +9,7 @@
 #include <QMap>
 #include <QLibrary>
 
-#include "daemon-iface/plugin-iface.h"
+#include "daemon-interface/plugin-interface.h"
 
 class PluginManager : QObject
 {
@@ -17,11 +17,11 @@ class PluginManager : QObject
 public:
     static PluginManager* getInstance();
     ~PluginManager() override;
-    PluginManager(PluginIface&)=delete;
+    PluginManager(PluginInterface&)=delete;
     PluginManager* operator= (const PluginManager&)=delete;
 
     void registerDefaultPlugins ();
-    void registerPlugin (const std::shared_ptr<PluginIface>& p);
+    void registerPlugin (const std::shared_ptr<PluginInterface>& p);
 
 private:
     PluginManager();
@@ -31,9 +31,9 @@ public Q_SLOTS:
     void managerStart ();
 
 private:
-    QMap<QString, std::shared_ptr<QLibrary>>        mPlugins1;
-    QMap<QString, std::shared_ptr<PluginIface>>     mPlugins2;
-    static PluginManager*                           gInstance;
+    QMap<QString, std::shared_ptr<QLibrary>>            mPlugins1;
+    QMap<QString, std::shared_ptr<PluginInterface>>     mPlugins2;
+    static PluginManager*                               gInstance;
 };
 
 

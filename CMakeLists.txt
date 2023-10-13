@@ -1,6 +1,5 @@
-project(Jarvis LANGUAGES CXX C)
-
 cmake_minimum_required(VERSION 3.5)
+project(Jarvis LANGUAGES CXX C)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -38,6 +37,7 @@ find_package (PkgConfig)
 find_package(Qt5 COMPONENTS Core Network Widgets Gui X11Extras REQUIRED)
 
 pkg_check_modules(X11 REQUIRED x11)
+pkg_check_modules(PROTO REQUIRED protobuf)
 pkg_check_modules(SQLITE REQUIRED sqlite3)
 pkg_check_modules(OPENSSL REQUIRED openssl)
 pkg_check_modules(PROTOBUF REQUIRED protobuf)

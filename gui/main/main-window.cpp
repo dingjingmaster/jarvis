@@ -308,7 +308,7 @@ void MainWindow::showHeader(QMouseEvent *e)
 {
     auto posT = e->pos();
 
-#if DEBUG
+#if 0 //DEBUG
     headerToShow();
 #else
 
@@ -322,22 +322,22 @@ void MainWindow::showHeader(QMouseEvent *e)
             && posT.y() > 0 && posT.y() < mHeader->maximumHeight() + 20) {
             headerToShow();
         }
-        else if (mHeader->height() > 0) {
-            headerToHidden();
-        }
+//        else if (mHeader->height() > 0) {
+//            headerToHidden();
+//        }
     }
 #endif
 }
 
 void MainWindow::leaveEvent(QEvent *e)
 {
+    headerToHidden();
     QWidget::leaveEvent (e);
 }
 
 void MainWindow::headerToShow()
 {
-    if (0 == mHeader->height()
-        || !mHeader->isVisible()) {
+    if (0 == mHeader->height() || !mHeader->isVisible()) {
         mHeader->setHeaderHeight (0);
         mHeader->show();
         mHeaderAnimation->setDuration(1000);
