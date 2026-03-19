@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.15)
 project(Jarvis LANGUAGES CXX C)
 
 set(CMAKE_AUTOUIC ON)
@@ -19,13 +19,16 @@ option(DEBUG "USE DEBUG" ON)
 
 if(DEBUG)
     set(INSTALL_NAME ${CMAKE_BINARY_DIR}/app/jarvis)
-    add_definitions(-O0 -g -rdynamic -Wl,--export-dynamic -D DEBUG -D WEB_HOME=\\"/data/code/skynet-web/dist/\\")
+    add_definitions(-O0 -g -rdynamic -Wl,--export-dynamic -D DEBUG)
+    # -D WEB_HOME=\\"/data/code/skynet-web/dist/\\")
 else()
     set(INSTALL_NAME ${INSTALL_DIR}/bin/jarvis)
-    add_definitions(-O0 -g -rdynamic -Wl,--export-dynamic -D WEB_HOME=\\"/usr/local/jarvis/html/\\")
+    add_definitions(-O0 -g -rdynamic -Wl,--export-dynamic)
+    #-D WEB_HOME=\\"/usr/local/jarvis/html/\\")
 endif()
 
 add_definitions(
+        -D ORMPP_ENABLE_MYSQL
         -D INSTALL_DIR=\\"${INSTALL_DIR}\\"
         -D INSTALL_NAME=\\"${INSTALL_NAME}\\"
         -D PACKAGE_NAME=\\"${CMAKE_PROJECT_NAME}\\"
@@ -41,9 +44,12 @@ pkg_check_modules(PROTO REQUIRED protobuf)
 pkg_check_modules(SQLITE REQUIRED sqlite3)
 pkg_check_modules(OPENSSL REQUIRED openssl)
 pkg_check_modules(PROTOBUF REQUIRED protobuf)
+pkg_check_modules(MYSQL REQUIRED mysqlclient)
 pkg_check_modules(GLIB REQUIRED gio-2.0 json-glib-1.0)
 #pkg_check_modules(QT5 REQUIRED Qt5Core Qt5Network Qt5Widgets Qt5Gui Qt5X11Extras)
 #pkg_check_modules(JSON REQUIRED json-glib-1.0)
+
+include_directories(${MYSQL_INCLUDE_DIRS})
 
 enable_testing()
 set_tests_properties(${noArgsTests} PROPERTIES TIMEOUT 1000)
@@ -55,7 +61,7 @@ include_directories(${GLIB_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR})
 
 if(DEBUG)
-#add_subdirectory(demo)
+add_subdirectory(demo)
 endif()
 
 
