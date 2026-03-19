@@ -4,20 +4,22 @@
 #include <signal.h>
 #include <execinfo.h>
 
+
+#include "http-router.h"
 #include "common/c-log.h"
 #include "manager/facilities.h"
 #include "../modules/http-server.h"
 #include "../spider/spider-manager.h"
-#include "http-router.h"
 
 static Facilities::WaitGroup waitGroup(1);
 
 static void signal_handler (int sig, siginfo_t* siginfo, void* context);
 
+
 int main (int argc, char* argv[])
 {
 #if DEBUG
-    log_init(LOG_TYPE_CONSOLE, LOG_DEBUG, LOG_ROTATE_FALSE, -1, NULL, LOG_TAG, NULL);
+    log_init(LOG_TYPE_CONSOLE, LOG_DEBUG, LOG_ROTATE_FALSE, -1, nullptr, LOG_TAG, nullptr);
 #else
     log_init(LOG_TYPE_FILE, LOG_INFO, LOG_ROTATE_FALSE, -1, "/tmp/", LOG_TAG, "log");
 #endif
@@ -25,15 +27,16 @@ int main (int argc, char* argv[])
 
     // 注册信号处理函数
     static struct sigaction sigAction;
-    sigAction.sa_sigaction = *signal_handler;
+    sigAction.sa_sigaction = signal_handler;
     sigAction.sa_flags |= SA_SIGINFO;
 
-    if (sigaction(SIGSEGV, &sigAction, NULL)) {
+    if (sigaction(SIGSEGV, &sigAction, nullptr)) {
         loge("sigaction error: %s", strerror(errno));
         return errno;
     }
 
-    //SpiderManager::instance()->runAll();
+    // 初始化 爬虫模块
+    SpiderManager::instance()->runAll();
 
 #ifdef DEBUG
     int port = 8889;
@@ -62,15 +65,15 @@ int main (int argc, char* argv[])
     return 0;
 }
 
-static void signal_handler (int sig, siginfo_t* siginfo, void* context)
+static void signal_handler (const int sig, siginfo_t* siginfo, void* context)
 {
-    void*   bt[256] = {0};
+    void*  bt[256] = {nullptr};
     char** btSymbols = nullptr;
 
-    int bufSize = 0;
     char buf[256000] = {0};
+    unsigned long bufSize = 0;
 
-    int n = backtrace (bt, sizeof(bt) / sizeof(bt[0]));
+    int n = backtrace (bt, std::size(bt));
     btSymbols = backtrace_symbols(bt, n);
     for (int i = 0; i < n; ++i) {
         char fileName[2048] = {0};
@@ -84,16 +87,16 @@ static void signal_handler (int sig, siginfo_t* siginfo, void* context)
             memset(fileName, 0, sizeof(fileName));
             fread(fileName, sizeof(fileName) - 1, 1, fr);
             fclose(fr);
-            for (int j = 0; j < sizeof(fileName); ++j) {
-                if ('\n' == fileName[j] || 0 == fileName[j]) {
-                    fileName[j] = 0;
+            for (char & j : fileName) {
+                if ('\n' == j || 0 == j) {
+                    j = 0;
                     break;
                 }
             }
         }
 
-        int fl = strlen(fileName);
-        int l = strlen(btSymbols[i]);
+        const unsigned long fl = strlen(fileName);
+        const unsigned long l = strlen(btSymbols[i]);
         if (bufSize + l + fl + 2 >= sizeof(buf) - 1) {
             break;
         }

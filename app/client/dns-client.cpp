@@ -96,23 +96,21 @@ struct DnsStatus
 static int __get_ndots(const std::string& s)
 {
     int ndots = 0;
-    for (size_t i = 0; i < s.size(); i++)
-        ndots += s[i] == '.';
+    for (char i : s) {
+        ndots += i == '.';
+    }
     return ndots;
 }
 
-static bool __has_next_name(const DnsParams::dns_params *p,
-                            struct DnsStatus *s)
+static bool __has_next_name(const DnsParams::dns_params *p, struct DnsStatus *s)
 {
-    if (s->try_origin_state == DNS_STATUS_TRY_ORIGIN_FIRST)
-    {
+    if (s->try_origin_state == DNS_STATUS_TRY_ORIGIN_FIRST) {
         s->current_name = s->origin_name;
         s->try_origin_state = DNS_STATUS_TRY_ORIGIN_DONE;
         return true;
     }
 
-    if (s->next_domain < p->search_list.size())
-    {
+    if (s->next_domain < p->search_list.size()) {
         s->current_name = s->origin_name;
         s->current_name.push_back('.');
         s->current_name.append(p->search_list[s->next_domain]);
@@ -121,8 +119,7 @@ static bool __has_next_name(const DnsParams::dns_params *p,
         return true;
     }
 
-    if (s->try_origin_state == DNS_STATUS_TRY_ORIGIN_LAST)
-    {
+    if (s->try_origin_state == DNS_STATUS_TRY_ORIGIN_LAST) {
         s->current_name = s->origin_name;
         s->try_origin_state = DNS_STATUS_TRY_ORIGIN_DONE;
         return true;
@@ -131,8 +128,7 @@ static bool __has_next_name(const DnsParams::dns_params *p,
     return false;
 }
 
-static void __callback_internal(DnsTask *task, const DnsParams& params,
-                                struct DnsStatus& s)
+static void __callback_internal(DnsTask *task, const DnsParams& params, struct DnsStatus& s)
 {
     ComplexTask *ctask = static_cast<ComplexTask *>(task);
     int state = task->getState();
@@ -149,8 +145,7 @@ static void __callback_internal(DnsTask *task, const DnsParams& params,
                          rcode == DNS_RCODE_NAME_ERROR ||
                          resp->get_ancount() == 0;
 
-    if (try_next_server)
-    {
+    if (try_next_server) {
         if (s.last_server == s.next_server)
             s.attempts_left--;
         if (s.attempts_left <= 0)

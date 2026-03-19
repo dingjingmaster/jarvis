@@ -13,8 +13,8 @@
 class DnsClient
 {
 public:
-    DnsClient() : mParams(NULL) { }
-    virtual ~DnsClient() { }
+    DnsClient() : mParams(nullptr) { }
+    virtual ~DnsClient() = default;
 
     int init(const std::string& url);
     int init(const std::string& url, const std::string& search_list, int ndots, int attempts, bool rotate);
