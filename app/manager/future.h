@@ -111,13 +111,13 @@ std::future_status Future<RES>::waitUntil(const std::chrono::time_point<CLOCK, D
 {
     std::future_status status = std::future_status::ready;
 
-    if (this->future.wait_for(std::chrono::seconds(0)) != std::future_status::ready) {
+    if (this->mFuture.wait_for(std::chrono::seconds(0)) != std::future_status::ready) {
         bool inHandler = Global::getScheduler()->isHandlerThread();
 
         if (inHandler)
             Global::syncOperationBegin();
 
-        status = this->future.wait_until(timeoutTime);
+        status = this->mFuture.wait_until(timeoutTime);
         if (inHandler)
             Global::syncOperationEnd();
     }

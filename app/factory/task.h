@@ -123,30 +123,30 @@ public:
 public:
     INPUT *getInput(size_t index)
     {
-        return static_cast<Thread *>(this->subtasks[index])->getInput();
+        return static_cast<Thread *>(this->mSubTasks[index])->getInput();
     }
 
     OUTPUT *getOutput(size_t index)
     {
-        return static_cast<Thread *>(this->subtasks[index])->getOutput();
+        return static_cast<Thread *>(this->mSubTasks[index])->getOutput();
     }
 
 
 public:
     int getState(size_t index) const
     {
-        return static_cast<const Thread *>(this->subtasks[index])->getState();
+        return static_cast<const Thread *>(this->mSubTasks[index])->getState();
     }
 
     int getError(size_t index) const
     {
-        return static_cast<const Thread *>(this->subtasks[index])->getError();
+        return static_cast<const Thread *>(this->mSubTasks[index])->getError();
     }
 
 public:
     void setCallback(std::function<void (MultiThreadTask<INPUT, OUTPUT> *)> cb)
     {
-        this->callback = std::move(cb);
+        this->mCallback = std::move(cb);
     }
 
 protected:
@@ -172,7 +172,7 @@ public:
         size_t i;
 
         for (i = 0; i < n; i++)
-            this->subtasks[i] = tasks[i];
+            this->mSubTasks[i] = tasks[i];
 
         mUserData = NULL;
     }
@@ -275,8 +275,8 @@ public:
     /* noReply(), push() are for server tasks only. */
     void noReply()
     {
-        if (this->state == TASK_STATE_TOREPLY)
-            this->state = TASK_STATE_NOREPLY;
+        if (this->mState == TASK_STATE_TOREPLY)
+            this->mState = TASK_STATE_NOREPLY;
     }
 
     virtual int push(const void *buf, size_t size)

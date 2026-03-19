@@ -13,6 +13,6 @@ target_link_libraries(jarvis
         PUBLIC
         ${OPENSSL_LIBRARIES} ${GLIB_LIBRARIES} -lsqlite3)
 
-target_include_directories(jarvis PUBLIC ${GLIB_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR})
+target_include_directories(jarvis PUBLIC ${GLIB_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/3thrd)
 
 target_compile_definitions(jarvis PUBLIC -D LOG_TAG="jarvis")

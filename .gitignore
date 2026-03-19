@@ -1,4 +1,5 @@
 doc/
+build/
 .idea/
 pkg/
 build-*
