@@ -11,6 +11,9 @@
 #include "../modules/http-server.h"
 #include "../spider/spider-manager.h"
 
+#include "../db/db.h"
+
+
 static Facilities::WaitGroup waitGroup(1);
 
 static void signal_handler (int sig, siginfo_t* siginfo, void* context);
@@ -35,9 +38,16 @@ int main (int argc, char* argv[])
         return errno;
     }
 
+    // 初始化数据库
+    if (!DB::getInstance().init()) {
+        loge("DB init error!");
+        return -1;
+    }
+
     // 初始化 爬虫模块
     SpiderManager::instance()->runAll();
 
+#if 0
 #ifdef DEBUG
     int port = 8889;
 #else
@@ -57,6 +67,8 @@ int main (int argc, char* argv[])
     if (0 == server.start(port)) {
         logi("http server 'http://127.0.0.1:%d' is running!", port);
     }
+
+#endif
 
     waitGroup.wait();
 

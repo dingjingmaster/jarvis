@@ -24,63 +24,78 @@ struct GoldData
     double          price;          // 价格: 美国是美元、中国是人民币
 };
 
-static inline void save_data (GoldData&);
+static void save_data (GoldData& sp)
+{
+    // using namespace sqlite_orm;
+    //
+    // auto gold = getGoldStorage();
+    //
+    // sqlite_lock();
+    // try {
+    //     gold.replace(sp);
+    // } catch (...) {
+    //     gold.update(sp);
+    // }
+    // sqlite_unlock();
+    logi("%s", sp.idx.c_str());
+}
+
 
 const float oz = 31.1034768;
 
 // 此处得到的是伦敦金价和银价
 static struct SpiderInfo gGoldSpider =
 {
-        .interval = 600,
-        .spiderName = "gold spider",
-        .requestURI = "https://data-asg.goldprice.org/dbXRates/CNY,USD",
-        .httpMethod = HTTP_METHOD_GET,
-        .rootParser = [] (Spider* sp) {
-            if (!sp || sp->getContent().empty()) {
-                loge("content is empty!");
-                return;
-            }
-            logd("\n%s", sp->getContent().c_str());
-            json js = json::parse (sp->getContent().c_str());
+    .interval = 600,
+    .spiderName = "gold spider",
+    .requestURI = "https://data-asg.goldprice.org/dbXRates/CNY,USD",
+    .httpMethod = HTTP_METHOD_GET,
+    .rootParser = [] (Spider* sp) {
+        if (!sp || sp->getContent().empty()) {
+            loge("content is empty!");
+            return;
+        }
+        logi("\n%s", sp->getContent().c_str());
+        json js = json::parse (sp->getContent().c_str());
 
-            time_t tim = js["ts"];
-            tim /= 1000;
+        time_t tim = js["ts"];
+        tim /= 1000;
 
-            struct tm* ltm = localtime(&tim);
-            char buf[12] = {0};
-            char idx[1024] = {0};
-            strftime(buf, sizeof buf, "%Y%m%d", ltm);
+        struct tm* ltm = localtime(&tim);
+        char buf[12] = {0};
+        char idx[1024] = {0};
+        strftime(buf, sizeof buf, "%Y%m%d", ltm);
 
-            // 获取的质量单位是 oz，需要转成克
-            double auPrice = js["items"][0]["xauPrice"];
-            double agPrice = js["items"][0]["xagPrice"];
+        // 获取的质量单位是 oz，需要转成克
+        double auPrice = js["items"][0]["xauPrice"];
+        double agPrice = js["items"][0]["xagPrice"];
 
-            auPrice /= oz;
-            agPrice /= oz;
+        auPrice /= oz;
+        agPrice /= oz;
 
-            //std::string area = js["items"][0]["curr"];
+        //std::string area = js["items"][0]["curr"];
 
-            logi("au: %f, ag:%f", auPrice, agPrice);
+        logi("au: %f, ag:%f", auPrice, agPrice);
 
-            snprintf(idx, sizeof idx, "%s-%s-%s", buf, "Au", "UK");
-            GoldData gd {
-                .idx = idx,
-                .dateTime = atoi(buf),
-                .itemType = "Au",
-                .area = "UK",
-                .price = auPrice
-            };
-            save_data(gd);
+        snprintf(idx, sizeof idx, "%s-%s-%s", buf, "Au", "UK");
+        GoldData gd {
+            .idx = idx,
+            .dateTime = atoi(buf),
+            .itemType = "Au",
+            .area = "UK",
+            .price = auPrice
+        };
+        save_data(gd);
 
-            snprintf(idx, sizeof idx, "%s-%s-%s", buf, "Ag", "UK");
-            gd.idx = idx;
-            gd.itemType = "Ag";
-            gd.area = "UK";
-            gd.price = agPrice;
-            save_data(gd);
-            },
-        .parsers = {},
-        .requestHeaders = {}
+        snprintf(idx, sizeof idx, "%s-%s-%s", buf, "Ag", "UK");
+        gd.idx = idx;
+        gd.itemType = "Ag";
+        gd.area = "UK";
+        gd.price = agPrice;
+        save_data(gd);
+    },
+    .parsers = {},
+    .requestHeaders = {}
 };
 
 static auto getGoldStorage()
@@ -97,52 +112,40 @@ static auto getGoldStorage()
     //                                     make_column("price", &GoldData::price)));
     // gold.sync_schema();
 
+    logi("111");
     // return gold;
     return nullptr;
-}
-
-static void save_data (GoldData& sp)
-{
-    // using namespace sqlite_orm;
-    //
-    // auto gold = getGoldStorage();
-    //
-    // sqlite_lock();
-    // try {
-    //     gold.replace(sp);
-    // } catch (...) {
-    //     gold.update(sp);
-    // }
-    // sqlite_unlock();
 }
 
 // 此处得到的是中国金价和银价
 static struct SpiderInfo gChinaGoldSpider =
 {
-        .interval = 6000,
-        .spiderName = "china gold spider (python)",
-        .requestURI = "https://www.sge.com.cn",
-        .httpMethod = HTTP_METHOD_GET,
-        .rootParser = [] (Spider* sp) {
+    .interval = 6000,
+    .spiderName = "china gold spider (python)",
+    .requestURI = "https://www.sge.com.cn",
+    .httpMethod = HTTP_METHOD_GET,
+    .rootParser = [] (Spider* sp) {
 
 #ifdef DEBUG
-            std::string spider = "python /data/code/Jarvis/tools/au-sge.py /tmp/au-jarvis.csv";
-            std::string updateData = "python /data/code/Jarvis/tools/gold-tool.py Au CN /tmp/au-jarvis.csv";
+        std::string spider = "python /data/code/Jarvis/tools/au-sge.py /tmp/au-jarvis.csv";
+        std::string updateData = "python /data/code/Jarvis/tools/gold-tool.py Au CN /tmp/au-jarvis.csv";
 #else
-            std::string spider = std::string("python ") + WEB_HOME + "/../bin/au-sge.py /tmp/au-jarvis.csv";
-            std::string updateData = std::string("python ") + WEB_HOME + "/../bin/gold-tool.py Au CN /tmp/au-jarvis.csv";
+        std::string spider = std::string("python ") + WEB_HOME + "/../bin/au-sge.py /tmp/au-jarvis.csv";
+        std::string updateData = std::string("python ") + WEB_HOME + "/../bin/gold-tool.py Au CN /tmp/au-jarvis.csv";
 #endif
-            system("/tmp/au-jarvis.csv");
-            if (0 == system(spider.c_str())) {
-                if (0 == system(updateData.c_str())) {
-                    logi("spider: %s OK!", sp->getName().c_str());
-                } else {
-                    loge("spider: %s error, cmd: %s", sp->getName().c_str(), updateData.c_str());
-                }
-            } else {
-                loge("spider: %s error, cmd: %s", sp->getName().c_str(), spider.c_str());
+        system("/tmp/au-jarvis.csv");
+        if (0 == system(spider.c_str())) {
+            if (0 == system(updateData.c_str())) {
+                logi("spider: %s OK!", sp->getName().c_str());
+            }
+            else {
+                loge("spider: %s error, cmd: %s", sp->getName().c_str(), updateData.c_str());
             }
         }
+        else {
+            loge("spider: %s error, cmd: %s", sp->getName().c_str(), spider.c_str());
+        }
+    }
 };
 
 

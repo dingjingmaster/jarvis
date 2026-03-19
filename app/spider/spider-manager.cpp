@@ -25,26 +25,6 @@ SpiderManager* SpiderManager::gInstance = nullptr;
 
 SpiderManager::SpiderManager()
 {
-    mode_t pre = umask(0);
-    if (access (SPIDER_DB, F_OK)) {
-        int fd = creat(SPIDER_DB, S_IRWXU | S_IRWXG | S_IRWXO);
-        if (-1 == fd) {
-            loge("spider db file '%s' create error", SPIDER_DB);
-            exit(-1);
-        }
-    }
-    chmod(SPIDER_DB, S_IRWXU | S_IRWXG | S_IRWXO);
-
-    if (access(SPIDER_DB_LOCK, F_OK)) {
-        int fd = creat(SPIDER_DB_LOCK, S_IRWXU | S_IRWXG | S_IRWXO);
-        if (-1 == fd) {
-            loge("spider db lock file '%s' create error", SPIDER_DB_LOCK);
-            exit(-1);
-        }
-    }
-    chmod(SPIDER_DB_LOCK, S_IRWXU | S_IRWXG | S_IRWXO);
-    umask(pre);
-
     SPIDER_REGISTER(GoldSpider);
     SPIDER_REGISTER(ChinaGoldSpider);
 }
@@ -82,7 +62,7 @@ void SpiderManager::runAll()
                 continue;
             }
             else if (it.second->interval > 0) {
-                SpiderTask* task = TaskFactory::createTimerTask(it.second->interval * 1000000, [&] (TimerTask*) {
+                SpiderTask* task = TaskFactory::createTimerTask(it.second->interval * 1000, [&] (TimerTask*) {
                     std::shared_ptr<SpiderInfo> spInfo = mSpiders[it.first];
                     if (mSpiderFilter.find(spInfo->spiderName) != mSpiderFilter.end()) {
                         if (!mSpiderFilter[spInfo->spiderName]->finished()) {
@@ -91,7 +71,7 @@ void SpiderManager::runAll()
                         delete mSpiderFilter[spInfo->spiderName];
                         mSpiderFilter.erase(spInfo->spiderName);
                     }
-                    logi("start spider: %s", spInfo->spiderName.c_str());
+                    logi("start spider: %s, uri: %s", spInfo->spiderName.c_str(), spInfo->requestURI.c_str());
                     Spider* sp = TaskFactory::createSpider(spInfo->spiderName, spInfo->requestURI, spInfo->rootParser, spInfo->httpMethod);
                     mSpiderFilter[spInfo->spiderName] = sp;
                     sp->run();
@@ -115,7 +95,7 @@ void SpiderManager::runAll()
 void SpiderManager::addSpider(int intervalSecond, const std::string& spiderName, const std::string& uri, std::string method, RootParser &parser)
 {
     if (!spiderName.empty() && !uri.empty() && parser) {
-        auto spInfo = new SpiderInfo;
+        auto spInfo = std::make_shared<SpiderInfo>();
 
         spInfo->interval = intervalSecond;
         spInfo->spiderName = spiderName;
@@ -123,7 +103,7 @@ void SpiderManager::addSpider(int intervalSecond, const std::string& spiderName,
         spInfo->httpMethod = std::move(method);
         spInfo->rootParser = parser;
 
-        mSpiders[spiderName] = std::make_shared<SpiderInfo>(*spInfo);
+        mSpiders[spiderName] = spInfo;
     }
 }
 

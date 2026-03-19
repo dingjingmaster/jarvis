@@ -104,21 +104,26 @@ void Spider::http_request_callback(HttpTask *task, void* spider)
     int error = task->getError();
 
     switch (state) {
-        case TASK_STATE_SYS_ERROR:
+        case TASK_STATE_SYS_ERROR: {
             loge("system error: %s", strerror(error));
             break;
-        case TASK_STATE_DNS_ERROR:
+        }
+        case TASK_STATE_DNS_ERROR: {
             loge("DNS error: %s", gai_strerror(error));
             break;
-        case TASK_STATE_SSL_ERROR:
+        }
+        case TASK_STATE_SSL_ERROR: {
             loge("SSL error: %d", error);
             break;
-        case TASK_STATE_TASK_ERROR:
+        }
+        case TASK_STATE_TASK_ERROR: {
             loge("Task error: %d", error);
             break;
-        case TASK_STATE_SUCCESS:
+        }
+        case TASK_STATE_SUCCESS: {
             logi ("http request success");
             break;
+        }
     }
 
     const void* body = nullptr;

@@ -30,7 +30,7 @@ private:
     ~SpiderManager();
 
 private:
-    bool                                                mRunning;
+    bool                                                mRunning = false;
     static SpiderManager*                               gInstance;
 
     std::map<std::string, SpiderTask*>                  mTasks;

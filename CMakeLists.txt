@@ -13,7 +13,7 @@ set(DEBUG ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(INSTALL_DIR "/usr/local/jarvis")
+set(INSTALL_DIR "/opt/jarvis")
 
 option(DEBUG "USE DEBUG" ON)
 
@@ -32,7 +32,6 @@ add_definitions(
         -D INSTALL_DIR=\\"${INSTALL_DIR}\\"
         -D INSTALL_NAME=\\"${INSTALL_NAME}\\"
         -D PACKAGE_NAME=\\"${CMAKE_PROJECT_NAME}\\"
-        -D CONFIG_FILE=\\"${INSTALL_DIR}/config/config.ini\\"
         -D PACKAGE_VERSION=\\"${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}\\"
     )
 
