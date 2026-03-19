@@ -105,13 +105,13 @@ target_link_libraries(demo-spider
 target_compile_definitions(demo-spider PUBLIC -D LOG_TAG="demo")
 target_include_directories(demo-spider PUBLIC ${CMAKE_SOURCE_DIR}/3thrd)
 
-add_executable(demo-timer-task ${CMAKE_SOURCE_DIR}/demo/demo-timer-task.cpp ${MODULE_SPIDER_SRC} ${COMMON_SRC})
-target_link_libraries(demo-timer-task
-        PRIVATE
-        PUBLIC
-        ${OPENSSL_LIBRARIES} ${SQLITE_LIBRARIES} ${GLIB_LIBRARIES})
-target_compile_definitions(demo-timer-task PUBLIC -D LOG_TAG="demo")
-target_include_directories(demo-timer-task PUBLIC ${CMAKE_SOURCE_DIR}/3thrd)
+#add_executable(demo-timer-task ${CMAKE_SOURCE_DIR}/demo/demo-timer-task.cpp ${MODULE_SPIDER_SRC} ${COMMON_SRC})
+#target_link_libraries(demo-timer-task
+#        PRIVATE
+#        PUBLIC
+#        ${OPENSSL_LIBRARIES} ${SQLITE_LIBRARIES} ${GLIB_LIBRARIES})
+#target_compile_definitions(demo-timer-task PUBLIC -D LOG_TAG="demo")
+#target_include_directories(demo-timer-task PUBLIC ${CMAKE_SOURCE_DIR}/3thrd)
 
 add_executable(demo-json-parser ${CMAKE_SOURCE_DIR}/demo/demo-json.cpp ${COMMON_SRC})
 target_link_libraries(demo-json-parser

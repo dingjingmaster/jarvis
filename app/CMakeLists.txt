@@ -11,8 +11,8 @@ add_executable(jarvis ${CMAKE_SOURCE_DIR}/app/main/main.cpp
 target_link_libraries(jarvis
         PRIVATE
         PUBLIC
-        ${OPENSSL_LIBRARIES} ${GLIB_LIBRARIES} -lsqlite3)
+        ${OPENSSL_LIBRARIES} ${GLIB_LIBRARIES} ${QTCORE_LIBRARIES})
 
-target_include_directories(jarvis PUBLIC ${GLIB_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/3thrd)
+target_include_directories(jarvis PUBLIC ${GLIB_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR} ${QTCORE_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/3thrd)
 
 target_compile_definitions(jarvis PUBLIC -D LOG_TAG="jarvis" -DORMPP_ENABLE_MYSQL)

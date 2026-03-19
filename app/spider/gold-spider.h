@@ -7,7 +7,7 @@
 
 #include <ctime>
 #include <nlohmann/json.hpp>
-#include <sqlite_orm/sqlite_orm.h>
+// #include <sqlite_orm/sqlite_orm.h>
 
 using json = nlohmann::json;
 
@@ -85,34 +85,35 @@ static struct SpiderInfo gGoldSpider =
 
 static auto getGoldStorage()
 {
-    using namespace sqlite_orm;
+    // using namespace sqlite_orm;
+    //
+    // auto gold = make_storage(SPIDER_DB,
+    //                          make_unique_index("idx_date_type_area", &GoldData::dateTime, &GoldData::itemType, &GoldData::area),
+    //                          make_table("gold",
+    //                                     make_column("idx", &GoldData::idx, primary_key()),
+    //                                     make_column("dateTime", &GoldData::dateTime),
+    //                                     make_column("itemType", &GoldData::itemType),
+    //                                     make_column("area", &GoldData::area),
+    //                                     make_column("price", &GoldData::price)));
+    // gold.sync_schema();
 
-    auto gold = make_storage(SPIDER_DB,
-                             make_unique_index("idx_date_type_area", &GoldData::dateTime, &GoldData::itemType, &GoldData::area),
-                             make_table("gold",
-                                        make_column("idx", &GoldData::idx, primary_key()),
-                                        make_column("dateTime", &GoldData::dateTime),
-                                        make_column("itemType", &GoldData::itemType),
-                                        make_column("area", &GoldData::area),
-                                        make_column("price", &GoldData::price)));
-    gold.sync_schema();
-
-    return gold;
+    // return gold;
+    return nullptr;
 }
 
 static void save_data (GoldData& sp)
 {
-    using namespace sqlite_orm;
-
-    auto gold = getGoldStorage();
-
-    sqlite_lock();
-    try {
-        gold.replace(sp);
-    } catch (...) {
-        gold.update(sp);
-    }
-    sqlite_unlock();
+    // using namespace sqlite_orm;
+    //
+    // auto gold = getGoldStorage();
+    //
+    // sqlite_lock();
+    // try {
+    //     gold.replace(sp);
+    // } catch (...) {
+    //     gold.update(sp);
+    // }
+    // sqlite_unlock();
 }
 
 // 此处得到的是中国金价和银价

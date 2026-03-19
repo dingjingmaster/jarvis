@@ -5,8 +5,8 @@ file(GLOB UTILS_SRC
         ${CMAKE_SOURCE_DIR}/app/utils/date-utils.h
         ${CMAKE_SOURCE_DIR}/app/utils/date-utils.cpp
 
-        ${CMAKE_SOURCE_DIR}/app/utils/sqlite-utils.h
-        ${CMAKE_SOURCE_DIR}/app/utils/sqlite-utils.cpp
+#        ${CMAKE_SOURCE_DIR}/app/utils/sqlite-utils.h
+#        ${CMAKE_SOURCE_DIR}/app/utils/sqlite-utils.cpp
 
         ${CMAKE_SOURCE_DIR}/app/utils/file-read-write.h
         ${CMAKE_SOURCE_DIR}/app/utils/file-read-write.cpp

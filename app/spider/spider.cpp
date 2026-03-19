@@ -8,6 +8,7 @@
 #include <sys/file.h>
 #include <sys/stat.h>
 
+#if 0
 std::mutex lock;
 static FILE* locker = nullptr;
 
@@ -46,6 +47,7 @@ void sqlite_unlock()
     lock.unlock();
 }
 
+#endif
 
 Spider::Spider(std::string &name, std::string &uri, RootParser& rootParser, const std::string &method)
         : mSpiderName(name), mBaseUrl(uri), mRootParser(rootParser), mWaitGroup(1)

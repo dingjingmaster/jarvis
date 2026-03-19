@@ -32,6 +32,7 @@ add_definitions(
         -D INSTALL_DIR=\\"${INSTALL_DIR}\\"
         -D INSTALL_NAME=\\"${INSTALL_NAME}\\"
         -D PACKAGE_NAME=\\"${CMAKE_PROJECT_NAME}\\"
+        -D CONFIG_FILE=\\"${INSTALL_DIR}/config/config.ini\\"
         -D PACKAGE_VERSION=\\"${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}\\"
     )
 
@@ -46,6 +47,7 @@ pkg_check_modules(OPENSSL REQUIRED openssl)
 pkg_check_modules(PROTOBUF REQUIRED protobuf)
 pkg_check_modules(MYSQL REQUIRED mysqlclient)
 pkg_check_modules(GLIB REQUIRED gio-2.0 json-glib-1.0)
+pkg_check_modules(QT5CORE REQUIRED Qt5Core)
 #pkg_check_modules(QT5 REQUIRED Qt5Core Qt5Network Qt5Widgets Qt5Gui Qt5X11Extras)
 #pkg_check_modules(JSON REQUIRED json-glib-1.0)
 

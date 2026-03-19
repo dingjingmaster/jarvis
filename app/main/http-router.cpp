@@ -6,7 +6,7 @@
 
 #include "common/area.h"
 #include "client-data.h"
-#include "../utils/sqlite-utils.h"
+// #include "../utils/sqlite-utils.h"
 #include "../utils/file-read-write.h"
 
 #include <mutex>
@@ -53,25 +53,25 @@ bool HttpRouter::responseStaticResource(HttpTask *task)
 std::string HttpRouter::requestStaticResource(HttpTask& task) const
 {
     std::string uri = task.getReq()->getRequestUri();
-    logd(WEB_HOME);
+    // logd(WEB_HOME);
     logd("request uri: %s", uri.c_str());
 
     if ("/" == uri || "/index.html" == uri) {
-        std::string path = WEB_HOME "/index.html";
-        if (!access(path.c_str(), R_OK)) {
-            return std::move(path);
-        } else {
-            loge("%d - %s", errno, strerror(errno));
-        }
+        // std::string path = WEB_HOME "/index.html";
+        // if (!access(path.c_str(), R_OK)) {
+            // return std::move(path);
+        // } else {
+            // loge("%d - %s", errno, strerror(errno));
+        // }
     }
     else if (uri.ends_with(".js")) {
-        std::string path = std::string(WEB_HOME) + uri;
-        if (!access(path.c_str(), R_OK)) {
-            task.getResp()->addHeaderPair("Content-type", "application/x-javascript");
-            return std::move(path);
-        } else {
-            loge("%d - %s", errno, strerror(errno));
-        }
+        // std::string path = std::string(WEB_HOME) + uri;
+        // if (!access(path.c_str(), R_OK)) {
+            // task.getResp()->addHeaderPair("Content-type", "application/x-javascript");
+            // return std::move(path);
+        // } else {
+            // loge("%d - %s", errno, strerror(errno));
+        // }
     }
 
     return std::string();
@@ -82,21 +82,21 @@ bool HttpRouter::responseDynamicResource(HttpTask *task)
     std::string uri = task->getReq()->getRequestUri();
     logd(uri.c_str());
 
-    if (uri.starts_with("/index/au-price/")) {
-        std::string param = uri.substr(16);
-        logd(param.c_str());
-        auto info = SqliteUtils::getCurrentGoldPrice(param);
-        task->getResp()->setHeaderPair("content-type", "application/json;charset=utf-8");
-        task->getResp()->appendOutputBody(JsonUtils::jsonBuildIndexPrice(info));
-        return true;
-    } else if (uri.starts_with("/index/ag-price/")) {
-        std::string param = uri.substr(16);
-        logd(param.c_str());
-        auto info = SqliteUtils::getCurrentSilverPrice(param);
-        task->getResp()->setHeaderPair("content-type", "application/json;charset=utf-8");
-        task->getResp()->appendOutputBody(JsonUtils::jsonBuildIndexPrice(info));
-        return true;
-    }
+    // if (uri.starts_with("/index/au-price/")) {
+    //     std::string param = uri.substr(16);
+    //     logd(param.c_str());
+    //     auto info = SqliteUtils::getCurrentGoldPrice(param);
+    //     task->getResp()->setHeaderPair("content-type", "application/json;charset=utf-8");
+    //     task->getResp()->appendOutputBody(JsonUtils::jsonBuildIndexPrice(info));
+    //     return true;
+    // } else if (uri.starts_with("/index/ag-price/")) {
+    //     std::string param = uri.substr(16);
+    //     logd(param.c_str());
+    //     auto info = SqliteUtils::getCurrentSilverPrice(param);
+    //     task->getResp()->setHeaderPair("content-type", "application/json;charset=utf-8");
+    //     task->getResp()->appendOutputBody(JsonUtils::jsonBuildIndexPrice(info));
+    //     return true;
+    // }
 
     return false;
 }
