@@ -6,7 +6,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(PROJECT_VERSION_MAJOR 0)
-set(PROJECT_VERSION_MINOR 0)
+set(PROJECT_VERSION_MINOR 7)
 set(PROJECT_VERSION_PATCH 0)
 
 set(DEBUG ON)
@@ -52,6 +52,7 @@ set_tests_properties(${withArgsTests} PROPERTIES TIMEOUT 20000)
 #include_directories(${JSON_INCLUDE_DIRS})
 
 include_directories(${GLIB_INCLUDE_DIRS})
+include_directories(${CMAKE_SOURCE_DIR})
 
 if(DEBUG)
 #add_subdirectory(demo)
